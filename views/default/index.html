@@ -12,6 +12,8 @@
     </header>
 {{end}}
 
+{{=FORM(str(T('or import from csv file'))+"  ",INPUT(_type='file',_name='csvfile'),INPUT(_type='submit',_value='import'))}}
+
 {{if 'message' in globals():}}
 <h2>{{=message}}</h2>
 <p class="lead">{{=T('How did you get here?')}}</p>
