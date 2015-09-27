@@ -36,12 +36,19 @@ def import_excel(file):
 #    reload(sys)
 #    sys.setdefaultencoding(wb.encoding)
     ws=wb.active
+    field_list = db(db.db_map.table_name=='custom_order').select(db.db_map.field_name,db.db_map.field_id).as_list()
+    field_dict = {}
+    for fd in field_list:
+        field_dict[fd['field_name'].decode("utf8")]=fd['field_id']
     if ws.min_col == 17:
-#        for cols in range(1,ws.min_col):
-        for rows in range(1,ws.max_row):
-            for cols in range(1,ws.min_col):
-#                db.(db_map)
-#                db.custom_order.insert(db.db_map[1]=ws.cell())
+        header=[]
+        for cols in range(1,ws.min_col+1):
+            header.append(field_dict[ws.cell(row=1,column=cols).value])
+        for rows in range(2,ws.max_row+1):
+            rowcontent={}
+            for cols in range(1,ws.min_col+1):
+                 rowcontent[header[cols-1]]=ws.cell(row=rows, column=cols).value
+            db.custom_order.insert(**rowcontent)
 
 
 def index():
@@ -57,7 +64,7 @@ def index():
     if request.vars.csvfile != None:
 #        import_csv(request.vars.csvfile.file)
 #        init_db()
-        import_excel(request.var.csvfile.file)
+        import_excel(request.vars.csvfile.file)
         response.flash = T('data uploaded')
     return dict()
 
