@@ -26,12 +26,16 @@ def init_db():
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'订货数量',field_id='order_num',field_order=16)
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'网店规格',field_id='ex_spec',field_order=17)
 
+def check_order():
+    from simhash import Simhash, SimhashIndex
+
+
 def import_csv(csvfile):
     db.custom_order.import_from_csv_file(csvfile)
 
 def import_excel(file):
     import openpyxl
-    import sys
+#    import sys
     wb=openpyxl.load_workbook(file)
 #    reload(sys)
 #    sys.setdefaultencoding(wb.encoding)
