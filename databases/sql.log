@@ -53,3 +53,36 @@ CREATE TABLE auth_cas(
     renew CHAR(1)
 );
 success!
+timestamp: 2015-09-14T15:14:55.141539
+CREATE TABLE custom_order(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(512) UNIQUE,
+    shop_name CHAR(512),
+    ex_id CHAR(512),
+    telephone CHAR(512),
+    mobile CHAR(512),
+    user_name CHAR(512),
+    province CHAR(512),
+    city CHAR(512),
+    county CHAR(512),
+    address CHAR(512),
+    product_id CHAR(512),
+    barcode CHAR(512),
+    specification CHAR(512),
+    ex_product_name CHAR(512),
+    product_name CHAR(512),
+    order_num CHAR(512),
+    ex_spec CHAR(512)
+);
+success!
+success!
+timestamp: 2015-09-16T16:54:30.475285
+CREATE TABLE db_map(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    table_type CHAR(20),
+    table_name CHAR(40),
+    field_name CHAR(40),
+    field_id CHAR(40),
+    field_order INTEGER
+);
+success!
