@@ -16,7 +16,7 @@ try:
 except ImportError:
     pgv = None
 
-is_gae = request.env.web2py_runtime_gae or False
+is_gae=request.env.web2py_runtime_gae or False
 
 # ## critical --- make a copy of the environment
 

@@ -26,18 +26,29 @@ def init_db():
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'产品名称',field_id='product_name',field_order=15)
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'订货数量',field_id='order_num',field_order=16)
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'网店规格',field_id='ex_spec',field_order=17)
-
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'订单编号',field_id='order_id',field_order=18)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'店铺名称',field_id='shop_name',field_order=19)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'外部平台单号',field_id='ex_id',field_order=20)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'电话',field_id='telephone',field_order=4)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'手机',field_id='mobile',field_order=5)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'收货人',field_id='user_name',field_order=6)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'收货省',field_id='province',field_order=7)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'收货市',field_id='city',field_order=8)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'收货县',field_id='county',field_order=9)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'收货地址',field_id='address',field_order=10)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'产品编号',field_id='product_id',field_order=11)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'条形码',field_id='barcode',field_order=12)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'规格',field_id='specification',field_order=13)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'网店品名',field_id='ex_product_name',field_order=14)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'产品名称',field_id='product_name',field_order=15)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'订货数量',field_id='order_num',field_order=16)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'网店规格',field_id='ex_spec',field_order=17)
+    db.db_map.insert(table_type='excel',table_name='incorrect_data',field_name=u'网店规格',field_id='wrong_reason',field_order=40)
 def check_order():
     from simhash import Simhash, SimhashIndex
 
 def import_csv(csvfile):
     db.custom_order.import_from_csv_file(csvfile)
-
-SKU_dict={u'589203710279202':u'(18片装)S',
-u'690314820783301':u'(18片装)NB',
-u'589203710279204':u'(8片装)S',
-u'690314820785503':u'(8片装)NB'
-}
 
 def import_excel(file):
     import openpyxl
@@ -51,18 +62,12 @@ def import_excel(file):
         header=[] #表头
         for cols in range(1,ws.min_col+1):
             header.append(field_dict[ws.cell(row=1,column=cols).value])
-        for rows in range(2,ws.max_row+1):
+        for rows in range(2,10):
             rowcontent={}
-            for cols in range(1,6+1)+range(10,ws.min_col+1):
+            for cols in range(1,ws.min_col+1):
                 rowcontent[header[cols-1]]=ws.cell(row=rows, column=cols).value
-            addr_list=re.split(u'省|市|自治州|县|区',ws.cell(row=rows,column=10).value)
-            rowcontent[header[6]]=addr_list[0]
-            if len(addr_list)>=4:
-                rowcontent[header[7]]=addr_list[1]
-                rowcontent[header[8]]=addr_list[2]
-            rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
             db.custom_order.insert(**rowcontent)
-
+            
 def index():
     """
     example action using the internationalization operator T and flash

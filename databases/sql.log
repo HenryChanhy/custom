@@ -1,4 +1,4 @@
-timestamp: 2015-09-08T17:15:45.941403
+timestamp: 2015-10-19T16:26:51.712000
 CREATE TABLE auth_user(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name CHAR(128),
@@ -10,21 +10,21 @@ CREATE TABLE auth_user(
     registration_id CHAR(512)
 );
 success!
-timestamp: 2015-09-08T17:15:45.950161
+timestamp: 2015-10-19T16:26:51.843000
 CREATE TABLE auth_group(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     role CHAR(512),
     description TEXT
 );
 success!
-timestamp: 2015-09-08T17:15:45.961472
+timestamp: 2015-10-19T16:26:52.086000
 CREATE TABLE auth_membership(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE  ,
     group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE  
 );
 success!
-timestamp: 2015-09-08T17:15:46.036741
+timestamp: 2015-10-19T16:26:52.187000
 CREATE TABLE auth_permission(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     group_id INTEGER REFERENCES auth_group (id) ON DELETE CASCADE  ,
@@ -33,7 +33,7 @@ CREATE TABLE auth_permission(
     record_id INTEGER
 );
 success!
-timestamp: 2015-09-08T17:15:46.050410
+timestamp: 2015-10-19T16:26:52.274000
 CREATE TABLE auth_event(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     time_stamp TIMESTAMP,
@@ -43,7 +43,7 @@ CREATE TABLE auth_event(
     description TEXT
 );
 success!
-timestamp: 2015-09-08T17:15:46.065176
+timestamp: 2015-10-19T16:26:52.374000
 CREATE TABLE auth_cas(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER REFERENCES auth_user (id) ON DELETE CASCADE  ,
@@ -53,30 +53,29 @@ CREATE TABLE auth_cas(
     renew CHAR(1)
 );
 success!
-timestamp: 2015-09-14T15:14:55.141539
+timestamp: 2015-10-19T16:26:52.474000
 CREATE TABLE custom_order(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    order_id CHAR(512) UNIQUE,
-    shop_name CHAR(512),
-    ex_id CHAR(512),
-    telephone CHAR(512),
-    mobile CHAR(512),
-    user_name CHAR(512),
-    province CHAR(512),
-    city CHAR(512),
-    county CHAR(512),
-    address CHAR(512),
-    product_id CHAR(512),
-    barcode CHAR(512),
-    specification CHAR(512),
-    ex_product_name CHAR(512),
-    product_name CHAR(512),
-    order_num CHAR(512),
-    ex_spec CHAR(512)
+    order_id CHAR(20) UNIQUE,
+    shop_name CHAR(40),
+    ex_id CHAR(20),
+    telephone CHAR(13),
+    mobile CHAR(13),
+    user_name CHAR(40),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    product_id CHAR(40),
+    barcode CHAR(20),
+    specification CHAR(40),
+    ex_product_name CHAR(40),
+    product_name CHAR(40),
+    order_num INTEGER,
+    ex_spec CHAR(40)
 );
 success!
-success!
-timestamp: 2015-09-16T16:54:30.475285
+timestamp: 2015-10-19T16:26:52.574000
 CREATE TABLE db_map(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     table_type CHAR(20),
@@ -85,4 +84,149 @@ CREATE TABLE db_map(
     field_id CHAR(40),
     field_order INTEGER
 );
+success!
+timestamp: 2015-10-22T14:52:05.421000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+timestamp: 2015-10-22T14:54:47.644000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+timestamp: 2015-10-22T14:55:02.331000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+timestamp: 2015-10-22T14:55:31.866000
+CREATE TABLE auth_group(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role CHAR(512),
+    description TEXT
+);
+timestamp: 2015-10-22T14:55:58.116000
+CREATE TABLE auth_group(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    role CHAR(512),
+    description TEXT
+);
+success!
+timestamp: 2015-10-22T17:31:37.911000
+CREATE TABLE incorrect_dada(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    ex_id CHAR(20),
+    telephone CHAR(13),
+    mobile CHAR(13),
+    user_name CHAR(40),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    product_id CHAR(40),
+    barcode CHAR(20),
+    specification CHAR(40),
+    ex_product_name CHAR(40),
+    product_name CHAR(40),
+    order_num INTEGER,
+    ex_spec CHAR(40),
+    wrong_reason CHAR(40)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2015-10-23T16:28:29.354000
+ALTER TABLE incorrect_dada ADD product_tag CHAR(40);
+success!
+timestamp: 2015-10-23T16:38:48.313000
+ALTER TABLE custom_order ADD product_tag CHAR(40);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
 success!
