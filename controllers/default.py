@@ -35,7 +35,7 @@ def import_csv(csvfile):
 
 def import_excel(file):
     import openpyxl
-#    import sys
+#    import sys´
     wb=openpyxl.load_workbook(file)
 #    reload(sys)
 #    sys.setdefaultencoding(wb.encoding)
@@ -49,6 +49,7 @@ def import_excel(file):
         for cols in range(1,ws.min_col+1):
             header.append(field_dict[ws.cell(row=1,column=cols).value])
         for rows in range(2,ws.max_row+1):
+#        for rows in range(2,4):    #for debug
             rowcontent={}
             for cols in range(1,ws.min_col+1):
                  rowcontent[header[cols-1]]=ws.cell(row=rows, column=cols).value

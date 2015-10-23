@@ -176,6 +176,7 @@
 'Plugins': 'Plugins',
 'Powered by': '基于下列技术构建：',
 'Preface': 'Preface',
+'previous %s rows': 'previous %s rows',
 'previous 100 rows': '往前 100 笔',
 'pygraphviz library not found': 'pygraphviz library not found',
 'Python': 'Python',
