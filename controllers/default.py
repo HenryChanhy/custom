@@ -7,6 +7,7 @@
 ## - user is required for authentication and authorization
 ## - download is for downloading files uploaded in the db (does streaming)
 #########################################################################
+import re
 def init_db():
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'订单编号',field_id='order_id',field_order=1)
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'店铺名称',field_id='shop_name',field_order=2)
@@ -29,31 +30,38 @@ def init_db():
 def check_order():
     from simhash import Simhash, SimhashIndex
 
-
 def import_csv(csvfile):
     db.custom_order.import_from_csv_file(csvfile)
 
+SKU_dict={u'589203710279202':u'(18片装)S',
+u'690314820783301':u'(18片装)NB',
+u'589203710279204':u'(8片装)S',
+u'690314820785503':u'(8片装)NB'
+}
+
 def import_excel(file):
     import openpyxl
-#    import sys
     wb=openpyxl.load_workbook(file)
-#    reload(sys)
-#    sys.setdefaultencoding(wb.encoding)
     ws=wb.active
     field_list = db(db.db_map.table_name=='custom_order').select(db.db_map.field_name,db.db_map.field_id).as_list()
     field_dict = {}
     for fd in field_list:
         field_dict[fd['field_name'].decode("utf8")]=fd['field_id']
     if ws.min_col == 17:
-        header=[]
+        header=[] #表头
         for cols in range(1,ws.min_col+1):
             header.append(field_dict[ws.cell(row=1,column=cols).value])
         for rows in range(2,ws.max_row+1):
             rowcontent={}
-            for cols in range(1,ws.min_col+1):
-                 rowcontent[header[cols-1]]=ws.cell(row=rows, column=cols).value
+            for cols in range(1,6+1)+range(10,ws.min_col+1):
+                rowcontent[header[cols-1]]=ws.cell(row=rows, column=cols).value
+            addr_list=re.split(u'省|市|自治州|县|区',ws.cell(row=rows,column=10).value)
+            rowcontent[header[6]]=addr_list[0]
+            if len(addr_list)>=4:
+                rowcontent[header[7]]=addr_list[1]
+                rowcontent[header[8]]=addr_list[2]
+            rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
             db.custom_order.insert(**rowcontent)
-
 
 def index():
     """
@@ -66,8 +74,6 @@ def index():
 #    response.flash = T("Hello World")
 #    return dict(message=T('Welcome to web2py!'))
     if request.vars.csvfile != None:
-#        import_csv(request.vars.csvfile.file)
-#        init_db()
         import_excel(request.vars.csvfile.file)
         response.flash = T('data uploaded')
     return dict()
@@ -90,7 +96,6 @@ def user():
     """
     return dict(form=auth())
 
-
 @cache.action()
 def download():
     """
@@ -98,7 +103,6 @@ def download():
     http://..../[app]/default/download/[filename]
     """
     return response.download(request, db)
-
 
 def call():
     """

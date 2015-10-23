@@ -14,7 +14,6 @@ from gluon.contrib.appconfig import AppConfig
 ## once in production, remove reload=True to gain full speed
 myconf = AppConfig(reload=True)
 
-
 if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
     db = DAL(myconf.take('db.uri'), pool_size=myconf.take('db.pool_size', cast=int), check_reserved=['all'])
@@ -56,7 +55,6 @@ from gluon.tools import Auth, Service, PluginManager
 auth = Auth(db)
 service = Service()
 plugins = PluginManager()
-
 ## create all tables needed by auth if not custom tables
 auth.define_tables(username=False, signature=False)
 
@@ -87,6 +85,7 @@ auth.settings.reset_password_requires_verification = True
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
+
 db.define_table('custom_order',
                 Field('order_id', unique=True,length=20),
                 Field('shop_name',length=40),
@@ -104,14 +103,55 @@ db.define_table('custom_order',
                 Field('ex_product_name',length=40),
                 Field('product_name',length=40),
                 Field('order_num',type='integer'),
-                Field('ex_spec',length=40))
-
+                Field('ex_spec',length=40),
+                Field('product_tag',length=40)
+                )
 db.define_table('db_map',
                 Field('table_type',length=20),
                 Field('table_name',length=40),
                 Field('field_name',length=40),
                 Field('field_id',length=40),
                 Field('field_order',type='integer'))
+'''
+db.define_table('correct_data',
+                Field('order_id', unique=True,length=20),
+                Field('ex_id',length=20),
+                Field('telephone',length=13),
+                Field('mobile',length=13),
+                Field('user_name',length=40),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('product_id',length=40),
+                Field('barcode',length=20),
+                Field('specification',length=40),
+                Field('ex_product_name',length=40),
+                Field('product_name',length=40),
+                Field('order_num',type='integer'),
+                Field('ex_spec',length=40))
+'''
+db.define_table('incorrect_dada',
+                Field('order_id', unique=True,length=20),
+                Field('ex_id',length=20),
+                Field('telephone',length=13),
+                Field('mobile',length=13),
+                Field('user_name',length=40),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('product_id',length=40),
+                Field('barcode',length=20),
+                Field('specification',length=40),
+                Field('ex_product_name',length=40),
+                Field('product_name',length=40),
+                Field('order_num',type='integer'),
+                Field('ex_spec',length=40),
+                Field('wrong_reason',length=40)
+               )
+
+
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
