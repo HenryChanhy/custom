@@ -230,3 +230,138 @@ success!
 success!
 success!
 success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2015-10-26T14:22:59.841000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+timestamp: 2015-10-26T14:23:30.057000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+timestamp: 2015-10-26T14:24:19.625000
+CREATE TABLE auth_user(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    first_name CHAR(128),
+    last_name CHAR(128),
+    email CHAR(512),
+    password CHAR(512),
+    registration_key CHAR(512),
+    reset_password_key CHAR(512),
+    registration_id CHAR(512)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2015-10-26T14:39:28.172000
+CREATE TABLE custom_order(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    shop_name CHAR(40),
+    ex_id CHAR(20),
+    telephone CHAR(13),
+    mobile CHAR(13),
+    user_name CHAR(40),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    product_id CHAR(40),
+    barcode CHAR(20),
+    specification CHAR(40),
+    ex_product_name CHAR(40),
+    product_name CHAR(40),
+    order_num INTEGER,
+    ex_spec CHAR(40),
+    product_tag CHAR(40)
+);
+timestamp: 2015-10-26T14:40:17.262000
+CREATE TABLE custom_order(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    shop_name CHAR(40),
+    ex_id CHAR(20),
+    telephone CHAR(13),
+    mobile CHAR(13),
+    user_name CHAR(40),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    product_id CHAR(40),
+    barcode CHAR(20),
+    specification CHAR(40),
+    ex_product_name CHAR(40),
+    product_name CHAR(40),
+    order_num INTEGER,
+    ex_spec CHAR(40),
+    product_tag CHAR(40)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!

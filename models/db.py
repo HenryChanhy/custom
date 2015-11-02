@@ -106,33 +106,10 @@ db.define_table('custom_order',
                 Field('ex_spec',length=40),
                 Field('product_tag',length=40)
                 )
-db.define_table('db_map',
-                Field('table_type',length=20),
-                Field('table_name',length=40),
-                Field('field_name',length=40),
-                Field('field_id',length=40),
-                Field('field_order',type='integer'))
-'''
-db.define_table('correct_data',
+
+db.define_table('wrong_order',
                 Field('order_id', unique=True,length=20),
-                Field('ex_id',length=20),
-                Field('telephone',length=13),
-                Field('mobile',length=13),
-                Field('user_name',length=40),
-                Field('province',length=40),
-                Field('city',length=40),
-                Field('county',length=40),
-                Field('address',length=80),
-                Field('product_id',length=40),
-                Field('barcode',length=20),
-                Field('specification',length=40),
-                Field('ex_product_name',length=40),
-                Field('product_name',length=40),
-                Field('order_num',type='integer'),
-                Field('ex_spec',length=40))
-'''
-db.define_table('incorrect_dada',
-                Field('order_id', unique=True,length=20),
+                Field('shop_name',length=40),
                 Field('ex_id',length=20),
                 Field('telephone',length=13),
                 Field('mobile',length=13),
@@ -148,10 +125,39 @@ db.define_table('incorrect_dada',
                 Field('product_name',length=40),
                 Field('order_num',type='integer'),
                 Field('ex_spec',length=40),
-                Field('wrong_reason',length=40)
-               )
+                Field('wrong_reason',length=40),
+                Field('dup_ID',length=40)
+                )
 
+db.define_table('db_map',
+                Field('table_type',length=20),
+                Field('table_name',length=40),
+                Field('field_name',length=40),
+                Field('field_id',length=40),
+                Field('field_order',type='integer'))
 
+db.define_table('history_order',
+                Field('order_id', unique=True,length=20),
+                Field('ex_id',length=20),
+                Field('promo_id',length=20),
+                Field('barcode',length=20),
+                Field('user_name',length=40),
+                Field('mobile',length=13),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('order_date',length=13),
+                Field('product_name',length=20),
+                Field('data_date',length=20),
+                Field('channel',length=13),
+                Field('stage',length=20),
+                Field('city_class1',length=20),
+                Field('city_class2',length=20),
+                Field('memo1',length=20),
+                Field('memo2',length=20),
+                Field('address_bak',length=20)
+                )
 
 ## after defining tables, uncomment below to enable auditing
 # auth.enable_record_versioning(db)
