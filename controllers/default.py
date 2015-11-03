@@ -11,6 +11,8 @@
 import re
 from simhash import Simhash,SimhashIndex
 import openpyxl
+from plugin_sqleditable.editable import SQLEDITABLE
+SQLEDITABLE.init()
 
 provinces=(u'北京',u'天津',u'河北',u'山西',u'内蒙古',u'辽宁',u'吉林',u'黑龙江',u'上海',u'江苏',
            u'浙江',u'安徽',u'福建',u'江西',u'山东',u'河南',u'湖北',u'湖南',u'广东',u'广西',
@@ -45,10 +47,8 @@ def init_db():
 def import_csv(csvfile):
     db.custom_order.import_from_csv_file(csvfile)
 
-def get_feature(s,width):
-    s=s.lower()
-    s=re.sub(r'[^\w]+','',s)
-    return [s[i:i+width] for i in range(max(len(s)-width+1,1))]
+def get_feature(s):
+    return [s[i:i+2] for i in range(max(len(s)-2+1,1))]
 '''
 #s=Simhash(get_feature(ws.cell(row=rows,column=10).value,3))
 history_data=db().select(db.history_order.order_id,db.history_order.address).as_list()
@@ -63,8 +63,16 @@ if rowcontent['mobile'] in db().select(db.history_order.mobile) :
             db.incorrect_data.insert(**rowcontent)
         else:
             rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
-            db.custom_order.insert(**rowcontent)回族|壮族|维尔吾族|特别行政区|自治区'''
+                s=s.lower()
+    s=re.sub(r'[^\w]+','',s)
+    db.custom_order.insert(**rowcontent)回族|壮族|维尔吾族|特别行政区|自治区
+'''
 
+def wrong_data():
+    response.title = 'wrong_data'
+    response.view = 'plugin_sqleditable/sample.html'
+    editable = SQLEDITABLE(db.wrong_order, showid=False, maxrow=10).process()
+    return dict(editable=editable)
 
 def import_excel(file):
     wb=openpyxl.load_workbook(file)
@@ -76,6 +84,38 @@ def import_excel(file):
     header=[] #表头
     for cols in range(1,ws.min_col+1):
         header.append(field_dict[ws.cell(row=1,column=cols).value])
+    buf_list=[]
+    for rows in range(467,ws.max_row+1):
+        rowcontent={}
+        for cols in range(1,ws.min_col+1):
+            rowcontent[header[cols-1]]=ws.cell(row=rows, column=cols).value
+        rowcontent['address']=rowcontent['address'].replace(rowcontent['province']+u'','')
+        rowcontent['address']=rowcontent['address'].replace(u''+rowcontent['city'],'')
+        rowcontent['address']=rowcontent['address'].replace(rowcontent['county']+u'','')
+        if ws.cell(row=rows, column=9).value !=ws.cell(row=rows-1,column=9):
+            buf_list=db((db.history_order.province==ws.cell(row=rows, column=7).value)&\
+                        (db.history_order.city==ws.cell(row=rows, column=8).value)&\
+                        (db.history_order.county==ws.cell(row=rows, column=9).value)).select\
+                (db.history_order.mobile,db.history_order.address_bak,db.history_order.order_id).as_list()
+        is_correct=1
+        for i in range(0,len(buf_list)):
+            if rowcontent['mobile']==buf_list[i]['mobile']:
+                is_correct=0
+                rowcontent['wrong_reason']=u'与历史号码第'+str(buf_list[i]['order_id'])+u'条重复'
+                rowcontent['dup_ID']=buf_list[i]['order_id']
+                db.wrong_order.insert(**rowcontent)
+                break
+            elif Simhash(get_feature(buf_list[i]['address_bak'].decode('UTF-8'))).distance(Simhash(get_feature(u''+rowcontent['address'])))<20:
+                is_correct=0
+                rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
+                rowcontent['dup_ID']=buf_list[i]['order_id']
+                db.wrong_order.insert(**rowcontent)
+                break
+            else:break
+        if is_correct==1:
+            if rowcontent['user_name']!= ws.cell(row=rows-1, column=6).value:
+                rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
+                db.custom_order.insert(**rowcontent)
 
     for rows in range(2,467):
         rowcontent={}
@@ -124,42 +164,13 @@ def import_excel(file):
                 rowcontent['dup_ID']=buf_list[i]['order_id']
                 db.wrong_order.insert(**rowcontent)
                 break
-            elif Simhash(get_feature(buf_list[i]['address'],3)).distance(Simhash(get_feature(ws.cell(row=rows,column=10).value,3)))<6:
+            elif Simhash(get_feature(buf_list[i]['address'])).distance(Simhash(get_feature(ws.cell(row=rows,column=10).value)))<26:
                 is_correct=0
                 rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
                 rowcontent['dup_ID']=buf_list[i]['order_id']
                 db.wrong_order.insert(**rowcontent)
                 break
-            else:break
-        if is_correct==1:
-            rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
-            if rowcontent['user_name']!= ws.cell(row=rows-1, column=6).value:
-                db.custom_order.insert(**rowcontent)
-    buf_list=[]
-    for rows in range(467,ws.max_row+1):
-        rowcontent={}
-        for cols in range(1,ws.min_col+1):
-            rowcontent[header[cols-1]]=ws.cell(row=rows, column=cols).value
-        if ws.cell(row=rows, column=9).value !=ws.cell(row=rows-1,column=9):
-            buf_list=db((db.history_order.province==ws.cell(row=rows, column=7).value)&\
-                        (db.history_order.city==ws.cell(row=rows, column=8).value)&\
-                        (db.history_order.county==ws.cell(row=rows, column=9).value)).select\
-                (db.history_order.mobile,db.history_order.address_bak,db.history_order.order_id).as_list()
-        is_correct=1
-        for i in range(0,len(buf_list)):
-            if rowcontent['mobile']==buf_list[i]['mobile']:
-                is_correct=0
-                rowcontent['wrong_reason']=u'与历史号码第'+str(buf_list[i]['order_id'])+u'条重复'
-                rowcontent['dup_ID']=buf_list[i]['order_id']
-                db.wrong_order.insert(**rowcontent)
-                break
-            elif Simhash(get_feature(buf_list[i]['address_bak'],3)).distance(Simhash(get_feature(rowcontent['address'],3)))<5:
-                is_correct=0
-                rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
-                rowcontent['dup_ID']=buf_list[i]['order_id']
-                db.wrong_order.insert(**rowcontent)
-                break
-            else:break
+            else:pass
         if is_correct==1:
             rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
             if rowcontent['user_name']!= ws.cell(row=rows-1, column=6).value:
@@ -192,7 +203,6 @@ def index():
     """
     example action using the internationalization operator T and flash
     rendered by views/default/index.html or views/generic.html
-
     if you need a simple wiki simply replace the two lines below with:
     return auth.wiki()
     """
