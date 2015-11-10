@@ -85,57 +85,6 @@ auth.settings.reset_password_requires_verification = True
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
-
-db.define_table('custom_order',
-                Field('order_id', unique=True,length=20),
-                Field('shop_name',length=40),
-                Field('ex_id',length=20),
-                Field('telephone',length=13),
-                Field('mobile',length=13),
-                Field('user_name',length=40),
-                Field('province',length=40),
-                Field('city',length=40),
-                Field('county',length=40),
-                Field('address',length=80),
-                Field('product_id',length=40),
-                Field('barcode',length=20),
-                Field('specification',length=40),
-                Field('ex_product_name',length=40),
-                Field('product_name',length=40),
-                Field('order_num',type='integer'),
-                Field('ex_spec',length=40),
-                Field('product_tag',length=40)
-                )
-
-db.define_table('wrong_order',
-                Field('order_id', unique=True,length=20),
-                Field('shop_name',length=40),
-                Field('ex_id',length=20),
-                Field('telephone',length=13),
-                Field('mobile',length=13),
-                Field('user_name',length=40),
-                Field('province',length=40),
-                Field('city',length=40),
-                Field('county',length=40),
-                Field('address',length=80),
-                Field('product_id',length=40),
-                Field('barcode',length=20),
-                Field('specification',length=40),
-                Field('ex_product_name',length=40),
-                Field('product_name',length=40),
-                Field('order_num',type='integer'),
-                Field('ex_spec',length=40),
-                Field('wrong_reason',length=40),
-                Field('dup_ID',length=40)
-                )
-
-db.define_table('db_map',
-                Field('table_type',length=20),
-                Field('table_name',length=40),
-                Field('field_name',length=40),
-                Field('field_id',length=40),
-                Field('field_order',type='integer'))
-
 db.define_table('history_order',
                 Field('order_id', unique=True,length=20),
                 Field('ex_id',length=20),
@@ -158,6 +107,130 @@ db.define_table('history_order',
                 Field('memo2',length=20),
                 Field('address_bak',length=20)
                 )
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+db.define_table('db_map',
+                Field('table_type',length=20),
+                Field('table_name',length=40),
+                Field('field_name',length=40),
+                Field('field_id',length=40),
+                Field('field_order',type='integer'))
 
+db.define_table('custom_order',
+                Field('order_id', unique=True,length=20),
+                Field('shop_name',length=40),
+                Field('ex_id',length=20),
+                Field('telephone',length=13),
+                Field('mobile',length=13),
+                Field('user_name',length=40),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('product_id',length=40),
+                Field('barcode',length=20),
+                Field('specification',length=40),
+                Field('ex_product_name',length=40),
+                Field('product_name',length=40),
+                Field('order_num',type='integer'),
+                Field('ex_spec',length=40),
+                Field('product_tag',length=40)
+                )
+
+#the address is not complete
+db.define_table('address_lack',
+                Field('order_id', unique=True,length=20),
+                Field('shop_name',length=40),
+                Field('ex_id',length=20),
+                Field('telephone',length=13),
+                Field('mobile',length=13),
+                Field('user_name',length=40),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('product_id',length=40),
+                Field('barcode',length=20),
+                Field('specification',length=40),
+                Field('ex_product_name',length=40),
+                Field('product_name',length=40),
+                Field('order_num',type='integer'),
+                Field('ex_spec',length=40)
+                )
+
+db.define_table('wrong_order',
+                Field('order_id', unique=True,length=20),
+                Field('shop_name',length=40),
+                Field('ex_id',length=20),
+                Field('telephone',length=13),
+                Field('mobile',length=13),
+                Field('user_name',length=40),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('product_id',length=40),
+                Field('barcode',length=20),
+                Field('specification',length=40),
+                Field('ex_product_name',length=40),
+                Field('product_name',length=40),
+                Field('order_num',type='integer'),
+                Field('ex_spec',length=40),
+                Field('wrong_reason',length=40),
+                Field('dup_ID',length=40),
+                Field('dup_ex',length=80),
+                Field('dup_address',length=80),
+                Field('dup_name',length=80),
+                Field('dup_phone',length=80)
+                )
+
+#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+db.define_table('pampers_order',
+                Field('order_id', unique=True,length=20),
+                Field('ex_id',length=20),
+                Field('user_name',length=40),
+                Field('mobile',length=13),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('pregnancy',length=40),
+                Field('product_piece',length=40),
+                Field('product_size',length=40),
+                Field('date_time',length=20)
+                )
+db.define_table('pampers_history_dup',
+                Field('order_id', unique=True,length=20),
+                Field('ex_id',length=20),
+                Field('user_name',length=40),
+                Field('mobile',length=13),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('pregnancy',length=40),
+                Field('product_piece',length=40),
+                Field('product_size',length=40),
+                Field('date_time',length=20),
+                Field('wrong_reason',length=40),
+                Field('dup_ID',length=40),
+                Field('dup_ex',length=80),
+                Field('dup_address',length=80),
+                Field('dup_name',length=80),
+                Field('dup_phone',length=80)
+                )
+db.define_table('pampers_self_dup',
+                Field('order_id', unique=True,length=20),
+                Field('ex_id',length=20),
+                Field('user_name',length=40),
+                Field('mobile',length=13),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('pregnancy',length=40),
+                Field('product_piece',length=40),
+                Field('product_size',length=40),
+                Field('date_time',length=20)
+                )
 ## after defining tables, uncomment below to enable auditing
-# auth.enable_record_versioning(db)
+auth.enable_record_versioning(db)

@@ -13,7 +13,8 @@
     </header>
 {{end}}
 
-{{=FORM(str(T('or import from csv file'))+"  ",INPUT(_type='file',_name='csvfile'),INPUT(_type='submit',_value='import'))}}
+{{=FORM(str(T('or import from csv file1'))+"  ",INPUT(_type='file',_name='csvfile1'),INPUT(_type='submit',_value='import'))}}
+{{=FORM(str(T('or import from csv file2'))+"  ",INPUT(_type='file',_name='csvfile2'),INPUT(_type='submit',_value='import'))}}
 
 {{if 'message' in globals():}}
 <h2>{{=message}}</h2>
