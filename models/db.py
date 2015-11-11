@@ -196,7 +196,8 @@ db.define_table('pampers_order',
                 Field('pregnancy',length=40),
                 Field('product_piece',length=40),
                 Field('product_size',length=40),
-                Field('date_time',length=20)
+                Field('date_time',length=20),
+                Field('class_city',length=20)
                 )
 db.define_table('pampers_history_dup',
                 Field('order_id', unique=True,length=20),
@@ -219,6 +220,20 @@ db.define_table('pampers_history_dup',
                 Field('dup_phone',length=80)
                 )
 db.define_table('pampers_self_dup',
+                Field('order_id', unique=True,length=20),
+                Field('ex_id',length=20),
+                Field('user_name',length=40),
+                Field('mobile',length=13),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('pregnancy',length=40),
+                Field('product_piece',length=40),
+                Field('product_size',length=40),
+                Field('date_time',length=20)
+                )
+db.define_table('pampers_addr_lack',
                 Field('order_id', unique=True,length=20),
                 Field('ex_id',length=20),
                 Field('user_name',length=40),
