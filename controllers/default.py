@@ -24,6 +24,12 @@ SKU_dict={u'589203710279202':u'18片S码',
 u'690314820783301':u'18片NB码',
 u'589203710279204':u'8片S码',
 u'690314820785503':u'8片NB码'}
+top4_city=(u'北京市',u'成都市',u'广州市',u'上海市')
+A_city=(u'合肥市',u'福州市',u'兰州市',u'深圳市','南宁市',u'贵阳市',u'海口市',u'石家庄市',
+u'郑州市',u'哈尔滨市',u'武汉市',u'长沙市',u'南京市',u'大连市',u'沈阳市',u'呼和浩特市',
+u'银川市',u'西宁市',u'济南市',u'青岛市',u'太原市',u'西安市',u'天津市',u'拉萨市',u'昆明市',
+u'杭州市',u'重庆市')
+
 
 def init_db():
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'订单编号',field_id='order_id',field_order=1)
@@ -66,6 +72,8 @@ if rowcontent['mobile'] in db().select(db.history_order.mobile) :
                 s=s.lower()
     s=re.sub(r'[^\w]+','',s)
     db.custom_order.insert(**rowcontent)回族|壮族|维尔吾族|特别行政区|自治区
+    &\(re.match('\d{0,2}',db.history_order.product_name).group()==\
+                         str(ws1.cell(row=rows,column=10).value))
 '''
 
 def wrong_data():
@@ -221,6 +229,7 @@ def import_excel(file):
                    db.custom_order.insert(**rowcontent)
 
 
+
 pampers_dict={'order_id':'A','ex_id':'B','user_name':'C','mobile':'D','province':'E',\
                   'city':'F','county':'G','address':'H','pregnancy':'I','product_piece':'J',\
                   'product_size':'K','datetime':'L'}
@@ -241,35 +250,58 @@ def add_pampers(file):
                         (db.history_order.city==ws1.cell(row=rows, column=6).value)&\
                         (db.history_order.county==ws1.cell(row=rows, column=7).value)).select\
                 (db.history_order.mobile,db.history_order.address_bak,db.history_order.order_id,\
-                 db.history_order.ex_id,db.history_order.user_name).as_list()
+                 db.history_order.ex_id,db.history_order.user_name,db.history_order.product_name).as_list()
         is_correct=1
         for i in range(0,len(buf_list)):
-            if rowcontent['mobile']==buf_list[i]['mobile']:
-                is_correct=0
-                rowcontent['wrong_reason']=u'与历史号码第'+str(buf_list[i]['order_id'])+u'条重复'
-                rowcontent['dup_ID']=buf_list[i]['order_id']
-                rowcontent['dup_ex']=buf_list[i]['ex_id']
-                rowcontent['dup_address']=buf_list[i]['address_bak']
-                rowcontent['dup_name']=buf_list[i]['user_name']
-                rowcontent['dup_phone']=buf_list[i]['mobile']
-                db.pampers_history_dup.insert(**rowcontent)
-                break
-            elif Simhash(get_feature(buf_list[i]['address_bak'].decode('UTF-8'))).distance(Simhash(get_feature(u''+rowcontent['address'])))<5:
-                is_correct=0
-                rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
-                rowcontent['dup_ID']=buf_list[i]['order_id']
-                rowcontent['dup_ex']=buf_list[i]['ex_id']
-                rowcontent['dup_address']=buf_list[i]['address_bak']
-                rowcontent['dup_name']=buf_list[i]['user_name']
-                rowcontent['dup_phone']=buf_list[i]['mobile']
-                db.pampers_history_dup.insert(**rowcontent)
-                break
-            else:continue
+            if buf_list[i]['product_name'].startswith(str(rowcontent['product_piece'])):
+                if rowcontent['mobile']==buf_list[i]['mobile']:
+                    is_correct=0
+                    rowcontent['wrong_reason']=u'与历史号码第'+str(buf_list[i]['order_id'])+u'条重复'
+                    rowcontent['dup_ID']=buf_list[i]['order_id']
+                    rowcontent['dup_ex']=buf_list[i]['ex_id']
+                    rowcontent['dup_address']=buf_list[i]['address_bak']
+                    rowcontent['dup_name']=buf_list[i]['user_name']
+                    rowcontent['dup_phone']=buf_list[i]['mobile']
+                    db.pampers_history_dup.insert(**rowcontent)
+                    break
+                elif Simhash(get_feature(buf_list[i]['address_bak'].decode('UTF-8'))).distance(Simhash(get_feature(u''+rowcontent['address'])))<5:
+                    is_correct=0
+                    rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
+                    rowcontent['dup_ID']=buf_list[i]['order_id']
+                    rowcontent['dup_ex']=buf_list[i]['ex_id']
+                    rowcontent['dup_address']=buf_list[i]['address_bak']
+                    rowcontent['dup_name']=buf_list[i]['user_name']
+                    rowcontent['dup_phone']=buf_list[i]['mobile']
+                    db.pampers_history_dup.insert(**rowcontent)
+                    break
+                else:continue
         if is_correct==1:
-            if rowcontent['user_name']!= ws1.cell(row=rows-1, column=6).value:
+            if rowcontent['user_name'] ==ws1.cell(row=rows-1, column=3).value:
+                db.pampers_self_dup.insert(**rowcontent)
+            else:
+                if (rowcontent['county'].endswith(u'县'))or\
+                (rowcontent['county']==u'清新区')or\
+                (rowcontent['county']==u'伊宁市')or\
+                (rowcontent['county']==u'万山区')or\
+                (rowcontent['county']==u'清新区')or\
+                (rowcontent['county']==u'六枝特区'):
+                    if((u'村'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
+                    ((u'乡'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
+                    ((u'镇'in rowcontent['address'])and(u'小镇'not in rowcontent['address'])):
+                        rowcontent['class_city']='D_village'
+                    else:
+                        rowcontent['class_city']='D'
+                elif (rowcontent['county'].endswith(u'市'))and\
+                    (rowcontent['county']!=u'巢湖市')and\
+                    (rowcontent['county']!=u'毕节市'):
+                    rowcontent['class_city']='C'
+                elif (rowcontent['city'] in top4_city):
+                    rowcontent['class_city']='Top4'
+                elif(rowcontent['city'] in A_city):
+                    rowcontent['class_city']='A'
+                else:
+                    rowcontent['class_city']='B'
                 db.pampers_order.insert(**rowcontent)
-            else:db.pampers_self_dup.insert(**rowcontent)
-
 
 def index():
     """
