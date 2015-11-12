@@ -10,6 +10,7 @@
 '%Y-%m-%d %H:%M:%S': '%Y-%m-%d %H:%M:%S',
 '(something like "it-it")': '(格式类似 "zh-tw")',
 '@markmin\x01An error occured, please [[reload %s]] the page': 'An error occured, please [[reload %s]] the page',
+'@markmin\x01Number of entries: **%s**': 'Number of entries: **%s**',
 'A new version of web2py is available': '新版 web2py 已推出',
 'A new version of web2py is available: %s': '新版 web2py 已推出: %s',
 'about': '关于',

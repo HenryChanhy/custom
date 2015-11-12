@@ -1,0 +1,376 @@
+Index: progress.log
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>GBK
+===================================================================
+--- progress.log	(date 1444971785000)
++++ progress.log	(revision )
+@@ -24,3 +24,5 @@
+ [2015-09-16 16:53:54] EDIT custom/models/db.py: 0
+ [2015-09-22 16:00:48] EDIT custom/controllers/default.py: -1
+ [2015-09-22 16:01:22] EDIT custom/controllers/default.py: 0
++[2015-10-19 11:11:31] EDIT custom/models/db.py: 0
++[2015-10-19 11:11:33] EDIT custom/models/db.py: 0
+Index: databases/sql.log
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>GBK
+===================================================================
+--- databases/sql.log	(date 1444971785000)
++++ databases/sql.log	(revision )
+@@ -86,3 +86,339 @@
+     field_order INTEGER
+ );
+ success!
++timestamp: 2015-10-19T10:39:49.211000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T10:42:03.931000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T10:44:07.565000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T10:47:11.840000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T10:48:12.147000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T10:48:43.252000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T10:49:12.163000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T10:49:42.870000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T11:08:53.370000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T11:09:12.738000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T11:10:53.697000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T11:11:45.218000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T11:15:15.676000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T11:15:20.679000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T11:18:37.778000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
++timestamp: 2015-10-19T11:24:36.848000
++CREATE TABLE custom_order(
++    id INTEGER PRIMARY KEY AUTOINCREMENT,
++    order_id CHAR(20) UNIQUE,
++    shop_name CHAR(40),
++    ex_id CHAR(20),
++    telephone CHAR(13),
++    mobile CHAR(13),
++    user_name CHAR(40),
++    province CHAR(40),
++    city CHAR(40),
++    county CHAR(40),
++    address CHAR(80),
++    product_id CHAR(40),
++    barcode CHAR(20),
++    specification CHAR(40),
++    ex_product_name CHAR(40),
++    product_name CHAR(40),
++    order_num INTEGER,
++    ex_spec CHAR(40)
++);
+Index: models/db.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- models/db.py	(date 1444971785000)
++++ models/db.py	(revision )
+@@ -87,7 +87,7 @@
+ ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
+ ## >>> for row in rows: print row.id, row.myfield
+ #########################################################################
+-db.define_table('custom_order',
++db.define_table('custom_orde',
+                 Field('order_id', unique=True,length=20),
+                 Field('shop_name',length=40),
+                 Field('ex_id',length=20),
