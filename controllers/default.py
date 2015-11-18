@@ -30,7 +30,6 @@ u'郑州市',u'哈尔滨市',u'武汉市',u'长沙市',u'南京市',u'大连市'
 u'银川市',u'西宁市',u'济南市',u'青岛市',u'太原市',u'西安市',u'天津市',u'拉萨市',u'昆明市',
 u'杭州市',u'重庆市')
 
-
 def init_db():
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'订单编号',field_id='order_id',field_order=1)
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'店铺名称',field_id='shop_name',field_order=2)
@@ -85,11 +84,15 @@ def wrong_data():
 #@auth.requires_login()
 def display_form():
     grid = SQLFORM.grid(db.wrong_order,fields=\
-        [db.wrong_order.order_id,db.wrong_order.ex_id,db.wrong_order.mobile,\
-        db.wrong_order.user_name,db.wrong_order.province,db.wrong_order.city,\
-        db.wrong_order.address,db.wrong_order.wrong_reason,db.wrong_order.dup_ID,\
-        db.wrong_order.dup_ex,db.wrong_order.dup_address,db.wrong_order.dup_name,\
+        [db.wrong_order.order_id,db.wrong_order.ex_id,db.wrong_order.mobile,
+        db.wrong_order.user_name,db.wrong_order.province,db.wrong_order.city,
+        db.wrong_order.address,db.wrong_order.wrong_reason,db.wrong_order.dup_ID,
+        db.wrong_order.dup_ex,db.wrong_order.dup_address,db.wrong_order.dup_name,
         db.wrong_order.dup_phone])
+    return locals()
+
+def display_pampers_result():
+    grid = SQLFORM.grid(db.pampers_result)
     return locals()
 
 '''
@@ -162,8 +165,9 @@ def import_excel(file):
             rowcontent[header[cols-1]]=ws.cell(row=rows, column=cols).value
         for prov in provinces:
             if prov in str(ws.cell(row=rows,column=10).value):
-                spare_addr=re.sub(prov,'',ws.cell(row=rows,column=10).value)
-                spare_addr=re.sub(u'省|^市?' ,'',spare_addr)
+                spare_addr=ws.cell(row=rows,column=10).value.replace(prov,'')
+                spare_addr=spare_addr.replace(u'省','')
+                spare_addr=spare_addr.replace(u'市','')
                 if prov in zhixia:
                     rowcontent[header[6]]=prov+u'市'
                 elif prov in texing:
@@ -171,7 +175,7 @@ def import_excel(file):
                 elif prov==u'广西':
                     rowcontent[header[6]]=prov+u'壮族自治区'
                 elif prov==u'新疆':
-                    rowcontent[header[6]]=prov+u'维尔吾族自治区'
+                    rowcontent[header[6]]=prov+u'维吾尔自治区'
                 elif prov==u'宁夏':
                     rowcontent[header[6]]=prov+u'回族自治区'
                 elif prov==u'西藏':
@@ -229,22 +233,155 @@ def import_excel(file):
                    db.custom_order.insert(**rowcontent)
 
 
-
-pampers_dict={'order_id':'A','ex_id':'B','user_name':'C','mobile':'D','province':'E',\
-                  'city':'F','county':'G','address':'H','pregnancy':'I','product_piece':'J',\
-                  'product_size':'K','datetime':'L'}
+pampers_dict={'order_id':'A','ex_id':'B','user_name':'C','mobile':'D','province':'E',
+              'city':'F','county':'G','address':'H','pregnancy':'I','product_piece':'J',
+              'product_size':'K','datetime':'L'}
 def add_pampers(file):
     wb1=openpyxl.load_workbook(file)
     ws1=wb1.active
-    header=['order_id','ex_id','user_name','mobile','province','city','county','address',\
+    header=['order_id','ex_id','user_name','mobile','province','city','county','address',
             'pregnancy','product_piece','product_size','date_time']
+    for rows in range(1,647):
+        rowcontent={}
+        for cols in range(1,ws1.min_col+1):
+            rowcontent[header[cols-1]]=ws1.cell(row=rows,column=cols).value
+        is_addr_complete=1
+        flag=0
+        for prov in provinces:
+            if prov in str(ws1.cell(row=rows,column=8).value):
+                flag=1
+                spare_addr0=ws1.cell(row=rows,column=8).value.replace(prov,'')
+                spare_addr0=spare_addr0.replace(u'省','')
+                if prov in zhixia:
+                    rowcontent[header[4]]=prov
+                    rowcontent[header[5]]=prov+u'市'
+                    spare_addr1=spare_addr0[spare_addr0.find(u'市')+1:]
+                elif prov in texing:
+                    rowcontent[header[4]]=prov+u'特别行政区'
+                elif prov==u'广西':
+                    rowcontent[header[4]]=prov+u'壮族自治区'
+                    spare_addr1=spare_addr0.replace(u'壮族自治区','')
+                elif prov==u'新疆':
+                    rowcontent[header[4]]=prov+u'维吾尔自治区'
+                    spare_addr1=spare_addr0.replace(u'维吾尔自治区','')
+                elif prov==u'宁夏':
+                    rowcontent[header[4]]=prov+u'回族自治区'
+                    spare_addr1=spare_addr0.replace(u'回族自治区','')
+                elif prov==u'西藏':
+                    rowcontent[header[4]]=prov+u'自治区'
+                    spare_addr1=spare_addr0.replace(u'自治区','')
+                elif prov==u'内蒙古':
+                    rowcontent[header[4]]=prov+u'自治区'
+                    spare_addr1=spare_addr0.replace(u'自治区','')
+                else:
+                    rowcontent[header[4]]=prov+u'省'
+                    spare_addr1=spare_addr0[spare_addr0.find(u'省')+1:]
+                break
+        if flag==0:
+            is_addr_complete=0
+            spare_addr1=ws1.cell(row=rows,column=8).value
+        if (u'市'in spare_addr1):
+            addr2=spare_addr1[0:spare_addr1.find(u'市')+1]
+            spare_addr2=spare_addr1[spare_addr1.find(u'市')+1:]
+            rowcontent[header[5]]=addr2
+        elif u'自治州'in spare_addr1:
+            addr2=spare_addr1[0:spare_addr1.find(u'自治州')+3]
+            spare_addr2=spare_addr1[spare_addr1.find(u'自治州')+3:]
+            rowcontent[header[5]]=addr2
+        elif u'地区'in spare_addr1:
+            addr2=spare_addr1[0:spare_addr1.find(u'地区')+2]
+            spare_addr2=spare_addr1[spare_addr1.find(u'地区')+2:]
+            rowcontent[header[5]]=addr2
+        elif u'盟'in spare_addr1:
+            addr2=spare_addr1[0:spare_addr1.find(u'盟')+1]
+            spare_addr2=spare_addr1[spare_addr1.find(u'盟')+1:]
+            rowcontent[header[5]]=addr2
+        else:
+            spare_addr2=spare_addr1
+            if rowcontent[header[4]] not in zhixia:
+                is_addr_complete=0
+
+        if u'县'in spare_addr2:
+            addr3=spare_addr2[0:spare_addr2.find(u'县')+1]
+            spare_addr3=spare_addr2[spare_addr2.find(u'县')+1:]
+            rowcontent[header[6]]=addr3
+        elif (u'市'in spare_addr2)and (u'超市' not in spare_addr2)and (u'市场' not in spare_addr2):
+            addr3=spare_addr2[0:spare_addr2.find(u'市')+1]
+            spare_addr3=spare_addr2[spare_addr2.find(u'市')+1:]
+            rowcontent[header[6]]=addr3
+        elif (u'区'in spare_addr2):
+            addr3=spare_addr2[0:spare_addr2.find(u'区')+1]
+            spare_addr3=spare_addr2[spare_addr2.find(u'区')+1:]
+            rowcontent[header[6]]=addr3
+        else:
+            spare_addr3=spare_addr2
+            is_addr_complete=0
+
+        if is_addr_complete==0:
+            db.pampers_addr_lack.insert(**rowcontent)
+        else:
+            buf_list=db((db.history_order.province==ws1.cell(row=rows, column=5).value)&\
+                        (db.history_order.city==ws1.cell(row=rows, column=6).value)&\
+                        (db.history_order.county==ws1.cell(row=rows, column=7).value)).select\
+                (db.history_order.mobile,db.history_order.address_bak,db.history_order.order_id,
+                 db.history_order.ex_id,db.history_order.user_name).as_list()
+            is_dup=0
+            for i in range(0,len(buf_list)):
+                if rowcontent['mobile']==buf_list[i]['mobile']:
+                    is_dup=1
+                    rowcontent['wrong_reason']=u'与历史号码第'+str(buf_list[i]['order_id'])+u'条重复'
+                    rowcontent['dup_ID']=buf_list[i]['order_id']
+                    rowcontent['dup_ex']=buf_list[i]['ex_id']
+                    rowcontent['dup_address']=buf_list[i]['address']
+                    rowcontent['dup_name']=buf_list[i]['user_name']
+                    rowcontent['dup_phone']=buf_list[i]['mobile']
+                    db.pampers_history_dup.insert(**rowcontent)
+                    break
+                elif Simhash(get_feature(buf_list[i]['address'])).distance(Simhash(get_feature(ws1.cell(row=rows,column=10).value)))<24:
+                    is_dup=1
+                    rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
+                    rowcontent['dup_ID']=buf_list[i]['order_id']
+                    rowcontent['dup_ex']=buf_list[i]['ex_id']
+                    rowcontent['dup_address']=buf_list[i]['address']
+                    rowcontent['dup_name']=buf_list[i]['user_name']
+                    rowcontent['dup_phone']=buf_list[i]['mobile']
+                    db.pampers_history_dup.insert(**rowcontent)
+                    break
+                else:continue
+            if is_dup==0:
+                if rowcontent['user_name']== ws1.cell(row=rows-1, column=3).value:
+                    db.pampers_self_dup(**rowcontent)
+                else:
+                    if (rowcontent['county'].endswith(u'县'))or\
+                    (rowcontent['county']==u'清新区')or\
+                    (rowcontent['county']==u'伊宁市')or\
+                    (rowcontent['county']==u'万山区')or\
+                    (rowcontent['county']==u'六枝特区'):
+                        if((u'村'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
+                        ((u'乡'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
+                        ((u'镇'in rowcontent['address'])and(u'小镇'not in rowcontent['address'])):
+                            rowcontent['class_city']='village'
+                        else:
+                            rowcontent['class_city']='D'
+                    elif (rowcontent['county'].endswith(u'市'))and\
+                        (rowcontent['county']!=u'巢湖市')and\
+                        (rowcontent['county']!=u'毕节市'):
+                        rowcontent['class_city']='C'
+                    elif (rowcontent['city'] in top4_city):
+                        rowcontent['class_city']='Top4'
+                    elif(rowcontent['city'] in A_city):
+                        rowcontent['class_city']='A'
+                    else:
+                        rowcontent['class_city']='B'
+                    db.pampers_order.insert(**rowcontent)
+
     for rows in range(650,ws1.max_row+1):
         rowcontent={}
         for cols in range(1,ws1.min_col+1):
             rowcontent[header[cols-1]]=ws1.cell(row=rows,column=cols).value
-        rowcontent['address']=re.sub(rowcontent['province'],'',rowcontent['address'])
-        rowcontent['address']=re.sub(rowcontent['city'],'',rowcontent['address'])
-        rowcontent['address']=re.sub(rowcontent['county'],'',rowcontent['address'])
+        rowcontent['address']=rowcontent['address'].replace(rowcontent['province'],'')
+        rowcontent['address']=rowcontent['address'].replace(rowcontent['city'],'')
+        rowcontent['address']=rowcontent['address'].replace(rowcontent['county'],'')
         if ws1.cell(row=rows,column=7).value !=ws1.cell(row=rows-1,column=7).value:
             buf_list=db((db.history_order.province==ws1.cell(row=rows, column=5).value)&\
                         (db.history_order.city==ws1.cell(row=rows, column=6).value)&\
@@ -283,12 +420,11 @@ def add_pampers(file):
                 (rowcontent['county']==u'清新区')or\
                 (rowcontent['county']==u'伊宁市')or\
                 (rowcontent['county']==u'万山区')or\
-                (rowcontent['county']==u'清新区')or\
                 (rowcontent['county']==u'六枝特区'):
                     if((u'村'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
                     ((u'乡'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
                     ((u'镇'in rowcontent['address'])and(u'小镇'not in rowcontent['address'])):
-                        rowcontent['class_city']='D_village'
+                        rowcontent['class_city']='village'
                     else:
                         rowcontent['class_city']='D'
                 elif (rowcontent['county'].endswith(u'市'))and\
@@ -302,6 +438,18 @@ def add_pampers(file):
                 else:
                     rowcontent['class_city']='B'
                 db.pampers_order.insert(**rowcontent)
+
+def pampers_census():
+    row_content={}
+    row_content['tag']='November'
+    row_content['distribution']=db(db.pampers_order.order_id >= 0).count()
+    row_content['Top4']=db(db.pamers_order.class_city=='Top4').count()
+    row_content['A_city']=db(db.pamers_order.class_city=='A').count()
+    row_content['B_city']=db(db.pamers_order.class_city=='B').count()
+    row_content['C_city']=db(db.pamers_order.class_city=='C').count()
+    row_content['D_city']=db(db.pamers_order.class_city=='D').count()
+    row_content['village']=db(db.pamers_order.class_city=='village').count()
+    db.pampers_result.insert(**row_content)
 
 def index():
     """
@@ -318,6 +466,7 @@ def index():
     if request.vars.csvfile2 != None:
         add_pampers(request.vars.csvfile2.file)
         response.flash = T('data uploaded')
+        pampers_census()
     return dict()
 
 def user():

@@ -247,5 +247,15 @@ db.define_table('pampers_addr_lack',
                 Field('product_size',length=40),
                 Field('date_time',length=20)
                 )
+db.define_table('pampers_result',
+                Field('tag',length=40),
+                Field('distribution',length=20),
+                Field('Top4',length=20),
+                Field('A_city',length=20),
+                Field('B_city',length=20),
+                Field('C_city',length=20),
+                Field('D_city',length=20),
+                Field('village',length=20)
+                )
 ## after defining tables, uncomment below to enable auditing
 auth.enable_record_versioning(db)
