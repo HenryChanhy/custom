@@ -95,6 +95,10 @@ def display_pampers_result():
     grid = SQLFORM.grid(db.pampers_result)
     return locals()
 
+def display_pampers_order():
+    grid = SQLFORM.grid(db.pampers_order)
+    return locals()
+
 '''
 def data_wrong():
     form = SQLFORM(db.wrong_order)
@@ -377,8 +381,9 @@ def add_pampers(file):
 
     for rows in range(650,ws1.max_row+1):
         rowcontent={}
+        buf_list=[]
         for cols in range(1,ws1.min_col+1):
-            rowcontent[header[cols-1]]=ws1.cell(row=rows,column=cols).value
+            rowcontent[header[cols-1]]=u''+str(ws1.cell(row=rows,column=cols).value)
         rowcontent['address']=rowcontent['address'].replace(rowcontent['province'],'')
         rowcontent['address']=rowcontent['address'].replace(rowcontent['city'],'')
         rowcontent['address']=rowcontent['address'].replace(rowcontent['county'],'')
@@ -401,7 +406,8 @@ def add_pampers(file):
                     rowcontent['dup_phone']=buf_list[i]['mobile']
                     db.pampers_history_dup.insert(**rowcontent)
                     break
-                elif Simhash(get_feature(buf_list[i]['address_bak'].decode('UTF-8'))).distance(Simhash(get_feature(u''+rowcontent['address'])))<5:
+                elif Simhash(get_feature(str(buf_list[i]['address_bak']).decode('UTF-8')))\
+                        .distance(Simhash(get_feature(u''+rowcontent['address'])))<5:
                     is_correct=0
                     rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
                     rowcontent['dup_ID']=buf_list[i]['order_id']
@@ -443,12 +449,22 @@ def pampers_census():
     row_content={}
     row_content['tag']='November'
     row_content['distribution']=db(db.pampers_order.order_id >= 0).count()
-    row_content['Top4']=db(db.pamers_order.class_city=='Top4').count()
-    row_content['A_city']=db(db.pamers_order.class_city=='A').count()
-    row_content['B_city']=db(db.pamers_order.class_city=='B').count()
-    row_content['C_city']=db(db.pamers_order.class_city=='C').count()
-    row_content['D_city']=db(db.pamers_order.class_city=='D').count()
-    row_content['village']=db(db.pamers_order.class_city=='village').count()
+    row_content['Top4']=db(db.pampers_order.class_city=='Top4').count()
+    row_content['A_city']=db(db.pampers_order.class_city=='A').count()
+    row_content['B_city']=db(db.pampers_order.class_city=='B').count()
+    row_content['C_city']=db(db.pampers_order.class_city=='C').count()
+    row_content['D_city']=db(db.pampers_order.class_city=='D').count()
+    row_content['village']=db(db.pampers_order.class_city=='village').count()
+    db.pampers_result.insert(**row_content)
+    row_content={}
+    row_content['tag']='percent'
+    row_content['distribution']='100%'
+    row_content['Top4']=float(db(db.pampers_order.class_city=='Top4').count())/db(db.pampers_order.order_id >= 0).count()
+    row_content['A_city']=float(db(db.pampers_order.class_city=='A').count())/db(db.pampers_order.order_id >= 0).count()
+    row_content['B_city']=float(db(db.pampers_order.class_city=='B').count())/db(db.pampers_order.order_id >= 0).count()
+    row_content['C_city']=float(db(db.pampers_order.class_city=='C').count())/db(db.pampers_order.order_id >= 0).count()
+    row_content['D_city']=float(db(db.pampers_order.class_city=='D').count())/db(db.pampers_order.order_id >= 0).count()
+    row_content['village']=float(db(db.pampers_order.class_city=='village').count())/db(db.pampers_order.order_id >= 0).count()
     db.pampers_result.insert(**row_content)
 
 def index():
