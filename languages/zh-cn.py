@@ -77,6 +77,7 @@
 'Community': 'Community',
 'Components and Plugins': 'Components and Plugins',
 'Config.ini': 'Config.ini',
+'Confirm Password': 'Confirm Password',
 'contains': 'contains',
 'Controller': '控件',
 'Controllers': '控件',
