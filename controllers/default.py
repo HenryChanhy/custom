@@ -10,6 +10,7 @@
 # #######################################################################
 import re
 from simhash import Simhash,SimhashIndex
+from gluon.http import redirect
 import openpyxl
 from plugin_sqleditable.editable import SQLEDITABLE
 SQLEDITABLE.init()
@@ -29,6 +30,10 @@ A_city=(u'合肥市',u'福州市',u'兰州市',u'深圳市','南宁市',u'贵阳
 u'郑州市',u'哈尔滨市',u'武汉市',u'长沙市',u'南京市',u'大连市',u'沈阳市',u'呼和浩特市',
 u'银川市',u'西宁市',u'济南市',u'青岛市',u'太原市',u'西安市',u'天津市',u'拉萨市',u'昆明市',
 u'杭州市',u'重庆市')
+
+def check_order():
+    orderList=db(db.wrong_order).select().as_list()
+    return locals()
 
 def init_db():
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'订单编号',field_id='order_id',field_order=1)
@@ -73,6 +78,10 @@ if rowcontent['mobile'] in db().select(db.history_order.mobile) :
     db.custom_order.insert(**rowcontent)回族|壮族|维尔吾族|特别行政区|自治区
     &\(re.match('\d{0,2}',db.history_order.product_name).group()==\
                          str(ws1.cell(row=rows,column=10).value))
+
+        if not tablename=='custom_order': raise HTTP(400)
+        return dict(custom_order = db.custom_order(id))
+
 '''
 
 def wrong_data():
@@ -110,10 +119,12 @@ def data_wrong():
         response.flash = 'please fill out the form'
     return dict(form=form)
 '''
-
 def import_excel(file):
-    wb=openpyxl.load_workbook(file)
-    ws=wb.active
+    WB=openpyxl.load_workbook(file)
+    WS=WB.active
+    return WS
+
+def add_excel(ws):
     field_list = db(db.db_map.table_name=='custom_order').select(db.db_map.field_name,db.db_map.field_id).as_list()
     field_dict = {}
     for fd in field_list:
@@ -129,7 +140,7 @@ def import_excel(file):
         rowcontent['address']=rowcontent['address'].replace(rowcontent['province']+u'','')
         rowcontent['address']=rowcontent['address'].replace(u''+rowcontent['city'],'')
         rowcontent['address']=rowcontent['address'].replace(rowcontent['county']+u'','')
-        if ws.cell(row=rows, column=9).value !=ws.cell(row=rows-1,column=9):
+        if ws.cell(row=rows, column=9).value !=ws.cell(row=rows-1,column=9).value:
             buf_list=db((db.history_order.province==ws.cell(row=rows, column=7).value)&\
                         (db.history_order.city==ws.cell(row=rows, column=8).value)&\
                         (db.history_order.county==ws.cell(row=rows, column=9).value)&\
@@ -233,18 +244,84 @@ def import_excel(file):
                 else:continue
             if is_correct==1:
                 if rowcontent['user_name']!= ws.cell(row=rows-1, column=6).value:
-                   rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
-                   db.custom_order.insert(**rowcontent)
-
+                    rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
+                    db.custom_order.insert(**rowcontent)
 
 pampers_dict={'order_id':'A','ex_id':'B','user_name':'C','mobile':'D','province':'E',
               'city':'F','county':'G','address':'H','pregnancy':'I','product_piece':'J',
               'product_size':'K','datetime':'L'}
-def add_pampers(file):
-    wb1=openpyxl.load_workbook(file)
-    ws1=wb1.active
+def add_pampers(ws1):
     header=['order_id','ex_id','user_name','mobile','province','city','county','address',
             'pregnancy','product_piece','product_size','date_time']
+    for rows in range(650,ws1.max_row+1):
+        rowcontent={}
+        buf_list=[]
+        for cols in range(1,ws1.min_col+1):
+            rowcontent[header[cols-1]]=u''+str(ws1.cell(row=rows,column=cols).value)
+        rowcontent['address']=rowcontent['address'].replace(rowcontent['province'],'')
+        rowcontent['address']=rowcontent['address'].replace(rowcontent['city'],'')
+        rowcontent['address']=rowcontent['address'].replace(rowcontent['county'],'')
+        if ws1.cell(row=rows,column=7).value==ws1.cell(row=rows-1,column=7).value:
+            db.pampers_self_dup(**rowcontent)
+        elif not isinstance(rowcontent['address'],str):
+            db.pampers_addr_lack.insert(**rowcontent)
+        else:
+            buf_list=db((db.history_order.province==ws1.cell(row=rows, column=5).value)&\
+                        (db.history_order.city==ws1.cell(row=rows, column=6).value)&\
+                        (db.history_order.county==ws1.cell(row=rows, column=7).value)).select\
+                (db.history_order.mobile,db.history_order.address_bak,db.history_order.order_id,
+                 db.history_order.ex_id,db.history_order.user_name,db.history_order.product_name).as_list()
+        is_correct=1
+        for i in range(0,len(buf_list)):
+            if (buf_list[i]['product_name'].decode('utf8')).startswith(str(rowcontent['product_piece'])):
+                if rowcontent['mobile']==buf_list[i]['mobile']:
+                    is_correct=0
+                    rowcontent['wrong_reason']=u'与历史号码第'+str(buf_list[i]['order_id'])+u'条重复'
+                    rowcontent['dup_ID']=buf_list[i]['order_id']
+                    rowcontent['dup_ex']=buf_list[i]['ex_id']
+                    rowcontent['dup_address']=buf_list[i]['address_bak']
+                    rowcontent['dup_name']=buf_list[i]['user_name']
+                    rowcontent['dup_phone']=buf_list[i]['mobile']
+                    db.pampers_history_dup.insert(**rowcontent)
+                    break
+                elif Simhash(get_feature(str(buf_list[i]['address_bak']).decode('UTF-8')))\
+                        .distance(Simhash(get_feature(u''+rowcontent['address'])))<5:
+                    is_correct=0
+                    rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
+                    rowcontent['dup_ID']=buf_list[i]['order_id']
+                    rowcontent['dup_ex']=buf_list[i]['ex_id']
+                    rowcontent['dup_address']=buf_list[i]['address_bak']
+                    rowcontent['dup_name']=buf_list[i]['user_name']
+                    rowcontent['dup_phone']=buf_list[i]['mobile']
+                    db.pampers_history_dup.insert(**rowcontent)
+                    break
+                else:continue
+        if is_correct==1:
+            if rowcontent['user_name'] ==ws1.cell(row=rows-1,column=3).value:
+                db.pampers_self_dup.insert(**rowcontent)
+            else:
+                if (rowcontent['county'].endswith(u'县'))or\
+                (rowcontent['county']==u'清新区')or\
+                (rowcontent['county']==u'伊宁市')or\
+                (rowcontent['county']==u'万山区')or\
+                (rowcontent['county']==u'六枝特区'):
+                    if((u'村'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
+                    ((u'乡'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
+                    ((u'镇'in rowcontent['address'])and(u'小镇'not in rowcontent['address'])):
+                        rowcontent['class_city']='village'
+                    else:
+                        rowcontent['class_city']='D'
+                elif (rowcontent['county'].endswith(u'市'))and\
+                    (rowcontent['county']!=u'巢湖市')and\
+                    (rowcontent['county']!=u'毕节市'):
+                    rowcontent['class_city']='C'
+                elif (rowcontent['city'] in top4_city):
+                    rowcontent['class_city']='Top4'
+                elif(rowcontent['city'] in A_city):
+                    rowcontent['class_city']='A'
+                else:
+                    rowcontent['class_city']='B'
+                db.pampers_order.insert(**rowcontent)
     for rows in range(1,647):
         rowcontent={}
         for cols in range(1,ws1.min_col+1):
@@ -252,7 +329,7 @@ def add_pampers(file):
         is_addr_complete=1
         flag=0
         for prov in provinces:
-            if prov in str(ws1.cell(row=rows,column=8).value):
+            if prov in unicode(ws1.cell(row=rows,column=8).value):
                 flag=1
                 spare_addr0=ws1.cell(row=rows,column=8).value.replace(prov,'')
                 spare_addr0=spare_addr0.replace(u'省','')
@@ -379,72 +456,6 @@ def add_pampers(file):
                         rowcontent['class_city']='B'
                     db.pampers_order.insert(**rowcontent)
 
-    for rows in range(650,ws1.max_row+1):
-        rowcontent={}
-        buf_list=[]
-        for cols in range(1,ws1.min_col+1):
-            rowcontent[header[cols-1]]=u''+str(ws1.cell(row=rows,column=cols).value)
-        rowcontent['address']=rowcontent['address'].replace(rowcontent['province'],'')
-        rowcontent['address']=rowcontent['address'].replace(rowcontent['city'],'')
-        rowcontent['address']=rowcontent['address'].replace(rowcontent['county'],'')
-        if ws1.cell(row=rows,column=7).value !=ws1.cell(row=rows-1,column=7).value:
-            buf_list=db((db.history_order.province==ws1.cell(row=rows, column=5).value)&\
-                        (db.history_order.city==ws1.cell(row=rows, column=6).value)&\
-                        (db.history_order.county==ws1.cell(row=rows, column=7).value)).select\
-                (db.history_order.mobile,db.history_order.address_bak,db.history_order.order_id,\
-                 db.history_order.ex_id,db.history_order.user_name,db.history_order.product_name).as_list()
-        is_correct=1
-        for i in range(0,len(buf_list)):
-            if buf_list[i]['product_name'].startswith(str(rowcontent['product_piece'])):
-                if rowcontent['mobile']==buf_list[i]['mobile']:
-                    is_correct=0
-                    rowcontent['wrong_reason']=u'与历史号码第'+str(buf_list[i]['order_id'])+u'条重复'
-                    rowcontent['dup_ID']=buf_list[i]['order_id']
-                    rowcontent['dup_ex']=buf_list[i]['ex_id']
-                    rowcontent['dup_address']=buf_list[i]['address_bak']
-                    rowcontent['dup_name']=buf_list[i]['user_name']
-                    rowcontent['dup_phone']=buf_list[i]['mobile']
-                    db.pampers_history_dup.insert(**rowcontent)
-                    break
-                elif Simhash(get_feature(str(buf_list[i]['address_bak']).decode('UTF-8')))\
-                        .distance(Simhash(get_feature(u''+rowcontent['address'])))<5:
-                    is_correct=0
-                    rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'条重复'
-                    rowcontent['dup_ID']=buf_list[i]['order_id']
-                    rowcontent['dup_ex']=buf_list[i]['ex_id']
-                    rowcontent['dup_address']=buf_list[i]['address_bak']
-                    rowcontent['dup_name']=buf_list[i]['user_name']
-                    rowcontent['dup_phone']=buf_list[i]['mobile']
-                    db.pampers_history_dup.insert(**rowcontent)
-                    break
-                else:continue
-        if is_correct==1:
-            if rowcontent['user_name'] ==ws1.cell(row=rows-1, column=3).value:
-                db.pampers_self_dup.insert(**rowcontent)
-            else:
-                if (rowcontent['county'].endswith(u'县'))or\
-                (rowcontent['county']==u'清新区')or\
-                (rowcontent['county']==u'伊宁市')or\
-                (rowcontent['county']==u'万山区')or\
-                (rowcontent['county']==u'六枝特区'):
-                    if((u'村'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
-                    ((u'乡'in rowcontent['address'])and(u'乡村'not in rowcontent['address']))or\
-                    ((u'镇'in rowcontent['address'])and(u'小镇'not in rowcontent['address'])):
-                        rowcontent['class_city']='village'
-                    else:
-                        rowcontent['class_city']='D'
-                elif (rowcontent['county'].endswith(u'市'))and\
-                    (rowcontent['county']!=u'巢湖市')and\
-                    (rowcontent['county']!=u'毕节市'):
-                    rowcontent['class_city']='C'
-                elif (rowcontent['city'] in top4_city):
-                    rowcontent['class_city']='Top4'
-                elif(rowcontent['city'] in A_city):
-                    rowcontent['class_city']='A'
-                else:
-                    rowcontent['class_city']='B'
-                db.pampers_order.insert(**rowcontent)
-
 def pampers_census():
     row_content={}
     row_content['tag']='November'
@@ -477,11 +488,25 @@ def index():
     #response.flash = T("Hello World")
     #return dict(message=T('Welcome to web2py!'))
     if request.vars.csvfile1 != None:
-        import_excel(request.vars.csvfile1.file)
+        ws=import_excel(request.vars.csvfile1.file)
+        add_excel(ws)
         response.flash = T('data uploaded')
     if request.vars.csvfile2 != None:
-        add_pampers(request.vars.csvfile2.file)
-        response.flash = T('data uploaded')
+        ws1=import_excel(request.vars.csvfile2.file)
+        license=[1516161,1520345,1518691,1542961,1551748,1541116,1516035,1520803,
+        1522679,1527299,1538111,1544564,1550749,1520841,1540979,1523641]
+        if db(db.pampers_order).isempty():
+            add_pampers(ws1)
+            response.flash = T('data uploaded')
+        else:
+            count=0
+            for i in range(0,len(license)):
+                if(ws1.cell(row=i,column=1).value==license[i]):
+                    count=count+1
+            if count>11:
+                add_pampers(ws1)
+                response.flash = T('data uploaded')
+            else:pass
         pampers_census()
     return dict()
 
@@ -519,3 +544,64 @@ def call():
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
     return service()
+'''def post_db_map(table_name,**vars):
+    response.view ='generic.'+request.extension  #return  json
+    if table_name == 'db_map':
+        return db.db_map.validate_and_insert(**vars)
+dict(counter=session.counter, now=request.now,
+                f=request.extension,s=request.view,
+                a=request.args,v=request.vars)
+ttGetHistoryByField()
+ttGet
+        patterns=[
+            "/products[custom_order]",
+            "/product/{custom_order.user_name.startswith}",
+            "/product/{custom_order.user_name}/:field"
+        ]
+        "/product/{custom_order.id}",
+        "/products[custom_order]",
+                #patterns=['/products[db_map]']
+                '''
+
+@request.restful()
+def api():
+    response.view ='generic.'+request.extension  #return  json
+    def GET(*args,**vars):
+        patterns=[
+            "/products[db_map]",
+            "/productid/{db_map.id}",
+            "/product_exid/{db_map.field_order}",
+            "/product/{custom_order.user_name.startswith}",
+            "/product/{custom_order.user_name}/:field",
+            "/trades[trade]",
+            "/tradeTid/{trade.tid}",
+            "/tradeOut/{trade.out_tid}"
+        ]
+        #patterns = 'auto'
+        parser = db.parse_as_rest(patterns,args,vars)
+        if parser.status == 200:
+            return dict(content=parser.response)
+        else:
+            raise HTTP(parser.status,parser.error)
+    def POST(tablename,**vars):
+        #if tablename=='pampers_order':
+        return dict(db[tablename].validate_and_insert(**vars))
+            #return dict(db(db.pampers_order.order_id==vars['order_id']).delete())
+            #else:
+            #raise HTTP(400)
+    def PUT(table_name,record_id,**vars):
+        return db(db[table_name].order_id==record_id).update(**vars)
+    def DELETE(table_name,record_id):
+        return db(db[table_name].order_id==record_id).delete()
+    return locals()
+
+
+'''elif method=='put':
+   return dict(db.pampers_order.validate_and_updata(**fields))
+def post_db_map(table_name,**vars):
+response.view ='generic.'+request.extension  #return  json
+if table_name == 'db_map':
+    return db.db_map.validate_and_insert(**vars)
+dict(counter=session.counter, now=request.now,
+                f=request.extension,s=request.view,
+                a=request.args,v=request.vars)'''

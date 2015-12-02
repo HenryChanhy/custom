@@ -365,3 +365,270 @@ success!
 success!
 success!
 success!
+timestamp: 2015-12-02T13:12:16.817000
+CREATE TABLE history_order(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    ex_id CHAR(20),
+    promo_id CHAR(20),
+    barcode CHAR(20),
+    user_name CHAR(40),
+    mobile CHAR(13),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    order_date CHAR(13),
+    product_name CHAR(20),
+    data_date CHAR(20),
+    channel CHAR(13),
+    stage CHAR(20),
+    city_class1 CHAR(20),
+    city_class2 CHAR(20),
+    memo1 CHAR(20),
+    memo2 CHAR(20),
+    address_bak CHAR(20)
+);
+success!
+timestamp: 2015-12-02T13:12:17.155000
+CREATE TABLE address_lack(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    shop_name CHAR(40),
+    ex_id CHAR(20),
+    telephone CHAR(13),
+    mobile CHAR(13),
+    user_name CHAR(40),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    product_id CHAR(40),
+    barcode CHAR(20),
+    specification CHAR(40),
+    ex_product_name CHAR(40),
+    product_name CHAR(40),
+    order_num INTEGER,
+    ex_spec CHAR(40)
+);
+success!
+timestamp: 2015-12-02T13:12:17.356000
+CREATE TABLE wrong_order(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    shop_name CHAR(40),
+    ex_id CHAR(20),
+    telephone CHAR(13),
+    mobile CHAR(13),
+    user_name CHAR(40),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    product_id CHAR(40),
+    barcode CHAR(20),
+    specification CHAR(40),
+    ex_product_name CHAR(40),
+    product_name CHAR(40),
+    order_num INTEGER,
+    ex_spec CHAR(40),
+    wrong_reason CHAR(40),
+    dup_ID CHAR(40),
+    dup_ex CHAR(80),
+    dup_address CHAR(80),
+    dup_name CHAR(80),
+    dup_phone CHAR(80)
+);
+success!
+timestamp: 2015-12-02T13:12:17.478000
+CREATE TABLE pampers_order(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    ex_id CHAR(20),
+    user_name CHAR(40),
+    mobile CHAR(13),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    pregnancy CHAR(40),
+    product_piece CHAR(40),
+    product_size CHAR(40),
+    date_time CHAR(20),
+    class_city CHAR(20)
+);
+success!
+timestamp: 2015-12-02T13:12:17.697000
+CREATE TABLE pampers_history_dup(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    ex_id CHAR(20),
+    user_name CHAR(40),
+    mobile CHAR(13),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    pregnancy CHAR(40),
+    product_piece CHAR(40),
+    product_size CHAR(40),
+    date_time CHAR(20),
+    wrong_reason CHAR(40),
+    dup_ID CHAR(40),
+    dup_ex CHAR(80),
+    dup_address CHAR(80),
+    dup_name CHAR(80),
+    dup_phone CHAR(80)
+);
+success!
+timestamp: 2015-12-02T13:12:17.839000
+CREATE TABLE pampers_self_dup(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    ex_id CHAR(20),
+    user_name CHAR(40),
+    mobile CHAR(13),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    pregnancy CHAR(40),
+    product_piece CHAR(40),
+    product_size CHAR(40),
+    date_time CHAR(20)
+);
+success!
+timestamp: 2015-12-02T13:12:17.977000
+CREATE TABLE pampers_addr_lack(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    ex_id CHAR(20),
+    user_name CHAR(40),
+    mobile CHAR(13),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    pregnancy CHAR(40),
+    product_piece CHAR(40),
+    product_size CHAR(40),
+    date_time CHAR(20)
+);
+success!
+timestamp: 2015-12-02T13:12:18.076000
+CREATE TABLE pampers_result(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tag CHAR(40),
+    distribution CHAR(20),
+    Top4 CHAR(20),
+    A_city CHAR(20),
+    B_city CHAR(20),
+    C_city CHAR(20),
+    D_city CHAR(20),
+    village CHAR(20)
+);
+success!
+timestamp: 2015-12-02T13:12:18.178000
+CREATE TABLE trade(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tid CHAR(20),
+    out_tid CHAR(20),
+    shop_id CHAR(20),
+    storage_id CHAR(20),
+    buyer_msg CHAR(20),
+    buyer_email CHAR(20),
+    buyer_alipay CHAR(20),
+    seller_remark CHAR(20),
+    consignee CHAR(20),
+    address CHAR(20),
+    postcode CHAR(20),
+    telephone CHAR(20),
+    mobilPhone CHAR(20),
+    province CHAR(20),
+    city CHAR(20),
+    area CHAR(20),
+    actual_freight_get CHAR(20),
+    actual_RP CHAR(20),
+    ship_method CHAR(20),
+    express CHAR(20),
+    is_invoiceOpened CHAR(20),
+    invoice_type CHAR(20),
+    invoice_money CHAR(20),
+    invoice_title CHAR(20),
+    invoice_msg CHAR(20),
+    order_type CHAR(20),
+    process_status CHAR(20),
+    pay_status CHAR(20),
+    deliver_status CHAR(20),
+    is_OCD CHAR(20),
+    severCost_COD CHAR(20),
+    order_totalMOney CHAR(20),
+    product_totalMoney CHAR(20),
+    pay_method CHAR(20),
+    pay_commission CHAR(20),
+    pay_score CHAR(20),
+    return_score CHAR(20),
+    favorable_money CHAR(20),
+    alipay_transaction_no CHAR(20),
+    out_payNo CHAR(20),
+    out_express_method CHAR(20),
+    out_order_status CHAR(20),
+    order_date CHAR(20),
+    pay_date CHAR(20),
+    finish_date CHAR(20),
+    plat_type CHAR(20),
+    distributor_no CHAR(20),
+    WuLiu CHAR(20),
+    WuLiu_no CHAR(20),
+    in_memo CHAR(20),
+    other_remark CHAR(20),
+    actual_freight_pay CHAR(20),
+    ship_date_plan CHAR(20),
+    deliver_date_plan CHAR(20),
+    is_scorePay CHAR(20),
+    is_needInvoice CHAR(20),
+    barCode CHAR(20),
+    product_title CHAR(20),
+    standard CHAR(20),
+    out_price CHAR(20),
+    favorite_money CHAR(20),
+    orderGoods_Num CHAR(20),
+    gift_Num CHAR(20),
+    cost_price CHAR(20),
+    t_id CHAR(20),
+    product_stockout CHAR(20),
+    is_Book CHAR(20),
+    is_presell CHAR(20),
+    is_Gift CHAR(20),
+    avg_price CHAR(20),
+    product_freight CHAR(20),
+    out_productId CHAR(20),
+    out_barCode CHAR(20),
+    product_intro CHAR(20)
+);
+success!
+timestamp: 2015-12-02T15:01:53.694000
+ALTER TABLE trade ADD is_cod CHAR(20);
+timestamp: 2015-12-02T15:01:53.828000
+ALTER TABLE trade ADD out__tid CHAR(20);
+timestamp: 2015-12-02T15:01:53.931000
+ALTER TABLE trade ADD shop__id CHAR(20);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
