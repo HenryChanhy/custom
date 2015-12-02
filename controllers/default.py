@@ -544,24 +544,6 @@ def call():
     supports xml, json, xmlrpc, jsonrpc, amfrpc, rss, csv
     """
     return service()
-'''def post_db_map(table_name,**vars):
-    response.view ='generic.'+request.extension  #return  json
-    if table_name == 'db_map':
-        return db.db_map.validate_and_insert(**vars)
-dict(counter=session.counter, now=request.now,
-                f=request.extension,s=request.view,
-                a=request.args,v=request.vars)
-ttGetHistoryByField()
-ttGet
-        patterns=[
-            "/products[custom_order]",
-            "/product/{custom_order.user_name.startswith}",
-            "/product/{custom_order.user_name}/:field"
-        ]
-        "/product/{custom_order.id}",
-        "/products[custom_order]",
-                #patterns=['/products[db_map]']
-                '''
 
 @request.restful()
 def api():
@@ -597,11 +579,29 @@ def api():
 
 
 '''elif method=='put':
-   return dict(db.pampers_order.validate_and_updata(**fields))
+return dict(db.pampers_order.validate_and_updata(**fields))
 def post_db_map(table_name,**vars):
 response.view ='generic.'+request.extension  #return  json
 if table_name == 'db_map':
     return db.db_map.validate_and_insert(**vars)
 dict(counter=session.counter, now=request.now,
                 f=request.extension,s=request.view,
-                a=request.args,v=request.vars)'''
+                a=request.args,v=request.vars)
+                def post_db_map(table_name,**vars):
+    response.view ='generic.'+request.extension  #return  json
+    if table_name == 'db_map':
+        return db.db_map.validate_and_insert(**vars)
+dict(counter=session.counter, now=request.now,
+                f=request.extension,s=request.view,
+                a=request.args,v=request.vars)
+ttGetHistoryByField()
+ttGet
+        patterns=[
+            "/products[custom_order]",
+            "/product/{custom_order.user_name.startswith}",
+            "/product/{custom_order.user_name}/:field"
+        ]
+        "/product/{custom_order.id}",
+        "/products[custom_order]",
+                #patterns=['/products[db_map]']
+                '''
