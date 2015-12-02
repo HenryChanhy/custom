@@ -11,9 +11,15 @@
 import re
 from simhash import Simhash,SimhashIndex
 import openpyxl
+<<<<<<< HEAD
 #from plugin_sqleditable.editable import SQLEDITABLE
 #SQLEDITABLE.init()
 import sys
+=======
+from plugin_sqleditable.editable import SQLEDITABLE
+from gluon.http import redirect
+SQLEDITABLE.init()
+>>>>>>> cf17a158e345901e0f60ccbd37fc14c611c4d3f7
 
 provinces=(u'北京',u'天津',u'河北',u'山西',u'内蒙古',u'辽宁',u'吉林',u'黑龙江',u'上海',u'江苏',
            u'浙江',u'安徽',u'福建',u'江西',u'山东',u'河南',u'湖北',u'湖南',u'广东',u'广西',
@@ -100,6 +106,14 @@ def display_pampers_order():
     grid = SQLFORM.grid(db.pampers_order)
     return locals()
 
+def check_order():
+    orderList=db(db.wrong_order).select().as_list()
+    return locals()
+
+def process_order():
+    Info=request.vars
+    order_id=Info["order_id"]
+    iFlag=Info["process_flag"]
 '''
 def data_wrong():
     form = SQLFORM(db.wrong_order)
