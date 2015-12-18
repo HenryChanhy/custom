@@ -1,0 +1,80 @@
+{{extend "layout.html"}}
+
+<script src="{{=URL('static','js/jquery.form.js')}}"></script>
+
+<script language="JavaScript" type="text/JavaScript">
+function showdiv(targetid,objN){
+	var target=document.getElementById(targetid);
+	var clicktext=document.getElementById(objN);
+
+	if (target.style.display=="block"){
+		target.style.display="none";
+		clicktext.innerText="+ 详细信息";
+	}else {
+		target.style.display="block";
+		clicktext.innerText='- 详细信息';
+	}
+}
+function submitForm(formid,centerid){
+	var center=document.getElementById(centerid)
+	$("#"+formid).ajaxSubmit(function(message){
+		center.style.display="none"
+	})
+	return false
+}
+</script>
+
+{{
+KEY_NAME={'order_id':'订单编号','shop_name':'店铺名称','ex_id':'外部平台单号','telephone':'电话','mobile':'手机','user_name':'收货人','province':'收货省','city':'收货市','county':'收货县','address':'收货地址','product_id':'产品编号','barcode':'条形码','specification':'规格','ex_product_name':'网店品名','product_name':'产品名称','order_num':'订货数量','ex_spec':'网店规格'}
+DUP_KEY_LIST=['wrong_reason','order_id','dup_ID','user_name','dup_name','mobile','dup_phone','address','dup_address','ex_id','dup_ex'] 
+}}
+
+{{for orderInfo in orderList:
+	formId="f"+str(orderInfo["order_id"])
+	hideDivId="d"+str(orderInfo["order_id"])
+	clickId="c"+str(orderInfo["order_id"])
+	centerId="cen"+str(orderInfo["order_id"])
+}}
+<center id="{{=centerId}}">
+<div style="background:#cccccc;WIDTH:70%">
+<table width="80%">
+<tr><td><a id="{{=clickId}}" onClick="showdiv('{{=hideDivId}}','{{=clickId}}')"><h5>+ 详细信息</h5></a></td></tr>
+</table>
+<form id="{{=formId}}" action="process_order" method="post" onsubmit="return false">
+<div style="background:#aaaaaa;WIDTH:80%">
+<div id="{{=hideDivId}}" style="display:none">
+<table width="80%">
+{{for k,v in orderInfo.items():}}
+{{if k=='id' or k in DUP_KEY_LIST:
+	continue
+else:
+}}
+<tr><td width="20%">{{=KEY_NAME.get(k,k)}}</td><td name="{{=k}}">{{=v}}</td></tr>
+{{pass}}
+{{pass}}
+</table></div></div>
+<table width="80%">
+<tr><td><h3>对比信息</h3></td></tr>
+{{for k in DUP_KEY_LIST:}}
+<tr><td width="20%">{{=KEY_NAME.get(k,k)}}</td><td id="{{=k}}">{{=orderInfo[k]}}</td></tr>
+{{pass}}
+</table>
+<table width="80%">
+<tr>
+<td>
+<select name="process_flag">
+<option value="1">不处理</option>
+<option value="2">有冲突</option>
+<option value="3">无冲突</option>
+</SELECT>
+</td>
+<td><button onclick="submitForm('{{=formId}}','{{=centerId}}')">OK</button></tr>
+<tr style="display:none"><td><input name="order_id" value="{{=orderInfo['order_id']}}"/></td></tr>
+</table>
+</form></div></br></center>
+{{pass}}
+
+</body>
+
+
+</html>
