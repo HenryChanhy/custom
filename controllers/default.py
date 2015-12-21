@@ -10,11 +10,11 @@
 # #######################################################################
 import re
 from simhash import Simhash,SimhashIndex
-from gluon.http import redirect
+
 import openpyxl
-from plugin_sqleditable.editable import SQLEDITABLE
-from gluon.http import redirect
-SQLEDITABLE.init()
+
+auth.settings.allow_basic_login = True
+auth.define_tables(username=True)
 
 provinces=(u'北京',u'天津',u'河北',u'山西',u'内蒙古',u'辽宁',u'吉林',u'黑龙江',u'上海',u'江苏',
            u'浙江',u'安徽',u'福建',u'江西',u'山东',u'河南',u'湖北',u'湖南',u'广东',u'广西',
@@ -82,14 +82,12 @@ if rowcontent['mobile'] in db().select(db.history_order.mobile) :
 
         if not tablename=='custom_order': raise HTTP(400)
         return dict(custom_order = db.custom_order(id))
-
-'''
-
 def wrong_data():
     response.title = 'wrong_data'
     response.view = 'plugin_sqleditable/sample.html'
     editable = SQLEDITABLE(db.wrong_order, showid=False, maxrow=29).process()
     return dict(editable=editable)
+'''
 
 #@auth.requires_login()
 def display_form():
@@ -491,6 +489,216 @@ def pampers_census():
     row_content['village']=float(db(db.pampers_order.class_city=='village').count())/db(db.pampers_order.order_id >= 0).count()
     db.pampers_result.insert(**row_content)
 
+def add_PG(ws3):
+    product_dict={}
+    header=['SB_Internal_Member_ID','Member_Account_ID','Reward_ID','Reward_Name','Reward_Value',
+        'Reward_Points','Reward_Internal_Cost','Issue_Date','Issue_Location','Redeemed_Date',
+        'Redeemed_Location','Cancel_Date','Expiration_Date','Reward_Barcode','First_Name','Last_Name',
+        'Address','City','trade_state','ZipCode','Email_Address','Mobil_Phone','IssuedFlag','RedeemFlag',
+        'CanceledFlag','REDEMPTION_STATUS','DLVRYNBR_REJRSN','DELIVERY_ADDRESS']
+    for rows in range(1,ws3.max_row+1):
+        rowcontent={}
+        buf_list=[]
+        for cols in range(1,ws3.min_col+1):
+            rowcontent[header[cols-1]]=unicode(ws3.cell(row=rows,column=cols).value)
+        db.original_data.insert(**rowcontent)
+#product id detribute info
+    rows= db().select(db.original_data.Reward_Name,
+                db.original_data.Reward_Value,
+                db.original_data.Reward_Points,
+                db.original_data.Reward_Internal_Cost,
+                orderby=db.original_data.Reward_Name)
+    rows[0]['product_id']=1*100+37
+    product_id=1*100+37
+    product_dict[rows[0]['Reward_Name']]=rows[0]['product_id']
+    db.product_info.insert(**rows[0])
+    for i in range(1,len(rows)):
+        if (rows[i]['Reward_Name']!=rows[i-1]['Reward_Name'])or\
+        (rows[i]['Reward_Value']!=rows[i-1]['Reward_Value'])or\
+        (rows[i]['Reward_Points']!=rows[i-1]['Reward_Points'])or\
+        (rows[i]['Reward_Internal_Cost']!=rows[i-1]['Reward_Internal_Cost']):
+            rows[i]['product_id']=product_id+100
+            product_id=rows[i]['product_id']
+            product_dict[rows[i]['Reward_Name']]=rows[i]['product_id']
+            db.product_info.insert(**rows[i])
+        else:pass
+#user id detribute info
+    user_row={}
+    users_address=[]
+    address_buf={}
+    users= db(db.original_data.DELIVERY_ADDRESS !=None).select\
+            (db.original_data.SB_Internal_Member_ID,
+             db.original_data.Member_Account_ID,
+             db.original_data.DELIVERY_ADDRESS,
+             db.original_data.Reward_Name,
+             orderby=db.original_data.DELIVERY_ADDRESS)
+    users_address=((users[0]['DELIVERY_ADDRESS']).decode('utf8')).split(";")
+    user_row['user_name']=users_address[0]
+    address_buf['user_name']=users_address[0]
+    user_row['address']=users_address[1]
+    address_buf['address']=users_address[1]
+    user_row['phone_num']=users_address[2]
+    address_buf['phone_num']=users_address[2]
+    user_row['city']=users_address[3]
+    user_row['province']=users_address[4]
+    user_row['zip_code']=users_address[5]
+    user_row['Country']=users_address[6]
+    user_row['SB_Internal_Member_ID']=unicode(users[0]['SB_Internal_Member_ID'])
+    user_row['Member_Account_ID']=unicode(users[0]['Member_Account_ID'])
+    user_row['user_id']=1*100+79
+    user_id=1*100+79
+    db.user_info.insert(**user_row)
+
+    for i in range(1,len(users)):
+        users_address=((users[i]['DELIVERY_ADDRESS']).decode('utf8')).split(";")
+        if len(users_address)==7:
+            user_row['user_name']=users_address[0]
+            user_row['address']=users_address[1]
+            user_row['phone_num']=users_address[2]
+            user_row['city']=users_address[3]
+            user_row['province']=users_address[4]
+            user_row['zip_code']=users_address[5]
+            user_row['Country']=users_address[6]
+            user_row['SB_Internal_Member_ID']=unicode(users[0]['SB_Internal_Member_ID'])
+            user_row['Member_Account_ID']=unicode(users[0]['Member_Account_ID'])
+            w1=(user_row['phone_num']==address_buf['phone_num'])
+            w2=(Simhash(get_feature(user_row['address'])).distance(Simhash(get_feature(address_buf['address'])))<5)
+            w3=(user_row['user_name']==address_buf['user_name'])
+            if (w1*0.5+w2*0.3+w3*0.2)<0.5:
+                user_row['user_id']=user_id+100
+                user_id=user_row['user_id']
+                db.user_info.insert(**user_row)
+                address_buf['phone_num']=user_row['phone_num']
+                address_buf['address']=user_row['address']
+                address_buf['user_name']=user_row['user_name']
+            else:pass
+#user2product
+    all_user=db().select(db.user_info.ALL)
+    for each in range(0,len(all_user)):
+        u2p_row={}
+        u2p_row['product_id']=[]
+        u2p_row['trials_count']=[]
+        u2p_row['user_id']=all_user[each]['user_id']
+        u2p_ship=db(int(all_user[each]['Member_Account_ID'])==db.original_data.Member_Account_ID).select\
+                (db.original_data.Reward_Name)
+        all_product=[]
+        all_product.append(u2p_ship[0]['Reward_Name'])
+        if len(u2p_ship)>=2:
+            for j in range(1,len(u2p_ship)):
+                if u2p_ship[j]['Reward_Name'] != u2p_ship[j-1]['Reward_Name']:
+                    all_product.append(u2p_ship[j]['Reward_Name'])
+        for k in range(0,len(all_product)):
+            (u2p_row['product_id']).append(all_product[k])
+            each_product_count=all_product.count(all_product[k])
+            (u2p_row['trials_count']).append(int(each_product_count))
+        db.user2product.insert(**u2p_row)
+        del all_product
+        del u2p_ship
+        u2p_row.clear()
+def display_u2p():
+    grid = SQLFORM.grid(db.user2product)
+    return locals()
+
+
+def add_babybox_BBS_CD(ws4):
+    header_babybox=['order_id','trade_order','trade_id','ex_id','product_order','barcode',
+                    'username','cellphone','province','city','county','address','reserve1',
+                    'product_name','data_date','channel','moon','reserve2','product','product_size',
+                    'product_brand','store_size','product_quantity','store_name',
+                    'receive_province','receive_city','receive_county','receive_address']
+    header_BBS=[]
+    header_FSCD=[]
+    SameOneHouse_phonenum=[]
+    town5times_phonenum=[]
+    village3times_phonenum=[]
+    AddressBlur_phonenum=[]
+    cor=[]
+    incor=[]
+    field_list = header_babybox
+    table_header={}
+    for cols in range(1,ws4.min_col+1):
+        table_header[field_list[cols-1]]=ws4.cell(row=1,column=cols).value
+    for rows in range(2,ws4.max_row+1):
+        rowcontent={}
+        for cols in range(1,ws4.min_col+1):
+            rowcontent[field_list[cols-1]]=ws4.cell(row=rows,column=cols).value
+        address=rowcontent['address']
+        if address.endswith(u'市')or address.endswith(u'县')or\
+        address.endswith(u'镇')or address.endswith(u'工业区')or address.endswith(u'工业园区')or\
+        address.endswith(u'公园')or address.endswith(u'管理区')or address.endswith(u'开发区')or\
+        address.endswith(u'新区')or address.endswith(u'球场')or address.endswith(u'停车场')or\
+        address.endswith(u'篮球场')or address.endswith(u'大道')or address.endswith(u'国道')or\
+        address.endswith(u'道')or address.endswith(u'路')or address.endswith(u'桥')or\
+        address.endswith(u'路口')or address.endswith(u'街上')or address.endswith(u'街')or\
+        address.endswith(u'门口')or address.endswith(u'市场')or address.endswith(u'公交站')or\
+        address.endswith(u'车站')or address.endswith(u'加油站')or address.endswith(u'服务站')or\
+        address.endswith(u'自取')or address.endswith(u'交叉口')or address.endswith(u'三岔口')or\
+        address.endswith(u'桥头')or address.endswith(u'附近')or address.endswith(u'快递')or\
+        address.endswith(u'物流')or address.endswith(u'自取')or address.endswith(u'交口'):
+            incor.append(rowcontent['cellphone'])
+        elif address.endswith(u'号楼') or address.endswith(u'栋')or\
+        address.endswith(u'幢') or address.endswith(u'座'):
+            SameOneHouse_phonenum.append(rowcontent['cellphone'])
+        elif address.endswith(u'小区')or address.endswith(u'校区')or\
+        address.endswith(u'宿舍')or address.endswith(u'公寓')or\
+        address.endswith(u'期')or address.endswith(u'A区')or\
+        address.endswith(u'B区')or address.endswith(u'C区')or\
+        address.endswith(u'D区')or address.endswith(u'东区')or\
+        address.endswith(u'西区')or address.endswith(u'北区')or\
+        address.endswith(u'南区'):
+            town5times_phonenum.append(rowcontent['cellphone'])
+        elif address.endswith(u'乡')or address.endswith(u'村')or address.endswith(u'庄')or\
+        address.endswith(u'营')or address.endswith(u'寨')or address.endswith(u'崖')or\
+        address.endswith(u'矿')or address.endswith(u'岗')or address.endswith(u'沟')or\
+        address.endswith(u'集')or address.endswith(u'湾')or address.endswith(u'小学')or\
+        address.endswith(u'中学')or  address.endswith(u'大学')or address.endswith(u'厂')or\
+        address.endswith(u'街道')or address.endswith(u'里')or address.endswith(u'巷')or\
+        address.endswith(u'弄')or address.endswith(u'社区')or address.endswith(u'中心')or\
+        address.endswith(u'办事处')or address.endswith(u'政府单位')or address.endswith(u'局')or\
+        address.endswith(u'法院')or address.endswith(u'医院')or address.endswith(u'大厦')or\
+        address.endswith(u'居委会')or address.endswith(u'派出所')or address.endswith(u'汽配城')or\
+        address.endswith(u'商贸城')or address.endswith(u'速递易')or address.endswith(u'镇邮局'):
+            village3times_phonenum.append(rowcontent['cellphone'])
+        elif address.endswith(u'侧') or address.endswith(u'旁')or address.endswith(u'边')or\
+        address.endswith(u'隔壁')or address.endswith(u'附近')or address.endswith(u'对面')or \
+        address.endswith(u'段'):#or address.endswith(u'门口') or address.endswith(u'口') :
+            AddressBlur_phonenum.append(rowcontent['cellphone'])
+        else:
+            cor.append(rowcontent['cellphone'])
+
+    for rows in range(2,ws4.max_row+1):
+        rowcontent={}
+        correct_phonenum=SameOneHouse_phonenum + town5times_phonenum + \
+                        village3times_phonenum + AddressBlur_phonenum
+        phonenum = ws4.cell(row=rows,column=8).value
+        for cols in range(1,ws4.min_col+1):
+            rowcontent[field_list[cols-1]]=ws4.cell(row=rows,column=cols).value
+        if phonenum in incor:
+            db.incorrect_BCB.insert(**rowcontent)
+        elif phonenum in cor:
+            db.correct_BCB.insert(**rowcontent)
+        elif phonenum in SameOneHouse_phonenum:
+            if SameOneHouse_phonenum.count(phonenum)>=2:
+                db.incorrect_BCB.insert(**rowcontent)
+            else:
+                db.correct_BCB.insert(**rowcontent)
+        elif phonenum in town5times_phonenum:
+            if (town5times_phonenum.count(phonenum)>5):
+                db.incorrect_BCB.insert(**rowcontent)
+            else:
+                db.correct_BCB.insert(**rowcontent)
+        elif phonenum in village3times_phonenum:
+            if village3times_phonenum.count(phonenum)>3:
+                db.incorrect_BCB.insert(**rowcontent)
+            else:
+                db.correct_BCB.insert(**rowcontent)
+        elif phonenum in AddressBlur_phonenum:
+            if AddressBlur_phonenum.count(phonenum)>=2:
+                db.incorrect_BCB.insert(**rowcontent)
+            else:
+                db.correct_BCB.insert(**rowcontent)
+        else:pass
+
 def index():
     """
     example action using the internationalization operator T and flash
@@ -504,17 +712,25 @@ def index():
         ws=import_excel(request.vars.csvfile1.file)
         add_excel(ws)
         response.flash = T('data uploaded')
+    if request.vars.csvfile3 != None:
+        ws3=import_excel(request.vars.csvfile3.file)
+        add_PG(ws3)
+        response.flash = T('data uploaded')
+    if request.vars.csvfile4 != None:
+        ws4=import_excel(request.vars.csvfile4.file)
+        add_babybox_BBS_CD(ws4)
+        response.flash = T('data uploaded')
     if request.vars.csvfile2 != None:
         ws1=import_excel(request.vars.csvfile2.file)
-        license=[1516161,1520345,1518691,1542961,1551748,1541116,1516035,1520803,
+        lice=[1516161,1520345,1518691,1542961,1551748,1541116,1516035,1520803,
         1522679,1527299,1538111,1544564,1550749,1520841,1540979,1523641]
         if db(db.pampers_order).isempty():
             add_pampers(ws1)
             response.flash = T('data uploaded')
         else:
             count=0
-            for i in range(0,len(license)):
-                if(ws1.cell(row=i,column=1).value==license[i]):
+            for i in range(0,len(lice)):
+                if(ws1.cell(row=i,column=1).value==lice[i]):
                     count=count+1
             if count>11:
                 add_pampers(ws1)
@@ -558,8 +774,33 @@ def call():
     """
     return service()
 
+#@auth.requires_login()
 @request.restful()
-def api():
+def TradeAdd():
+    response.view ='generic.'+request.extension  #return  json
+    def POST(tablename,**vars):
+        ret={}
+        #if db(db.trade).isempty():
+        ret=dict(db[tablename].validate_and_insert(**vars))
+        '''else:
+            samp_list=db().select(db.trade.mobilPhone,
+            db.trade.postcode,db.trade.consignee,db.trade.address).as_list()
+            for i in range(0,len(samp_list)):
+                w1=(vars['mobilPhone']==samp_list[i]['mobilPhone'])
+                w2=(vars['postcode']==samp_list[i]['postcode'])and \
+                   (Simhash(get_feature(vars['address'])).distance(Simhash(get_feature(samp_phonenum[i]['address'])))<5)
+                w3=(vars['consignee']==samp_list[i]['consignee'])
+                if (w1*0.5+w2*0.3+w3*0.2)>0.5:
+                    ret=dict(db[tablename].validate_and_insert(**vars))
+                else:
+                    ret["errors"]={"WrongReason":"duplication"}'''
+        return ret
+            #else:raise HTTP(400)
+    return locals()
+
+@auth.requires_login()
+@request.restful()
+def TradeGet():
     response.view ='generic.'+request.extension  #return  json
     def GET(*args,**vars):
         patterns=[
@@ -578,43 +819,20 @@ def api():
             return dict(content=parser.response)
         else:
             raise HTTP(parser.status,parser.error)
-    def POST(tablename,**vars):
-        #if tablename=='pampers_order':
-        return dict(db[tablename].validate_and_insert(**vars))
-            #return dict(db(db.pampers_order.order_id==vars['order_id']).delete())
-            #else:
-            #raise HTTP(400)
+    return locals()
+
+@request.restful()
+def TradeUpdate():
+    response.view ='generic.'+request.extension  #return  json
     def PUT(table_name,record_id,**vars):
         return db(db[table_name].order_id==record_id).update(**vars)
+    return locals()
+
+@request.restful()
+def TradeDelete():
+    response.view ='generic.'+request.extension  #return  json
     def DELETE(table_name,record_id):
         return db(db[table_name].order_id==record_id).delete()
     return locals()
 
 
-'''elif method=='put':
-return dict(db.pampers_order.validate_and_updata(**fields))
-def post_db_map(table_name,**vars):
-response.view ='generic.'+request.extension  #return  json
-if table_name == 'db_map':
-    return db.db_map.validate_and_insert(**vars)
-dict(counter=session.counter, now=request.now,
-                f=request.extension,s=request.view,
-                a=request.args,v=request.vars)
-                def post_db_map(table_name,**vars):
-    response.view ='generic.'+request.extension  #return  json
-    if table_name == 'db_map':
-        return db.db_map.validate_and_insert(**vars)
-dict(counter=session.counter, now=request.now,
-                f=request.extension,s=request.view,
-                a=request.args,v=request.vars)
-ttGetHistoryByField()
-ttGet
-        patterns=[
-            "/products[custom_order]",
-            "/product/{custom_order.user_name.startswith}",
-            "/product/{custom_order.user_name}/:field"
-        ]
-        "/product/{custom_order.id}",
-        "/products[custom_order]",
-                #patterns=['/products[db_map]']
-                '''
