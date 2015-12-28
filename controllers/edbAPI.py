@@ -168,12 +168,12 @@ def AddTrade(data):
     for k,v in data.items():
         if k in orderTag:
             tmp=XML_ET.SubElement(orderInfo,k)
-            tmp.text=v
+            tmp.text=v.decode('utf8')
         if k in productTag:
             tmp=XML_ET.SubElement(itemInfo,k)
-            tmp.text=v
+            tmp.text=v.decode('utf8')
     orderInfo.append(productXml)
-    finalStr=XML_ET.tostring(orderXml,"utf-8")
+    finalStr=XML_ET.tostring(orderXml,"utf8")
     result={}
     result["xmlValues"]=finalStr
     return result
@@ -197,7 +197,6 @@ def test_main():
     "product_title":"测试修改没",
     "standard":"统一规格",
     "orderGoods_Num":"1",
-    "out_tid":"CRMJ2015120728547",
     }
     print AddTrade(data)
     
