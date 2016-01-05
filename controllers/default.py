@@ -962,45 +962,50 @@ def TradeAdd():
         #if db(db.trade).isempty():
         keys=[]
         keys=vars.keys()
-        if ('apiKey' in keys)and('apiSecret' in keys)and\
+        for k in keys:
+            k.decode('unicode_escape')
+        if ('apiKey' in keys)and('product_info' in keys)and\
         ('timestamp' in keys)and('sig' in keys) and\
         ('out_tid' in keys)and ('shop_id' in keys)and\
         ('consignee' in keys)and('address' in keys)and\
         ('postcode' in keys)and('mobilPhone' in keys)and\
         ('order_date' in keys)and\
-        ('barCode' in keys)and\
-        ('product_title' in keys)and \
-        ('standard' in keys)and\
-        ('out__tid' in keys):
-            ret=dict(db[tablename].validate_and_insert(**vars))
+        ('product_title' in vars['product_info'][0].keys())and \
+        ('standard' in vars['product_info'][0].keys())and\
+        ('out__tid' in vars['product_info'][0].keys()):
+            #ret=dict(db[tablename].validate_and_insert(**vars))
             ts=int(time.time())
-            this_apiKey=0xec4238a0
+            this_apiKey=u'0xec4238a0'
             this_apiSecret=0xec30a863
-            essencial_field=[str(vars['apiKey']),str(vars['apiSecret']),str(vars['timestamp']),
-                            str(vars['out_tid']),str(vars['shop_id']),str(vars['consignee']),
-                            str(vars['address']),str(vars['postcode']),str(vars['mobilPhone']),
-                            str(vars['order_date']),
-                            str(vars['barCode']),
-                            str(vars['product_title']),
-                            str(vars['standard']),
-                            str(vars['out__tid'])]
+            essencial_field=vars.keys()
             essencial_field.sort()
-            SigStr=''
+            SigStr=""
             for field in essencial_field:
-                SigStr=SigStr+field
-            this_sig=int(hash(SigStr))
-            if (int(vars['apiKey'])==this_apiKey)and(ts-int(vars['timestamp'])<100)and\
-            (int(vars['sig'])==this_apiKey):
+                if field =="sig" or field =="apiSecret":
+                    continue
+                elif field =="product_info":
+                    SigStr=SigStr+unicode(field)+u"="+u"["
+                    for d in vars["product_info"]:
+                        k=d.keys()
+                        k.sort()
+                        SigStr=SigStr+u"{"
+                        for j in k:
+                            SigStr=SigStr+unicode(j)+u"="+unicode(d[j])+u"&"
+                        SigStr=SigStr[0:len(SigStr)-1]
+                        SigStr=SigStr+u"}"
+                    SigStr=SigStr+u"]"+u"&"
+                else:
+                     SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
+            this_sig=MD5Sign(SigStr[0:len(SigStr)-1].encode('utf8'))
+            if (vars['sig']==this_sig) and ((vars['apiKey']).decode('unicode_escape')==(this_apiKey))  :
                 content.append({'is_success':'true','response_Msg':u'成功导入系统'})
+            else:
+                content.append({'sig':(vars['sig']),'this_sig':this_sig})
         else:
             if not ('apiKey' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'接口密钥在软件中不存在',
                                 'field':'apiKey'})
-            if not ('apiSecret' in keys):
-                content.append({'is_success':'false',
-                                'response_Msg':u'接口密码在软件中不存在',
-                                'field':'apiSecret'})
             if not ('timestamp' in keys):
                 content.append({'is_success':'false',
                         'response_Msg':u'时间戳在软件中不存在',
@@ -1037,23 +1042,24 @@ def TradeAdd():
                 content.append({'is_success':'false',
                                 'response_Msg':u'订货日期在表单中不存在',
                                 'field':'order_date'})
-            if not ('barCode' in keys):
+            if not ('product_info' in keys):
                 content.append({'is_success':'false',
-                                'response_Msg':u'产品条形码在表单中不存在',
-                                'field':'barCode'})
-            if not ('product_title' in keys):
-                content.append({'is_success':'false',
-                                'response_Msg':u'产品名称在表单中不存在',
-                                'field':'product_title'})
-            if not ('standard' in keys):
-                content.append({'is_success':'false',
-                                'response_Msg':u'网店规格在表单中不存在',
-                                'field':'standard'})
-            if not ('out__tid' in keys):
-                content.append({'is_success':'false',
-                                'response_Msg':u'外部平台单号在子表中不存在',
-                                'field':'out__tid'})
-    #ret=dict(db[tablename].validate_and_insert(**vars))
+                                'response_Msg':u'订货在表单中不存在',
+                                'field':'product_info'})
+            else:
+                if not ('product_title' in vars['product_info'][0].keys()):
+                    content.append({'is_success':'false',
+                                    'response_Msg':u'产品名称在表单中不存在',
+                                    'field':'product_title'})
+                if not ('standard' in vars['product_info'][0].keys()):
+                    content.append({'is_success':'false',
+                                    'response_Msg':u'网店规格在表单中不存在',
+                                    'field':'standard'})
+                if not ('out__tid' in vars['product_info'][0].keys()):
+                    content.append({'is_success':'false',
+                                    'response_Msg':u'外部平台单号在子表中不存在',
+                                    'field':'out__tid'})
+#ret=dict(db[tablename].validate_and_insert(**vars))
         jsonObj['item']=content
         return jsonObj
             #else:raise HTTP(400)
@@ -1110,5 +1116,3 @@ w2=(vars['postcode']==samp_list[i]['postcode'])and \
         ret=dict(db[tablename].validate_and_insert(**vars))
     else:
         ret["errors"]={"WrongReason":"duplication"}'''
-
-

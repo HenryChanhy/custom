@@ -107,6 +107,28 @@ db.define_table('history_order',
                 Field('memo2',length=20),
                 Field('address_bak',length=20)
                 )
+db.define_table('history',
+                Field('order_id', unique=True,length=20),
+                Field('ex_id',length=20),
+                Field('promo_id',length=20),
+                Field('barcode',length=20),
+                Field('user_name',length=40),
+                Field('mobile',length=13),
+                Field('province',length=40),
+                Field('city',length=40),
+                Field('county',length=40),
+                Field('address',length=80),
+                Field('order_date',length=13),
+                Field('product_name',length=20),
+                Field('data_date',length=20),
+                Field('channel',length=13),
+                Field('stage',length=20),
+                Field('city_class1',length=20),
+                Field('city_class2',length=20),
+                Field('memo1',length=20),
+                Field('memo2',length=20),
+                Field('address_bak',length=20)
+                )
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 db.define_table('db_map',
                 Field('table_type',length=20),
