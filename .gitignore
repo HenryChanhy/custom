@@ -6,3 +6,11 @@ databases/**
 *˜
 *.pyc
 .idea/**
+
+*.pyc
+
+controllers/err.txt
+
+*.pyc
+
+*.pyc
