@@ -22,7 +22,7 @@ import requests
 
 import xml.etree.ElementTree as XML_ET
 
-def GetTimeStamp():
+def GetTimeStamp_edb():
     t=time.localtime()
     lst=[]
     for i in xrange(len(t)):
@@ -32,6 +32,9 @@ def GetTimeStamp():
         lst.append(v)
     reStr="".join(lst)
     return reStr
+
+def GetTimeStamp():
+    return int(time.time())
 
 def MD5Sign(md5Str):
     m=hashlib.md5()
@@ -91,14 +94,16 @@ def TrialAPI(**arg):
         def __TrialAPI(data):
             #url="http://vip802.6x86.com/edb2/rest/index.aspx"
             SysData={
-                "apiKey":"6f55e36b",
+                "apiKey":"A6BEA59B",
                 }
             ExData={
-                "apiSecret":"adeaac8b252e4ed6a564cdcb1a064082",
+                "apiSecret":"1F6F088755B094DDAD3C7AEFEA73A1A1",
                 }
             param=func(data)
             param.update(SysData)
-            url="http://IP+PORT/TrialCenter/order/Pampers/ST/"+arg["method"]
+            param.update(data)
+            #url="http://IP+PORT/TrialCenter/order/Pampers/ST/"+arg["method"]
+            url="https://int.taotonggroup.com/pampers1/default/"+arg["method"]
             #param["method"]=arg["method"]
             param["timestamp"]=GetTimeStamp()
             #param["timestamp"]="201512161115"
@@ -106,19 +111,18 @@ def TrialAPI(**arg):
             for k,v in param.items():
 #                if k=="appkey":
 #                    continue
-                if not str(v):
-                    continue
-                paraList.append(k+"="+str(v))
+                if isinstance(v,str):
+                    paraList.append(k+"="+str(v))
 
-            for k,v in ExData.items():
-                paraList.append(k+"="+str(v))
+#            for k,v in ExData.items():
+#                paraList.append(k+"="+str(v))
 
             paraList.sort(cmp)
             md5Str="&".join(paraList)
-            md5Str=md5Str+"&apiSecret="+ExData["apiSecret"]
+            md5Str=md5Str+ExData["apiSecret"]
             #md5Str=ToUTF8Str(md5Str)
             param["sig"]=MD5Sign(md5Str)
-            req=requests.post(url,param)
+            req=requests.post(url,param,verify=False)
 
             if not req.ok:
                 print "requests FAIL"
@@ -146,10 +150,12 @@ def updateOTI(data):
 
 @TrialAPI(method="updateTrialOrderStatus")
 def updateTOS(data):
-    result={}
-    result["xmlValues"]=finalStr
-    return result
 
+    return {}
+@TrialAPI(method="TradeAdd")
+def addTrade(data):
+
+    return {}
 
 #测试用，可删除
 def test_main():
@@ -159,12 +165,31 @@ def test_main():
 	"status": "1"
     }
     print updateTOS(data)
+
     orderinfo={
 	"order_id": "11212",
 	"tracking_number": "121212121212121",
 	"tracking_company": "ZTO"
     }
     print updateOTI(orderinfo)
-
+def test_addTrade():
+    data0={"product_totalMoney":"0","storage_id":"11",
+       "deliver_status":"\u672a\u53d1\u8d27","consignee":"\u6d4b\u8bd51",
+       "actual_RP":"","express":"\u4e2d\u901a\u4e0a\u6d77",
+       "pay_status":"\u5df2\u4ed8\u6b3e","invoice_type":"","city":"\u65e0\u9521",
+       "is_invoiceOpened":"0","timestamp":"1451903037","buyer_email":"",
+       "area":"\u6ee8\u6e56\u533a","province":"\u6c5f\u82cf",
+       "process_status":"\u672a\u786e\u8ba4","order_date":"yyyy-mm-dd hh24:mi:ss",
+       "mobilPhone":"18651515873","order_totalMoney":"0","buyer_id":"","shop_id":"9",
+       "invoice_title":"","out_tid":"1","postcode":"","buyer_alipay":"","pay_method":"",
+       "actual_freight_get":"","address":"\u6c5f\u82cf \u65e0\u9521 \u6ee8\u6e56\u533a \u9526\u6eaa\u8def",
+       "pay_date":"","invoice_money":"","invoice_msg":"",
+       "product_info":[{"orderGoods_Num":"1","out__tid":"1","product_title":"\u6d4b\u8bd5\u5546\u54c11","standard":"1","cost_Price":"0","barCode":"12345678"}],
+       "sig":"6b1e5af7b119bdeb1c7dc70512a6be8e","order_type":"\u6b63\u5e38\u8ba2\u5355",
+       "finish_date":""}
+    for k,v in data0.items():
+        if isinstance(v,str):
+            data0[k]=v.decode("unicode-escape")
+    print addTrade(data0)
 if __name__=="__main__":
     test_main()
