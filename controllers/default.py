@@ -975,8 +975,8 @@ def TradeAdd():
         ('out__tid' in vars['product_info'][0].keys()):
             #ret=dict(db[tablename].validate_and_insert(**vars))
             ts=int(time.time())
-            this_apiKey=u'0xec4238a0'
-            this_apiSecret=0xec30a863
+            this_apiKey=u'A6BEA59B'
+            this_apiSecret=u'1F6F088755B094DDAD3C7AEFEA73A1A1'
             essencial_field=vars.keys()
             essencial_field.sort()
             SigStr=""
@@ -996,66 +996,68 @@ def TradeAdd():
                     SigStr=SigStr+u"]"+u"&"
                 else:
                      SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
-            this_sig=MD5Sign(SigStr[0:len(SigStr)-1].encode('utf8'))
-            if (vars['sig']==this_sig) and ((vars['apiKey']).decode('unicode_escape')==(this_apiKey))  :
+            this_sig=MD5Sign((SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'))
+            if (vars['sig']==this_sig) and \
+            (ts-int(vars['timestamp'])<180) and \
+            ((vars['apiKey']).decode('unicode_escape')==(this_apiKey))  :
                 content.append({'is_success':'true','response_Msg':u'成功导入系统'})
             else:
-                content.append({'sig':(vars['sig']),'this_sig':this_sig})
+                content.append({'sig':(vars['sig']),'this_sig':this_sig,'sigstr':(SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8')})
         else:
-            if not ('apiKey' in keys):
+            if not (u'apiKey' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'接口密钥在软件中不存在',
-                                'field':'apiKey'})
-            if not ('timestamp' in keys):
+                                'field':'apiKey',})
+            if not (u'timestamp' in keys):
                 content.append({'is_success':'false',
                         'response_Msg':u'时间戳在软件中不存在',
                         'field':'timestamp'})
-            if not ('sig' in keys):
+            if not (u'sig' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'签名在软件中不存在',
                                 'field':'sig'})
-            if not ('out_tid' in keys):
+            if not (u'out_tid' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'签名在软件中不存在',
                                 'field':'out_tid'})
-            if not ('shop_id' in keys):
+            if not (u'shop_id' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'店铺代码在表单中不存在',
                                 'field':'shop_id'})
-            if not ('consignee' in keys):
+            if not (u'consignee' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'收货人姓名在表单中不存在',
                                 'field':'consignee'})
-            if not ('address' in keys):
+            if not (u'address' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'收货地址在表单中不存在',
                                 'field':'address'})
-            if not ('postcode' in keys):
+            if not (u'postcode' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'邮政编码在表单中不存在',
                                 'field':'postcode'})
-            if not ('mobilPhone' in keys):
+            if not (u'mobilPhone' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'手机号码在表单中不存在',
                                 'field':'mobilPhone'})
-            if not ('order_date' in keys):
+            if not (u'order_date' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'订货日期在表单中不存在',
                                 'field':'order_date'})
-            if not ('product_info' in keys):
+            if not (u'product_info' in keys):
                 content.append({'is_success':'false',
                                 'response_Msg':u'订货在表单中不存在',
                                 'field':'product_info'})
             else:
-                if not ('product_title' in vars['product_info'][0].keys()):
+                if not (u'product_title' in vars['product_info'][0].keys()):
                     content.append({'is_success':'false',
                                     'response_Msg':u'产品名称在表单中不存在',
                                     'field':'product_title'})
-                if not ('standard' in vars['product_info'][0].keys()):
+                if not (u'standard' in vars['product_info'][0].keys()):
                     content.append({'is_success':'false',
                                     'response_Msg':u'网店规格在表单中不存在',
                                     'field':'standard'})
-                if not ('out__tid' in vars['product_info'][0].keys()):
+                if not (u'out__tid' in vars['product_info'][0].keys()):
                     content.append({'is_success':'false',
                                     'response_Msg':u'外部平台单号在子表中不存在',
                                     'field':'out__tid'})
