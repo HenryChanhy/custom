@@ -10,7 +10,8 @@
 # #######################################################################
 import re
 from simhash import Simhash,SimhashIndex
-
+import time
+import hashlib
 import openpyxl
 
 auth.settings.allow_basic_login = True
@@ -54,35 +55,8 @@ def init_db():
 def import_csv(csvfile):
     db.custom_order.import_from_csv_file(csvfile)
 
-def get_features(s):
-    return [s[i:i+3] for i in range(max(len(s)-3+1,1))]
-'''
-#s=Simhash(get_feature(ws.cell(row=rows,column=10).value,3))
-history_data=db().select(db.history_order.order_id,db.history_order.address).as_list()
-addr_obj=[(str(k),Simhash(get_feature(v,3))) for k, v in history_data]
-index = SimhashIndex(addr_obj, k=3)
-or index.get_near_dups(s) is not None
-and\(db.history_order.county==ws.cell(row=rows, column=9).value)
-rowcontent['relate_history_id']=buf_list[i]['order_id']
-rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'地址重复'
-if rowcontent['mobile'] in db().select(db.history_order.mobile) :
-            rowcontent['wrong_reason']=u'与历史重复'
-            db.incorrect_data.insert(**rowcontent)
-        else:
-            rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
-                s=s.lower()
-    s=re.sub(r'[^\w]+','',s)
-    db.custom_order.insert(**rowcontent)回族|壮族|维尔吾族|特别行政区|自治区
-    &\(re.match('\d{0,2}',db.history_order.product_name).group()==\
-    str(ws1.cell(row=rows,column=10).value))
-        if not tablename=='custom_order': raise HTTP(400)
-        return dict(custom_order = db.custom_order(id))
-def wrong_data():
-    response.title = 'wrong_data'
-    response.view = 'plugin_sqleditable/sample.html'
-    editable = SQLEDITABLE(db.wrong_order, showid=False, maxrow=29).process()
-    return dict(editable=editable)
-'''
+def get_feature(s):
+    return [s[i:i+1] for i in range(max(len(s)-1+1,1))]
 
 #@auth.requires_login()
 def display_form():
@@ -110,7 +84,7 @@ def process_order():
     Info=request.vars
     order_id=Info["order_id"]
     iFlag=Info["process_flag"]
-'''
+
 def data_wrong():
     form = SQLFORM(db.wrong_order)
     if form.process().accepted:
@@ -120,7 +94,7 @@ def data_wrong():
     else:
         response.flash = 'please fill out the form'
     return dict(form=form)
-'''
+
 def import_excel(file):
     WB=openpyxl.load_workbook(file)
     WS=WB.active
@@ -588,6 +562,7 @@ def add_PG(ws3):
         del all_product
         del u2p_ship
         u2p_row.clear()
+
 def display_u2p():
     grid = SQLFORM.grid(db.user2product)
     return locals()
@@ -656,7 +631,6 @@ def add_babybox_BBS_CD(ws4):
             AddressBlur_phonenum.append(rowcontent['cellphone'])
         else:
             cor.append(rowcontent['cellphone'])
-
     for rows in range(2,ws4.max_row+1):
         rowcontent={}
         correct_phonenum=SameOneHouse_phonenum + town5times_phonenum + \
@@ -703,26 +677,16 @@ def statistics(list1):
                     li.append(j)
         dict1[list1[i]]=li
     return dict1
-'''
-def statistics(addr):
-    dict1={}
-    for i in range(0,len(addr)):
-        if  addr[i] in dict1.keys():
-            continue
-        else:
-            li=[]
-            li.append(i)
-            for j in range(i+1,len(addr)):
-                if Simhash(get_features(u''+addr[i])).distance(Simhash(get_features(u''+addr[j])))<7:
-                    li.append(j)
-        dict1[addr[i]]=li
-    return dict1
-#address compare
 
-address_dict={}
-    for num in single_place_collect:
-        if  ws4.cell(row=num,column=7).value in dict.keys():
-'''
+def himin_distance(i1,i2):
+    f=64
+    x = (i1 ^ i2) & ((1 << 64) - 1)
+    ans = 0
+    while x:
+        ans += 1
+        x &= x - 1
+    return ans
+    
 def add_BBS_20151222(ws4):
     field_list=['order_id','ex_id','shop_name','telephone','cellphone','user_name','address',
                 'province','city','county','product_order','barcode','product_name','product_size',
@@ -734,7 +698,27 @@ def add_BBS_20151222(ws4):
             full_line=full_line+1
         else:
             break
-    #for rows in range(2,full_line):
+#get the all hash Address
+    hash_addr=[]
+    for i in range(1,ws4.max_row+1):
+        hash_addr.append(Simhash(get_feature(ws4.cell(row=i,column=7).value)).value)
+#collect the duplicated address_place
+    addr_dict={}
+    dup_addr_place=[]
+    for i in range(0,len(hash_addr)):
+        if i in dup_addr_place:
+            continue
+        else:
+            li=[]
+            for j in range(i+1,len(hash_addr)):
+                if himin_distance(hash_addr[i],hash_addr[j])<8:
+                    li.append(j)
+            if len(li)==0:
+                continue
+            else:
+                dup_addr_place.extend(li)
+                addr_dict[i]=li
+#collect the duplicated phone_place
     phone_dict={}
     for i in range(1,ws4.max_row+1):
         if  ws4.cell(row=i,column=5).value in phone_dict.keys():
@@ -746,30 +730,45 @@ def add_BBS_20151222(ws4):
                 if ws4.cell(row=j,column=5).value == ws4.cell(row=i,column=5).value:
                     li.append(j)
         phone_dict[ws4.cell(row=i,column=5).value]=li
-#collect the duplicated phone_place
-    dup_place_collect=[]
-    weight_place_collect=[]
-    single_place_collect=[]
+    def InsertExcel2IncorrectDb(i,wrong_reason):
+        rowcontent={}
+        for cols in range(1,ws4.min_col+1):
+            rowcontent[field_list[cols-1]]=ws4.cell(row=i,column=cols).value
+        rowcontent['wrong_reason']=wrong_reason
+        db.incorrect_BCB.insert(**rowcontent)
+    incorrect_record=[]
+#process the dup phone_dict
     for phone_place in phone_dict.values():
         if len(phone_place)>=3:
-            raise HTTP(404)
-        elif len(phone_place)>=2:
-            if Simhash(get_feature(ws4.cell(row=phone_place[0],column=7).value)).distance\
-            (Simhash(get_feature(ws4.cell(row=phone_place[1],column=7).value)))<8:
-                dup_place_collect.extend(phone_place)
-            else:
-                weight_place_collect.extend(phone_place)
+            return u"数据错误"
         else:
             pass
-    for i in range(1,ws4.max_row+1):
-        if i in (weight_place_collect+dup_place_collect):
-            continue
+#process the dup addr
+    for i,k in addr_dict.items():
+        if len(k)>=2:
+            k.append(i)
+            for j in k:
+                InsertExcel2IncorrectDb(j+2,u'当份重复')
+                incorrect_record.append(j+2)
         else:
-            single_place_collect.append(i)
-    precor_place_collect=[]
-    precor_place_collect.append(single_place_collect[0])
-    for i in single_place_collect[1:]:
-        address=ws4.cell(row=i,column=7).value
+            sizei=str(ws4.cell(row=i+2,column=15).value)
+            sizek=str(ws4.cell(row=k[0]+2,column=15).value)
+            if (sizei[sizei.find(u'片')-2]==1)and(sizek[sizek.find(u'片')-2]==1):
+                InsertExcel2IncorrectDb(k[0]+2,u'当份重复')
+                incorrect_record.append(k[0]+2)
+            elif (sizei[sizei.find(u'片')-2]!=sizek[sizek.find(u'片')-2]):
+                if (ws4.cell(row=i+2,column=5).value)!=(ws4.cell(row=k[0]+2,column=5).value):
+                    x = i if sizei[sizei.find(u'片')-2]==1 else k[0]
+                    InsertExcel2IncorrectDb(x+2,u'当份重复')
+                    incorrect_record.append(x+2)
+            else:
+                InsertExcel2IncorrectDb(k[0]+2,u'当份重复')
+                incorrect_record.append(k[0]+2)
+    all_record=range(full_line,ws4.max_row+1)
+    precor_record=set(all_record)-set(incorrect_record)
+
+    for r in precor_record:
+        address=ws4.cell(row=r,column=7).value
         if address.endswith(u'市')or address.endswith(u'县')or\
         address.endswith(u'镇')or address.endswith(u'工业区')or address.endswith(u'工业园区')or\
         address.endswith(u'公园')or address.endswith(u'管理区')or address.endswith(u'开发区')or\
@@ -782,93 +781,37 @@ def add_BBS_20151222(ws4):
         address.endswith(u'自取')or address.endswith(u'交叉口')or address.endswith(u'三岔口')or\
         address.endswith(u'桥头')or address.endswith(u'附近')or address.endswith(u'快递')or\
         address.endswith(u'物流')or address.endswith(u'自取')or address.endswith(u'交口'):
-            rowcontent={}
-            for cols in range(1,ws4.min_col+1):
-                rowcontent[field_list[cols-1]]=ws4.cell(row=i,column=cols).value
-            rowcontent['wrong_reason']=u'地址不详'
-            db.incorrect_BCB.insert(**rowcontent)
-        elif Simhash(get_feature(ws4.cell(row=i-1,column=7).value)).distance\
-        (Simhash(get_feature(ws4.cell(row=i,column=7).value)))<8:
-            rowcontent={}
-            for cols in range(1,ws4.min_col+1):
-                rowcontent[field_list[cols-1]]=ws4.cell(row=i,column=cols).value
-            rowcontent['wrong_reason']=u'当份重复'
-            db.incorrect_BCB.insert(**rowcontent)
+            InsertExcel2IncorrectDb(r,u'地址不全')
         else:
-            precor_place_collect.append(i)
-    for rows in (precor_place_collect+dup_place_collect):
-        rowcontent={}
-        for cols in range(1,ws4.min_col+1):
-            rowcontent[field_list[cols-1]]=ws4.cell(row=rows,column=cols).value
-        address=rowcontent['address']+u''
-        address=address.replace(u'，','')
-        address=address.replace(u'--',u'-')
-        address=address.replace(u'“','')
-        address=address.replace(u'”','')
-        rowcontent['address']=address
-        #rowcontent['address']=(str(rowcontent['address']).decode('UTF-8')).replace(u'，','')
-        #rowcontent['address']=(str(rowcontent['address']).decode('UTF-8')).replace(u'--',u'-')
-        #rowcontent['address']=(str(rowcontent['address']).decode('UTF-8')).replace(u'“','')
-        #rowcontent['address']=(str(rowcontent['address']).decode('UTF-8')).replace(u'”','')
-        if u'街道办事处' in address[0:address.find(u'省')]:
-            rowcontent['address']=str(rowcontent['address']).replace(u'街道办事处','')
-        buf_list=db((db.history_order.province==ws4.cell(row=rows, column=8).value)&\
-                    (db.history_order.city==ws4.cell(row=rows, column=9).value)&\
-                    (db.history_order.county==ws4.cell(row=rows, column=10).value)).select\
-                (db.history_order.order_id,db.history_order.address_bak,db.history_order.mobile).as_list()
-        is_dup=0
-        for i in range(0,len(buf_list)):
-            if rowcontent['cellphone']==buf_list[i]['mobile']:
-                is_dup=1
-                rowcontent['wrong_reason']=u'与历史号码第'+unicode(buf_list[i]['order_id'])+u'条重复'
-                db.incorrect_BCB.insert(**rowcontent)
-                break
-            elif Simhash(get_feature(str(buf_list[i]['address_bak']).decode('UTF-8'))).distance(Simhash(get_feature(u''+ws4.cell(row=rows,column=7).value)))<8:
-                is_dup=1
-                rowcontent['wrong_reason']=u'与历史地址第'+unicode(buf_list[i]['order_id'])+u'条重复'
-                db.incorrect_BCB.insert(**rowcontent)
-                break
-            else:continue
-        if is_dup==0:
-            db.correct_BCB.insert(**rowcontent)
-
-    for rows in weight_place_collect:
-        rowcontent={}
-        for cols in range(1,ws4.min_col+1):
-            rowcontent[field_list[cols-1]]=ws4.cell(row=rows,column=cols).value
-        address=str(rowcontent['address'])
-        address=address.replace(u'，','')
-        address=address.replace(u'--',u'-')
-        address=address.replace(u'“','')
-        address=address.replace(u'”','')
-        rowcontent['address']=address
-
-        if u'街道办事处' in address[0:address.find(u'省')]:
-            rowcontent['address']=str(rowcontent['address']).replace(u'街道办事处','')
-        buf_list=db((db.history_order.province==ws4.cell(row=rows, column=8).value)&\
-                    (db.history_order.city==ws4.cell(row=rows, column=9).value)&\
-                    (db.history_order.county==ws4.cell(row=rows, column=10).value)).select\
-                (db.history_order.order_id,db.history_order.address_bak,db.history_order.mobile).as_list()
-        is_dup=0
-        for i in range(0,len(buf_list)):
-            if rowcontent['cellphone']==buf_list[i]['mobile']:
-                is_dup=1
-                rowcontent['wrong_reason']=u'与历史号码第'+unicode(buf_list[i]['order_id'])+u'条重复'
-                rowcontent['status1']=u'着重看'
-                db.incorrect_BCB.insert(**rowcontent)
-                break
-            elif Simhash(get_feature(str(buf_list[i]['address_bak']).decode('UTF-8'))).distance(Simhash(get_feature(u''+ws4.cell(row=rows,column=7).value)))<8:
-                is_dup=1
-                rowcontent['wrong_reason']=u'与历史地址第'+unicode(buf_list[i]['order_id'])+u'条重复'
-                rowcontent['status1']=u'着重看'
-                db.incorrect_BCB.insert(**rowcontent)
-                break
-            else:continue
-        if is_dup==0:
-            db.correct_BCB.insert(**rowcontent)
-
-
-
+            rowcontent={}
+            for cols in range(1,ws4.min_col+1):
+                rowcontent[field_list[cols-1]]=ws4.cell(row=r,column=cols).value
+            address=rowcontent['address']+u''
+            address=address.replace(u'，','')
+            address=address.replace(u'--',u'-')
+            address=address.replace(u'“','')
+            address=address.replace(u'”','')
+            rowcontent['address']=address
+            if u'街道办事处' in address[0:address.find(u'省')]:
+                rowcontent['address']=str(rowcontent['address']).replace(u'街道办事处','')
+            buf_list=db((db.history.city==ws4.cell(row=r, column=9).value)&\
+                        (db.history.county==ws4.cell(row=r, column=10).value)).select\
+                    (db.history.order_id,db.history.address_bak,db.history.mobile).as_list()
+            is_dup=0
+            for i in range(0,len(buf_list)):
+                if rowcontent['cellphone']==buf_list[i]['mobile']:
+                    is_dup=1
+                    rowcontent['wrong_reason']=u'与历史号码第'+unicode(buf_list[i]['order_id'])+u'条重复'
+                    db.incorrect_BCB.insert(**rowcontent)
+                    break
+                elif himin_distance(hash_addr[r-2],Simhash(get_feature(str(buf_list[i]['address_bak']).decode('UTF-8'))).value)<18:
+                    is_dup=1
+                    rowcontent['wrong_reason']=u'与历史地址第'+unicode(buf_list[i]['order_id'])+u'条重复'
+                    db.incorrect_BCB.insert(**rowcontent)
+                    break
+                else:continue
+            if is_dup==0:
+                db.correct_BCB.insert(**rowcontent)
 
 def index():
     """
@@ -945,8 +888,7 @@ def call():
     """
     return service()
 
-import time
-import hashlib
+
 def MD5Sign(md5Str):
     m=hashlib.md5()
     m.update(md5Str)
@@ -956,11 +898,8 @@ def MD5Sign(md5Str):
 def TradeAdd():
     response.view ='generic.'+request.extension  #return  json
     def POST(tablename,**vars):
-        ret={}
-        content=[]
+        msg=[]
         jsonObj={}
-        #if db(db.trade).isempty():
-        keys=[]
         keys=vars.keys()
         for k in keys:
             k.decode('unicode_escape')
@@ -973,10 +912,9 @@ def TradeAdd():
         ('product_title' in vars['product_info'][0].keys())and \
         ('standard' in vars['product_info'][0].keys())and\
         ('out__tid' in vars['product_info'][0].keys()):
-            #ret=dict(db[tablename].validate_and_insert(**vars))
             ts=int(time.time())
-            this_apiKey=u'0xec4238a0'
-            this_apiSecret=0xec30a863
+            this_apiKey='A6BEA59B'
+            this_apiSecret='1F6F088755B094DDAD3C7AEFEA73A1A1'
             essencial_field=vars.keys()
             essencial_field.sort()
             SigStr=""
@@ -996,76 +934,105 @@ def TradeAdd():
                     SigStr=SigStr+u"]"+u"&"
                 else:
                      SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
-            this_sig=MD5Sign(SigStr[0:len(SigStr)-1].encode('utf8'))
-            if (vars['sig']==this_sig) and ((vars['apiKey']).decode('unicode_escape')==(this_apiKey))  :
-                content.append({'is_success':'true','response_Msg':u'成功导入系统'})
+            this_sig=MD5Sign((SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'))
+            if (vars['sig']==this_sig) and (ts-int(vars['timestamp'])<180) and \
+            ((vars['apiKey']).decode('unicode_escape')==(this_apiKey))  :
+                msg.append({'is_success':'true','response_Msg':u'成功导入系统'})
+                content={}
+                for field in essencial_field:
+                    if field =="sig" or field =="apiKey" or field=="timestamp":
+                        continue
+                    elif field=="product_info":
+                        for f in vars["product_info"][0].keys():
+                            content[f]=vars["product_info"][0][f]
+                    else:
+                        content[field]=vars[field]
+                db.trade.insert(**content)
+
             else:
-                content.append({'sig':(vars['sig']),'this_sig':this_sig})
+                if (vars['sig']!=this_sig):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':(SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'),
+                                    'field':'sig'})
+                if ((vars['apiKey']).decode('unicode_escape')!=(this_apiKey)):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':u'apiKey错误',
+                                    'field':'apiKey'})
+                if (ts-int(vars['timestamp'])>180):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':u'时间戳错误',
+                                    'field':'timestamp'})
         else:
-            if not ('apiKey' in keys):
-                content.append({'is_success':'false',
+            if not (u'apiKey' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'接口密钥在软件中不存在',
-                                'field':'apiKey'})
-            if not ('timestamp' in keys):
-                content.append({'is_success':'false',
+                                'field':'apiKey',})
+            if not (u'timestamp' in keys):
+                msg.append({'is_success':'false',
                         'response_Msg':u'时间戳在软件中不存在',
                         'field':'timestamp'})
-            if not ('sig' in keys):
-                content.append({'is_success':'false',
+            if not (u'sig' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'签名在软件中不存在',
                                 'field':'sig'})
-            if not ('out_tid' in keys):
-                content.append({'is_success':'false',
+            if not (u'out_tid' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'签名在软件中不存在',
                                 'field':'out_tid'})
-            if not ('shop_id' in keys):
-                content.append({'is_success':'false',
+            if not (u'shop_id' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'店铺代码在表单中不存在',
                                 'field':'shop_id'})
-            if not ('consignee' in keys):
-                content.append({'is_success':'false',
+            if not (u'consignee' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'收货人姓名在表单中不存在',
                                 'field':'consignee'})
-            if not ('address' in keys):
-                content.append({'is_success':'false',
+            if not (u'address' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'收货地址在表单中不存在',
                                 'field':'address'})
-            if not ('postcode' in keys):
-                content.append({'is_success':'false',
+            if not (u'postcode' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'邮政编码在表单中不存在',
                                 'field':'postcode'})
-            if not ('mobilPhone' in keys):
-                content.append({'is_success':'false',
+            if not (u'mobilPhone' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'手机号码在表单中不存在',
                                 'field':'mobilPhone'})
-            if not ('order_date' in keys):
-                content.append({'is_success':'false',
+            if not (u'order_date' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'订货日期在表单中不存在',
                                 'field':'order_date'})
-            if not ('product_info' in keys):
-                content.append({'is_success':'false',
+            if not (u'product_info' in keys):
+                msg.append({'is_success':'false',
                                 'response_Msg':u'订货在表单中不存在',
                                 'field':'product_info'})
             else:
-                if not ('product_title' in vars['product_info'][0].keys()):
-                    content.append({'is_success':'false',
+                if not (u'product_title' in vars['product_info'][0].keys()):
+                    msg.append({'is_success':'false',
                                     'response_Msg':u'产品名称在表单中不存在',
                                     'field':'product_title'})
-                if not ('standard' in vars['product_info'][0].keys()):
-                    content.append({'is_success':'false',
+                if not (u'standard' in vars['product_info'][0].keys()):
+                    msg.append({'is_success':'false',
                                     'response_Msg':u'网店规格在表单中不存在',
                                     'field':'standard'})
-                if not ('out__tid' in vars['product_info'][0].keys()):
-                    content.append({'is_success':'false',
+                if not (u'out__tid' in vars['product_info'][0].keys()):
+                    msg.append({'is_success':'false',
                                     'response_Msg':u'外部平台单号在子表中不存在',
                                     'field':'out__tid'})
-#ret=dict(db[tablename].validate_and_insert(**vars))
-        jsonObj['item']=content
+        jsonObj['item']=msg
         return jsonObj
-            #else:raise HTTP(400)
     return locals()
 
-@auth.requires_login()
+#@auth.requires_login()
+@request.restful()
+def EdbOrderGet():
+    response.view ='generic.'+request.extension  #return  json
+    def GET(*args,**vars):
+        return int(vars['a'])+int(vars['c'])*int(vars['b'])
+    return locals()
+
+#@auth.requires_login()
 @request.restful()
 def TradeGet():
     response.view ='generic.'+request.extension  #return  json
@@ -1104,15 +1071,3 @@ def TradeDelete():
 
 
 
-'''else:
- samp_list=db().select(db.trade.mobilPhone,
-db.trade.postcode,db.trade.consignee,db.trade.address).as_list()
-for i in range(0,len(samp_list)):
-w1=(vars['mobilPhone']==samp_list[i]['mobilPhone'])
-w2=(vars['postcode']==samp_list[i]['postcode'])and \
-    (Simhash(get_feature(vars['address'])).distance(Simhash(get_feature(samp_phonenum[i]['address'])))<5)
-    w3=(vars['consignee']==samp_list[i]['consignee'])
-    if (w1*0.5+w2*0.3+w3*0.2)>0.5:
-        ret=dict(db[tablename].validate_and_insert(**vars))
-    else:
-        ret["errors"]={"WrongReason":"duplication"}'''

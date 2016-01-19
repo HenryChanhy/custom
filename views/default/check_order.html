@@ -6,7 +6,6 @@
 function showdiv(targetid,objN){
 	var target=document.getElementById(targetid);
 	var clicktext=document.getElementById(objN);
-
 	if (target.style.display=="block"){
 		target.style.display="none";
 		clicktext.innerText="+ 详细信息";
@@ -45,7 +44,7 @@ DUP_KEY_LIST=['wrong_reason','order_id','dup_ID','user_name','dup_name','mobile'
 <div id="{{=hideDivId}}" style="display:none">
 <table width="80%">
 {{for k,v in orderInfo.items():}}
-{{if k=='id' or k in DUP_KEY_LIST:
+{{if (k=='id') or (k in DUP_KEY_LIST):
 	continue
 else:
 }}

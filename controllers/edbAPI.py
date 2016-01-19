@@ -19,6 +19,7 @@ import time
 import hashlib
 import chardet
 import requests
+import json
 
 import xml.etree.ElementTree as XML_ET
 
@@ -89,18 +90,20 @@ def HandleResult(method,data,xmlObj):
 def EdbAPI(**arg):
     def _EdbAPI(func):
         def __EdbAPI(data):
-            url="http://vip802.6x86.com/edb2/rest/index.aspx" 
+            #url="http://vip79.edb04.net/edb2/rest/openapi/index.aspx"
+            url="http://vip79.edb04.net/rest/index.aspx"
             SysData={
-                "appkey":"6f55e36b",
-                "dbhost":"edb_a88888",
-                "format":"XML",
+                "appkey":"5a7b7896",
+                "dbhost":"edb_a77527",
+                "format":"json",
                 "v":2.0,
                 "slencry":0,
+                #"Ip":"127.0.0.1"
                 "Ip":"117.79.148.228",
                 }
             ExData={
-                "appscret":"adeaac8b252e4ed6a564cdcb1a064082",
-                "token":"a266066b633c429890bf4df1690789a3",
+                "appscret":"1f5b75edd28d480e968feecbc38f2c73",
+                "token":"7041e7424cb4410f8370f10a2d3a285a",
                 }
             param=func(data)
             param.update(SysData)
@@ -124,23 +127,21 @@ def EdbAPI(**arg):
             #md5Str=ToUTF8Str(md5Str)
             param["sign"]=MD5Sign(md5Str)
             req=requests.post(url,param)
-            
             if not req.ok:
                 print "requests FAIL"
                 log_file("%s %s"%(arg,data))
                 filePath=log_file(req.content)
                 print "log_file in",filePath
                 return
-            xmlObj=XML_ET.fromstring(req.content)
-            
-            if xmlObj.findall("error_code"):
-                print "respond error"
-                log_file("%s %s"%(arg,data))
-                filePath=log_file(req.content)
-                print "log_file in",filePath
-                return
-            return HandleResult(arg["method"],data,xmlObj)
-            
+            return json.loads(req.content)
+            #xmlObj=XML_ET.fromstring(req.content)
+            #if xmlObj.findall("error_code"):
+            #    print "respond error"
+            #    log_file("%s %s"%(arg,data))
+            #    filePath=log_file(req.content)
+            #    print "log_file in",filePath
+            #    return
+            #return HandleResult(arg["method"],data,xmlObj)
         return __EdbAPI
     return _EdbAPI
 
@@ -175,12 +176,14 @@ def AddTrade(data):
     orderInfo.append(productXml)
     finalStr=XML_ET.tostring(orderXml,"utf8")
     result={}
-    result["xmlValues"]=finalStr
+    result["xmlValues"]=finalStr[37:]
     return result
 
 
 #测试用，可删除
 def test_main():
+    #d={"ProductName":u"帮宝适特级绵柔NB号8片装","pagenum":"1"}
+    #GetBarCode(dict(d))
     data={
     "out_tid":"CRMJ2015120728547",
     "shop_id":"15",
@@ -193,7 +196,7 @@ def test_main():
     "express":"EMS",
     "invoice_msg":"121212",
     "order_date":"2015-12-10 13:00:00",
-#    "barCode":"1",
+    "barCode":"690314820785503",
     "product_title":"测试修改没",
     "standard":"统一规格",
     "orderGoods_Num":"1",

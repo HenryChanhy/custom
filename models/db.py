@@ -359,6 +359,15 @@ db.define_table('trade',
                 Field('out_barCode',length=20),
                 Field('product_intro',length=20)
                 )
+db.define_table('AllBarcode',
+                Field('product_num',length=20),
+                Field('product_id',length=20),
+                Field('product_size',length=20),
+                Field('product_name',length=20),
+                Field('bar_code',length=20),
+                Field('brand',length=20),
+                Field('product_classify',length=20),
+                )
 ################### P&G ############################################
 db.define_table('original_data',
                 Field('SB_Internal_Member_ID',length=20),

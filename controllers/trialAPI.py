@@ -19,22 +19,11 @@ import time
 import hashlib
 import chardet
 import requests
-
 import xml.etree.ElementTree as XML_ET
-
-def GetTimeStamp_edb():
-    t=time.localtime()
-    lst=[]
-    for i in xrange(len(t)):
-        if i>=5:
-            break
-        v=str(t[i]).zfill(2)
-        lst.append(v)
-    reStr="".join(lst)
-    return reStr
+import json
 
 def GetTimeStamp():
-    return int(time.time())
+    return str(int(time.time()))
 
 def MD5Sign(md5Str):
     m=hashlib.md5()
@@ -58,6 +47,7 @@ def log_file(msg):
         f.write("[%s] %s\r\n"%(GetTimeStamp(),msg))
     return finalPath
 
+#TrialCenter_Order_Status
 def HandleUpdateTOS(data,xmlObj):
     lst=xmlObj.findall("Rows")
     if not lst:
@@ -73,6 +63,7 @@ def HandleUpdateTOS(data,xmlObj):
         return False
     return True
 
+#Order_Tracking_Info
 def HandleUpdateOTI(data,xmlObj):
     lst=xmlObj.findall("Rows")
     if not lst:
@@ -93,17 +84,14 @@ def TrialAPI(**arg):
     def _TrialAPI(func):
         def __TrialAPI(data):
             #url="http://vip802.6x86.com/edb2/rest/index.aspx"
-            SysData={
-                "apiKey":"A6BEA59B",
-                }
-            ExData={
-                "apiSecret":"1F6F088755B094DDAD3C7AEFEA73A1A1",
-                }
+            SysData={"apiKey":"qhT49hGFv5rks",}
+            ExData={"apiSecret":"wh76BtGfks7fVbkiu",}
             param=func(data)
             param.update(SysData)
             param.update(data)
             #url="http://IP+PORT/TrialCenter/order/Pampers/ST/"+arg["method"]
-            url="https://int.taotonggroup.com/pampers1/default/"+arg["method"]
+            #url="http://nwct.biz:18910/TrialCenter/order/Pampers/ST/"+arg["method"]
+            url="http://122.193.31.8:8080/TrialCenter/order/Pampers/ST/"+arg["method"]
             #param["method"]=arg["method"]
             param["timestamp"]=GetTimeStamp()
             #param["timestamp"]="201512161115"
@@ -116,13 +104,14 @@ def TrialAPI(**arg):
 
 #            for k,v in ExData.items():
 #                paraList.append(k+"="+str(v))
-
             paraList.sort(cmp)
             md5Str="&".join(paraList)
             md5Str=md5Str+ExData["apiSecret"]
             #md5Str=ToUTF8Str(md5Str)
             param["sig"]=MD5Sign(md5Str)
-            req=requests.post(url,param,verify=False)
+
+            jsparam=json.dumps(param)
+            req=requests.post(url,jsparam,verify=False)
 
             if not req.ok:
                 print "requests FAIL"
@@ -139,39 +128,39 @@ def TrialAPI(**arg):
                 print "log_file in",filePath
                 return
             return HandleResult(arg["method"],data,xmlObj)
-
         return __TrialAPI
     return _TrialAPI
 
+
 @TrialAPI(method="updateOrderTrackingInfo")
 def updateOTI(data):
-
     return {}
 
 @TrialAPI(method="updateTrialOrderStatus")
 def updateTOS(data):
-
     return {}
+
 @TrialAPI(method="TradeAdd")
 def addTrade(data):
-
     return {}
 
 #测试用，可删除
-def test_main():
-    data={
-	"mobile": "1111111",
-	"order_id": "1234",
-	"status": "1"
-    }
-    print updateTOS(data)
-
+def test_OTI():
     orderinfo={
-	"order_id": "11212",
-	"tracking_number": "121212121212121",
+	"order_id": "46",
+	"tracking_number": "13",
 	"tracking_company": "ZTO"
     }
     print updateOTI(orderinfo)
+
+def test_TOS():
+    data={
+    "order_id": "46",
+	"status": "1",
+    #"messge":"订单重复"
+    }
+    print updateTOS(data)
+
 def test_addTrade():
     data0={"product_totalMoney":"0","storage_id":"11",
        "deliver_status":"\u672a\u53d1\u8d27","consignee":"\u6d4b\u8bd51",
@@ -192,4 +181,4 @@ def test_addTrade():
             data0[k]=v.decode("unicode-escape")
     print addTrade(data0)
 if __name__=="__main__":
-    test_main()
+    test_addTrade()
