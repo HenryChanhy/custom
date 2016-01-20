@@ -935,91 +935,14 @@ def TradeAdd():
                 else:
                      SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
             this_sig=MD5Sign((SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'))
-            if (vars['sig']==this_sig) and (ts-int(vars['timestamp'])<180) and \
+            if (vars['sig']==this_sig) and \
+            (ts-int(vars['timestamp'])<180) and \
             ((vars['apiKey']).decode('unicode_escape')==(this_apiKey))  :
                 msg.append({'is_success':'true','response_Msg':u'成功导入系统'})
-                content={}
-                for field in essencial_field:
-                    if field =="sig" or field =="apiKey" or field=="timestamp":
-                        continue
-                    elif field=="product_info":
-                        for f in vars["product_info"][0].keys():
-                            content[f]=vars["product_info"][0][f]
-                    else:
-                        content[field]=vars[field]
-                db.trade.insert(**content)
-
             else:
-                if (vars['sig']!=this_sig):
-                    msg.append({'is_success':'false',
-                                    'response_Msg':(SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'),
-                                    'field':'sig'})
-                if ((vars['apiKey']).decode('unicode_escape')!=(this_apiKey)):
-                    msg.append({'is_success':'false',
-                                    'response_Msg':u'apiKey错误',
-                                    'field':'apiKey'})
-                if (ts-int(vars['timestamp'])>180):
-                    msg.append({'is_success':'false',
-                                    'response_Msg':u'时间戳错误',
-                                    'field':'timestamp'})
+                msg.append({'sig':(vars['sig']),'this_sig':this_sig,'sigstr':(SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8')})
         else:
-            if not (u'apiKey' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'接口密钥在软件中不存在',
-                                'field':'apiKey',})
-            if not (u'timestamp' in keys):
-                msg.append({'is_success':'false',
-                        'response_Msg':u'时间戳在软件中不存在',
-                        'field':'timestamp'})
-            if not (u'sig' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'签名在软件中不存在',
-                                'field':'sig'})
-            if not (u'out_tid' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'签名在软件中不存在',
-                                'field':'out_tid'})
-            if not (u'shop_id' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'店铺代码在表单中不存在',
-                                'field':'shop_id'})
-            if not (u'consignee' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'收货人姓名在表单中不存在',
-                                'field':'consignee'})
-            if not (u'address' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'收货地址在表单中不存在',
-                                'field':'address'})
-            if not (u'postcode' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'邮政编码在表单中不存在',
-                                'field':'postcode'})
-            if not (u'mobilPhone' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'手机号码在表单中不存在',
-                                'field':'mobilPhone'})
-            if not (u'order_date' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'订货日期在表单中不存在',
-                                'field':'order_date'})
-            if not (u'product_info' in keys):
-                msg.append({'is_success':'false',
-                                'response_Msg':u'订货在表单中不存在',
-                                'field':'product_info'})
-            else:
-                if not (u'product_title' in vars['product_info'][0].keys()):
-                    msg.append({'is_success':'false',
-                                    'response_Msg':u'产品名称在表单中不存在',
-                                    'field':'product_title'})
-                if not (u'standard' in vars['product_info'][0].keys()):
-                    msg.append({'is_success':'false',
-                                    'response_Msg':u'网店规格在表单中不存在',
-                                    'field':'standard'})
-                if not (u'out__tid' in vars['product_info'][0].keys()):
-                    msg.append({'is_success':'false',
-                                    'response_Msg':u'外部平台单号在子表中不存在',
-                                    'field':'out__tid'})
+            msg.append({'is_success':'false','response_Msg':u'absence of essencial field'})
         jsonObj['item']=msg
         return jsonObj
     return locals()
