@@ -91,7 +91,7 @@ def TrialAPI(**arg):
             param.update(data)
             #url="http://IP+PORT/TrialCenter/order/Pampers/ST/"+arg["method"]
             #url="http://nwct.biz:18910/TrialCenter/order/Pampers/ST/"+arg["method"]
-            url="http://122.193.31.5:8080/TrialCenter/order/Pampers/ST/"+arg["method"]
+            url="http://122.193.31.8:8080/TrialCenter/order/Pampers/ST/"+arg["method"]
             #param["method"]=arg["method"]
             param["timestamp"]=GetTimeStamp()
             #param["timestamp"]="201512161115"
