@@ -10,11 +10,12 @@
 # #######################################################################
 import re
 from simhash import Simhash,SimhashIndex
-from gluon.http import redirect
+import time
+import hashlib
 import openpyxl
-from plugin_sqleditable.editable import SQLEDITABLE
-from gluon.http import redirect
-SQLEDITABLE.init()
+
+auth.settings.allow_basic_login = True
+auth.define_tables(username=True)
 
 provinces=(u'北京',u'天津',u'河北',u'山西',u'内蒙古',u'辽宁',u'吉林',u'黑龙江',u'上海',u'江苏',
            u'浙江',u'安徽',u'福建',u'江西',u'山东',u'河南',u'湖北',u'湖南',u'广东',u'广西',
@@ -31,10 +32,6 @@ A_city=(u'合肥市',u'福州市',u'兰州市',u'深圳市','南宁市',u'贵阳
 u'郑州市',u'哈尔滨市',u'武汉市',u'长沙市',u'南京市',u'大连市',u'沈阳市',u'呼和浩特市',
 u'银川市',u'西宁市',u'济南市',u'青岛市',u'太原市',u'西安市',u'天津市',u'拉萨市',u'昆明市',
 u'杭州市',u'重庆市')
-
-def check_order():
-    orderList=db(db.wrong_order).select().as_list()
-    return locals()
 
 def init_db():
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'订单编号',field_id='order_id',field_order=1)
@@ -59,37 +56,7 @@ def import_csv(csvfile):
     db.custom_order.import_from_csv_file(csvfile)
 
 def get_feature(s):
-    return [s[i:i+2] for i in range(max(len(s)-2+1,1))]
-'''
-#s=Simhash(get_feature(ws.cell(row=rows,column=10).value,3))
-history_data=db().select(db.history_order.order_id,db.history_order.address).as_list()
-addr_obj=[(str(k),Simhash(get_feature(v,3))) for k, v in history_data]
-index = SimhashIndex(addr_obj, k=3)
-or index.get_near_dups(s) is not None
-and\(db.history_order.county==ws.cell(row=rows, column=9).value)
-rowcontent['relate_history_id']=buf_list[i]['order_id']
-rowcontent['wrong_reason']=u'与历史地址第'+str(buf_list[i]['order_id'])+u'地址重复'
-if rowcontent['mobile'] in db().select(db.history_order.mobile) :
-            rowcontent['wrong_reason']=u'与历史重复'
-            db.incorrect_data.insert(**rowcontent)
-        else:
-            rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
-                s=s.lower()
-    s=re.sub(r'[^\w]+','',s)
-    db.custom_order.insert(**rowcontent)回族|壮族|维尔吾族|特别行政区|自治区
-    &\(re.match('\d{0,2}',db.history_order.product_name).group()==\
-                         str(ws1.cell(row=rows,column=10).value))
-
-        if not tablename=='custom_order': raise HTTP(400)
-        return dict(custom_order = db.custom_order(id))
-
-'''
-
-def wrong_data():
-    response.title = 'wrong_data'
-    response.view = 'plugin_sqleditable/sample.html'
-    editable = SQLEDITABLE(db.wrong_order, showid=False, maxrow=29).process()
-    return dict(editable=editable)
+    return [s[i:i+1] for i in range(max(len(s)-1+1,1))]
 
 #@auth.requires_login()
 def display_form():
@@ -117,7 +84,7 @@ def process_order():
     Info=request.vars
     order_id=Info["order_id"]
     iFlag=Info["process_flag"]
-'''
+
 def data_wrong():
     form = SQLFORM(db.wrong_order)
     if form.process().accepted:
@@ -127,7 +94,7 @@ def data_wrong():
     else:
         response.flash = 'please fill out the form'
     return dict(form=form)
-'''
+
 def import_excel(file):
     WB=openpyxl.load_workbook(file)
     WS=WB.active
@@ -263,7 +230,6 @@ pampers_dict={'order_id':'A','ex_id':'B','user_name':'C','mobile':'D','province'
 def add_pampers(ws1):
     header=['order_id','ex_id','user_name','mobile','province','city','county','address',
             'pregnancy','product_piece','product_size','date_time']
-
     for rows in range(650,ws1.max_row+1):
         rowcontent={}
         buf_list=[]
@@ -468,7 +434,6 @@ def add_pampers(ws1):
                         rowcontent['class_city']='B'
                     db.pampers_order.insert(**rowcontent)
 
-
 def pampers_census():
     row_content={}
     row_content['tag']='November'
@@ -491,6 +456,363 @@ def pampers_census():
     row_content['village']=float(db(db.pampers_order.class_city=='village').count())/db(db.pampers_order.order_id >= 0).count()
     db.pampers_result.insert(**row_content)
 
+def add_PG(ws3):
+    product_dict={}
+    header=['SB_Internal_Member_ID','Member_Account_ID','Reward_ID','Reward_Name','Reward_Value',
+        'Reward_Points','Reward_Internal_Cost','Issue_Date','Issue_Location','Redeemed_Date',
+        'Redeemed_Location','Cancel_Date','Expiration_Date','Reward_Barcode','First_Name','Last_Name',
+        'Address','City','trade_state','ZipCode','Email_Address','Mobil_Phone','IssuedFlag','RedeemFlag',
+        'CanceledFlag','REDEMPTION_STATUS','DLVRYNBR_REJRSN','DELIVERY_ADDRESS']
+    for rows in range(1,ws3.max_row+1):
+        rowcontent={}
+        buf_list=[]
+        for cols in range(1,ws3.min_col+1):
+            rowcontent[header[cols-1]]=unicode(ws3.cell(row=rows,column=cols).value)
+        db.original_data.insert(**rowcontent)
+#product id detribute info
+    rows= db().select(db.original_data.Reward_Name,
+                db.original_data.Reward_Value,
+                db.original_data.Reward_Points,
+                db.original_data.Reward_Internal_Cost,
+                orderby=db.original_data.Reward_Name)
+    rows[0]['product_id']=1*100+37
+    product_id=1*100+37
+    product_dict[rows[0]['Reward_Name']]=rows[0]['product_id']
+    db.product_info.insert(**rows[0])
+    for i in range(1,len(rows)):
+        if (rows[i]['Reward_Name']!=rows[i-1]['Reward_Name'])or\
+        (rows[i]['Reward_Value']!=rows[i-1]['Reward_Value'])or\
+        (rows[i]['Reward_Points']!=rows[i-1]['Reward_Points'])or\
+        (rows[i]['Reward_Internal_Cost']!=rows[i-1]['Reward_Internal_Cost']):
+            rows[i]['product_id']=product_id+100
+            product_id=rows[i]['product_id']
+            product_dict[rows[i]['Reward_Name']]=rows[i]['product_id']
+            db.product_info.insert(**rows[i])
+        else:pass
+#user id detribute info
+    user_row={}
+    users_address=[]
+    address_buf={}
+    users= db(db.original_data.DELIVERY_ADDRESS !=None).select\
+            (db.original_data.SB_Internal_Member_ID,
+             db.original_data.Member_Account_ID,
+             db.original_data.DELIVERY_ADDRESS,
+             db.original_data.Reward_Name,
+             orderby=db.original_data.DELIVERY_ADDRESS)
+    users_address=((users[0]['DELIVERY_ADDRESS']).decode('utf8')).split(";")
+    user_row['user_name']=users_address[0]
+    address_buf['user_name']=users_address[0]
+    user_row['address']=users_address[1]
+    address_buf['address']=users_address[1]
+    user_row['phone_num']=users_address[2]
+    address_buf['phone_num']=users_address[2]
+    user_row['city']=users_address[3]
+    user_row['province']=users_address[4]
+    user_row['zip_code']=users_address[5]
+    user_row['Country']=users_address[6]
+    user_row['SB_Internal_Member_ID']=unicode(users[0]['SB_Internal_Member_ID'])
+    user_row['Member_Account_ID']=unicode(users[0]['Member_Account_ID'])
+    user_row['user_id']=1*100+79
+    user_id=1*100+79
+    db.user_info.insert(**user_row)
+
+    for i in range(1,len(users)):
+        users_address=((users[i]['DELIVERY_ADDRESS']).decode('utf8')).split(";")
+        if len(users_address)==7:
+            user_row['user_name']=users_address[0]
+            user_row['address']=users_address[1]
+            user_row['phone_num']=users_address[2]
+            user_row['city']=users_address[3]
+            user_row['province']=users_address[4]
+            user_row['zip_code']=users_address[5]
+            user_row['Country']=users_address[6]
+            user_row['SB_Internal_Member_ID']=unicode(users[0]['SB_Internal_Member_ID'])
+            user_row['Member_Account_ID']=unicode(users[0]['Member_Account_ID'])
+            w1=(user_row['phone_num']==address_buf['phone_num'])
+            w2=(Simhash(get_feature(user_row['address'])).distance(Simhash(get_feature(address_buf['address'])))<5)
+            w3=(user_row['user_name']==address_buf['user_name'])
+            if (w1*0.5+w2*0.3+w3*0.2)<0.5:
+                user_row['user_id']=user_id+100
+                user_id=user_row['user_id']
+                db.user_info.insert(**user_row)
+                address_buf['phone_num']=user_row['phone_num']
+                address_buf['address']=user_row['address']
+                address_buf['user_name']=user_row['user_name']
+            else:pass
+#user2product
+    all_user=db().select(db.user_info.ALL)
+    for each in range(0,len(all_user)):
+        u2p_row={}
+        u2p_row['product_id']=[]
+        u2p_row['trials_count']=[]
+        u2p_row['user_id']=all_user[each]['user_id']
+        u2p_ship=db(int(all_user[each]['Member_Account_ID'])==db.original_data.Member_Account_ID).select\
+                (db.original_data.Reward_Name)
+        all_product=[]
+        all_product.append(u2p_ship[0]['Reward_Name'])
+        if len(u2p_ship)>=2:
+            for j in range(1,len(u2p_ship)):
+                if u2p_ship[j]['Reward_Name'] != u2p_ship[j-1]['Reward_Name']:
+                    all_product.append(u2p_ship[j]['Reward_Name'])
+        for k in range(0,len(all_product)):
+            (u2p_row['product_id']).append(all_product[k])
+            each_product_count=all_product.count(all_product[k])
+            (u2p_row['trials_count']).append(int(each_product_count))
+        db.user2product.insert(**u2p_row)
+        del all_product
+        del u2p_ship
+        u2p_row.clear()
+
+def display_u2p():
+    grid = SQLFORM.grid(db.user2product)
+    return locals()
+
+def add_babybox_BBS_CD(ws4):
+    field_list=['order_id','trade_order','trade_id','ex_id','product_order','barcode',
+                    'username','cellphone','province','city','county','address','reserve1',
+                    'product_name','data_date','channel','moon','reserve2','product','product_size',
+                    'product_brand','store_size','product_quantity','store_name',
+                    'receive_province','receive_city','receive_county','receive_address']
+    header_BBS=[]
+    header_FSCD=[]
+    SameOneHouse_phonenum=[]
+    town5times_phonenum=[]
+    village3times_phonenum=[]
+    AddressBlur_phonenum=[]
+    cor=[]
+    incor=[]
+    table_header={}
+    for cols in range(1,ws4.min_col+1):
+        table_header[field_list[cols-1]]=ws4.cell(row=1,column=cols).value
+    for rows in range(2,ws4.max_row+1):
+        rowcontent={}
+        for cols in range(1,ws4.min_col+1):
+            rowcontent[field_list[cols-1]]=ws4.cell(row=rows,column=cols).value
+        address=rowcontent['address']
+        if address.endswith(u'市')or address.endswith(u'县')or\
+        address.endswith(u'镇')or address.endswith(u'工业区')or address.endswith(u'工业园区')or\
+        address.endswith(u'公园')or address.endswith(u'管理区')or address.endswith(u'开发区')or\
+        address.endswith(u'新区')or address.endswith(u'球场')or address.endswith(u'停车场')or\
+        address.endswith(u'篮球场')or address.endswith(u'大道')or address.endswith(u'国道')or\
+        address.endswith(u'道')or address.endswith(u'路')or address.endswith(u'桥')or\
+        address.endswith(u'路口')or address.endswith(u'街上')or address.endswith(u'街')or\
+        address.endswith(u'门口')or address.endswith(u'市场')or address.endswith(u'公交站')or\
+        address.endswith(u'车站')or address.endswith(u'加油站')or address.endswith(u'服务站')or\
+        address.endswith(u'自取')or address.endswith(u'交叉口')or address.endswith(u'三岔口')or\
+        address.endswith(u'桥头')or address.endswith(u'附近')or address.endswith(u'快递')or\
+        address.endswith(u'物流')or address.endswith(u'自取')or address.endswith(u'交口'):
+            incor.append(rowcontent['cellphone'])
+        elif address.endswith(u'号楼') or address.endswith(u'栋')or\
+        address.endswith(u'幢') or address.endswith(u'座'):
+            SameOneHouse_phonenum.append(rowcontent['cellphone'])
+        elif address.endswith(u'小区')or address.endswith(u'校区')or\
+        address.endswith(u'宿舍')or address.endswith(u'公寓')or\
+        address.endswith(u'期')or address.endswith(u'A区')or\
+        address.endswith(u'B区')or address.endswith(u'C区')or\
+        address.endswith(u'D区')or address.endswith(u'东区')or\
+        address.endswith(u'西区')or address.endswith(u'北区')or\
+        address.endswith(u'南区'):
+            town5times_phonenum.append(rowcontent['cellphone'])
+        elif address.endswith(u'乡')or address.endswith(u'村')or address.endswith(u'庄')or\
+        address.endswith(u'营')or address.endswith(u'寨')or address.endswith(u'崖')or\
+        address.endswith(u'矿')or address.endswith(u'岗')or address.endswith(u'沟')or\
+        address.endswith(u'集')or address.endswith(u'湾')or address.endswith(u'小学')or\
+        address.endswith(u'中学')or  address.endswith(u'大学')or address.endswith(u'厂')or\
+        address.endswith(u'街道')or address.endswith(u'里')or address.endswith(u'巷')or\
+        address.endswith(u'弄')or address.endswith(u'社区')or address.endswith(u'中心')or\
+        address.endswith(u'办事处')or address.endswith(u'政府单位')or address.endswith(u'局')or\
+        address.endswith(u'法院')or address.endswith(u'医院')or address.endswith(u'大厦')or\
+        address.endswith(u'居委会')or address.endswith(u'派出所')or address.endswith(u'汽配城')or\
+        address.endswith(u'商贸城')or address.endswith(u'速递易')or address.endswith(u'镇邮局'):
+            village3times_phonenum.append(rowcontent['cellphone'])
+        elif address.endswith(u'侧') or address.endswith(u'旁')or address.endswith(u'边')or\
+        address.endswith(u'隔壁')or address.endswith(u'附近')or address.endswith(u'对面')or \
+        address.endswith(u'段'):#or address.endswith(u'门口') or address.endswith(u'口') :
+            AddressBlur_phonenum.append(rowcontent['cellphone'])
+        else:
+            cor.append(rowcontent['cellphone'])
+    for rows in range(2,ws4.max_row+1):
+        rowcontent={}
+        correct_phonenum=SameOneHouse_phonenum + town5times_phonenum + \
+                        village3times_phonenum + AddressBlur_phonenum
+        phonenum = ws4.cell(row=rows,column=8).value
+        for cols in range(1,ws4.min_col+1):
+            rowcontent[field_list[cols-1]]=ws4.cell(row=rows,column=cols).value
+        if phonenum in incor:
+            db.incorrect_BCB.insert(**rowcontent)
+        elif phonenum in cor:
+            db.correct_BCB.insert(**rowcontent)
+        elif phonenum in SameOneHouse_phonenum:
+            if SameOneHouse_phonenum.count(phonenum)>=2:
+                db.incorrect_BCB.insert(**rowcontent)
+            else:
+                db.correct_BCB.insert(**rowcontent)
+        elif phonenum in town5times_phonenum:
+            if (town5times_phonenum.count(phonenum)>5):
+                db.incorrect_BCB.insert(**rowcontent)
+            else:
+                db.correct_BCB.insert(**rowcontent)
+        elif phonenum in village3times_phonenum:
+            if village3times_phonenum.count(phonenum)>3:
+                db.incorrect_BCB.insert(**rowcontent)
+            else:
+                db.correct_BCB.insert(**rowcontent)
+        elif phonenum in AddressBlur_phonenum:
+            if AddressBlur_phonenum.count(phonenum)>=2:
+                db.incorrect_BCB.insert(**rowcontent)
+            else:
+                db.correct_BCB.insert(**rowcontent)
+        else:pass
+
+def statistics(list1):
+    dict1={}
+    for i in range(0,len(list1)):
+        if  list1[i] in dict1.keys():
+            continue
+        else:
+            li=[]
+            li.append(i)
+            for j in range(i+1,len(list1)):
+                if list1[i] == list1[j]:
+                    li.append(j)
+        dict1[list1[i]]=li
+    return dict1
+
+def himin_distance(i1,i2):
+    f=64
+    x = (i1 ^ i2) & ((1 << 64) - 1)
+    ans = 0
+    while x:
+        ans += 1
+        x &= x - 1
+    return ans
+    
+def add_BBS_20151222(ws4):
+    field_list=['order_id','ex_id','shop_name','telephone','cellphone','user_name','address',
+                'province','city','county','product_order','barcode','product_name','product_size',
+                'store_name','store_size','product_quantity']
+    black_name=[]
+    full_line=2
+    for rows in range(2,ws4.max_row+1):
+        if (ws4.cell(row=rows,column=8).value ==u'-'):
+            full_line=full_line+1
+        else:
+            break
+#get the all hash Address
+    hash_addr=[]
+    for i in range(1,ws4.max_row+1):
+        hash_addr.append(Simhash(get_feature(ws4.cell(row=i,column=7).value)).value)
+#collect the duplicated address_place
+    addr_dict={}
+    dup_addr_place=[]
+    for i in range(0,len(hash_addr)):
+        if i in dup_addr_place:
+            continue
+        else:
+            li=[]
+            for j in range(i+1,len(hash_addr)):
+                if himin_distance(hash_addr[i],hash_addr[j])<8:
+                    li.append(j)
+            if len(li)==0:
+                continue
+            else:
+                dup_addr_place.extend(li)
+                addr_dict[i]=li
+#collect the duplicated phone_place
+    phone_dict={}
+    for i in range(1,ws4.max_row+1):
+        if  ws4.cell(row=i,column=5).value in phone_dict.keys():
+            continue
+        else:
+            li=[]
+            li.append(i)
+            for j in range(i+1,ws4.min_col+1):
+                if ws4.cell(row=j,column=5).value == ws4.cell(row=i,column=5).value:
+                    li.append(j)
+        phone_dict[ws4.cell(row=i,column=5).value]=li
+    def InsertExcel2IncorrectDb(i,wrong_reason):
+        rowcontent={}
+        for cols in range(1,ws4.min_col+1):
+            rowcontent[field_list[cols-1]]=ws4.cell(row=i,column=cols).value
+        rowcontent['wrong_reason']=wrong_reason
+        db.incorrect_BCB.insert(**rowcontent)
+    incorrect_record=[]
+#process the dup phone_dict
+    for phone_place in phone_dict.values():
+        if len(phone_place)>=3:
+            return u"数据错误"
+        else:
+            pass
+#process the dup addr
+    for i,k in addr_dict.items():
+        if len(k)>=2:
+            k.append(i)
+            for j in k:
+                InsertExcel2IncorrectDb(j+2,u'当份重复')
+                incorrect_record.append(j+2)
+        else:
+            sizei=str(ws4.cell(row=i+2,column=15).value)
+            sizek=str(ws4.cell(row=k[0]+2,column=15).value)
+            if (sizei[sizei.find(u'片')-2]==1)and(sizek[sizek.find(u'片')-2]==1):
+                InsertExcel2IncorrectDb(k[0]+2,u'当份重复')
+                incorrect_record.append(k[0]+2)
+            elif (sizei[sizei.find(u'片')-2]!=sizek[sizek.find(u'片')-2]):
+                if (ws4.cell(row=i+2,column=5).value)!=(ws4.cell(row=k[0]+2,column=5).value):
+                    x = i if sizei[sizei.find(u'片')-2]==1 else k[0]
+                    InsertExcel2IncorrectDb(x+2,u'当份重复')
+                    incorrect_record.append(x+2)
+            else:
+                InsertExcel2IncorrectDb(k[0]+2,u'当份重复')
+                incorrect_record.append(k[0]+2)
+    all_record=range(full_line,ws4.max_row+1)
+    precor_record=set(all_record)-set(incorrect_record)
+
+    for r in precor_record:
+        address=ws4.cell(row=r,column=7).value
+        if address.endswith(u'市')or address.endswith(u'县')or\
+        address.endswith(u'镇')or address.endswith(u'工业区')or address.endswith(u'工业园区')or\
+        address.endswith(u'公园')or address.endswith(u'管理区')or address.endswith(u'开发区')or\
+        address.endswith(u'新区')or address.endswith(u'球场')or address.endswith(u'停车场')or\
+        address.endswith(u'篮球场')or address.endswith(u'大道')or address.endswith(u'国道')or\
+        address.endswith(u'道')or address.endswith(u'路')or address.endswith(u'桥')or\
+        address.endswith(u'路口')or address.endswith(u'街上')or address.endswith(u'街')or\
+        address.endswith(u'门口')or address.endswith(u'市场')or address.endswith(u'公交站')or\
+        address.endswith(u'车站')or address.endswith(u'加油站')or address.endswith(u'服务站')or\
+        address.endswith(u'自取')or address.endswith(u'交叉口')or address.endswith(u'三岔口')or\
+        address.endswith(u'桥头')or address.endswith(u'附近')or address.endswith(u'快递')or\
+        address.endswith(u'物流')or address.endswith(u'自取')or address.endswith(u'交口'):
+            InsertExcel2IncorrectDb(r,u'地址不全')
+        else:
+            rowcontent={}
+            for cols in range(1,ws4.min_col+1):
+                rowcontent[field_list[cols-1]]=ws4.cell(row=r,column=cols).value
+            address=rowcontent['address']+u''
+            address=address.replace(u'，','')
+            address=address.replace(u'--',u'-')
+            address=address.replace(u'“','')
+            address=address.replace(u'”','')
+            rowcontent['address']=address
+            if u'街道办事处' in address[0:address.find(u'省')]:
+                rowcontent['address']=str(rowcontent['address']).replace(u'街道办事处','')
+            buf_list=db((db.history.city==ws4.cell(row=r, column=9).value)&\
+                        (db.history.county==ws4.cell(row=r, column=10).value)).select\
+                    (db.history.order_id,db.history.address_bak,db.history.mobile).as_list()
+            is_dup=0
+            for i in range(0,len(buf_list)):
+                if rowcontent['cellphone']==buf_list[i]['mobile']:
+                    is_dup=1
+                    rowcontent['wrong_reason']=u'与历史号码第'+unicode(buf_list[i]['order_id'])+u'条重复'
+                    db.incorrect_BCB.insert(**rowcontent)
+                    break
+                elif himin_distance(hash_addr[r-2],Simhash(get_feature(str(buf_list[i]['address_bak']).decode('UTF-8'))).value)<18:
+                    is_dup=1
+                    rowcontent['wrong_reason']=u'与历史地址第'+unicode(buf_list[i]['order_id'])+u'条重复'
+                    db.incorrect_BCB.insert(**rowcontent)
+                    break
+                else:continue
+            if is_dup==0:
+                db.correct_BCB.insert(**rowcontent)
+
 def index():
     """
     example action using the internationalization operator T and flash
@@ -504,17 +826,25 @@ def index():
         ws=import_excel(request.vars.csvfile1.file)
         add_excel(ws)
         response.flash = T('data uploaded')
+    if request.vars.csvfile3 != None:
+        ws3=import_excel(request.vars.csvfile3.file)
+        add_PG(ws3)
+        response.flash = T('data uploaded')
+    if request.vars.csvfile4 != None:
+        ws4=import_excel(request.vars.csvfile4.file)
+        add_BBS_20151222(ws4)
+        response.flash = T('data uploaded')
     if request.vars.csvfile2 != None:
         ws1=import_excel(request.vars.csvfile2.file)
-        license=[1516161,1520345,1518691,1542961,1551748,1541116,1516035,1520803,
+        lice=[1516161,1520345,1518691,1542961,1551748,1541116,1516035,1520803,
         1522679,1527299,1538111,1544564,1550749,1520841,1540979,1523641]
         if db(db.pampers_order).isempty():
             add_pampers(ws1)
             response.flash = T('data uploaded')
         else:
             count=0
-            for i in range(0,len(license)):
-                if(ws1.cell(row=i,column=1).value==license[i]):
+            for i in range(0,len(lice)):
+                if(ws1.cell(row=i,column=1).value==lice[i]):
                     count=count+1
             if count>11:
                 add_pampers(ws1)
@@ -558,8 +888,153 @@ def call():
     """
     return service()
 
+
+def MD5Sign(md5Str):
+    m=hashlib.md5()
+    m.update(md5Str)
+    return m.hexdigest().upper()
+#@auth.requires_login()
 @request.restful()
-def api():
+def TradeAdd():
+    response.view ='generic.'+request.extension  #return  json
+    def POST(tablename,**vars):
+        msg=[]
+        jsonObj={}
+        keys=vars.keys()
+        for k in keys:
+            k.decode('unicode_escape')
+        if ('apiKey' in keys)and('product_info' in keys)and\
+        ('timestamp' in keys)and('sig' in keys) and\
+        ('out_tid' in keys)and ('shop_id' in keys)and\
+        ('consignee' in keys)and('address' in keys)and\
+        ('postcode' in keys)and('mobilPhone' in keys)and\
+        ('order_date' in keys)and\
+        ('product_title' in vars['product_info'][0].keys())and \
+        ('standard' in vars['product_info'][0].keys())and\
+        ('out__tid' in vars['product_info'][0].keys()):
+            ts=int(time.time())
+            this_apiKey='A6BEA59B'
+            this_apiSecret='1F6F088755B094DDAD3C7AEFEA73A1A1'
+            essencial_field=vars.keys()
+            essencial_field.sort()
+            SigStr=""
+            for field in essencial_field:
+                if field =="sig" or field =="apiSecret":
+                    continue
+                elif field =="product_info":
+                    SigStr=SigStr+unicode(field)+u"="+u"["
+                    for d in vars["product_info"]:
+                        k=d.keys()
+                        k.sort()
+                        SigStr=SigStr+u"{"
+                        for j in k:
+                            SigStr=SigStr+unicode(j)+u"="+unicode(d[j])+u"&"
+                        SigStr=SigStr[0:len(SigStr)-1]
+                        SigStr=SigStr+u"}"
+                    SigStr=SigStr+u"]"+u"&"
+                else:
+                     SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
+            this_sig=MD5Sign((SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'))
+            if (vars['sig']==this_sig) and (ts-int(vars['timestamp'])<180) and \
+            ((vars['apiKey']).decode('unicode_escape')==(this_apiKey))  :
+                msg.append({'is_success':'true','response_Msg':u'成功导入系统'})
+                content={}
+                for field in essencial_field:
+                    if field =="sig" or field =="apiKey" or field=="timestamp":
+                        continue
+                    elif field=="product_info":
+                        for f in vars["product_info"][0].keys():
+                            content[f]=vars["product_info"][0][f]
+                    else:
+                        content[field]=vars[field]
+                db.trade.insert(**content)
+
+            else:
+                if (vars['sig']!=this_sig):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':(SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'),
+                                    'field':'sig'})
+                if ((vars['apiKey']).decode('unicode_escape')!=(this_apiKey)):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':u'apiKey错误',
+                                    'field':'apiKey'})
+                if (ts-int(vars['timestamp'])>180):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':u'时间戳错误',
+                                    'field':'timestamp'})
+        else:
+            if not (u'apiKey' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'接口密钥在软件中不存在',
+                                'field':'apiKey',})
+            if not (u'timestamp' in keys):
+                msg.append({'is_success':'false',
+                        'response_Msg':u'时间戳在软件中不存在',
+                        'field':'timestamp'})
+            if not (u'sig' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'签名在软件中不存在',
+                                'field':'sig'})
+            if not (u'out_tid' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'签名在软件中不存在',
+                                'field':'out_tid'})
+            if not (u'shop_id' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'店铺代码在表单中不存在',
+                                'field':'shop_id'})
+            if not (u'consignee' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'收货人姓名在表单中不存在',
+                                'field':'consignee'})
+            if not (u'address' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'收货地址在表单中不存在',
+                                'field':'address'})
+            if not (u'postcode' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'邮政编码在表单中不存在',
+                                'field':'postcode'})
+            if not (u'mobilPhone' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'手机号码在表单中不存在',
+                                'field':'mobilPhone'})
+            if not (u'order_date' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'订货日期在表单中不存在',
+                                'field':'order_date'})
+            if not (u'product_info' in keys):
+                msg.append({'is_success':'false',
+                                'response_Msg':u'订货在表单中不存在',
+                                'field':'product_info'})
+            else:
+                if not (u'product_title' in vars['product_info'][0].keys()):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':u'产品名称在表单中不存在',
+                                    'field':'product_title'})
+                if not (u'standard' in vars['product_info'][0].keys()):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':u'网店规格在表单中不存在',
+                                    'field':'standard'})
+                if not (u'out__tid' in vars['product_info'][0].keys()):
+                    msg.append({'is_success':'false',
+                                    'response_Msg':u'外部平台单号在子表中不存在',
+                                    'field':'out__tid'})
+        jsonObj['item']=msg
+        return jsonObj
+    return locals()
+
+#@auth.requires_login()
+@request.restful()
+def EdbOrderGet():
+    response.view ='generic.'+request.extension  #return  json
+    def GET(*args,**vars):
+        return int(vars['a'])+int(vars['c'])*int(vars['b'])
+    return locals()
+
+#@auth.requires_login()
+@request.restful()
+def TradeGet():
     response.view ='generic.'+request.extension  #return  json
     def GET(*args,**vars):
         patterns=[
@@ -578,43 +1053,21 @@ def api():
             return dict(content=parser.response)
         else:
             raise HTTP(parser.status,parser.error)
-    def POST(tablename,**vars):
-        #if tablename=='pampers_order':
-        return dict(db[tablename].validate_and_insert(**vars))
-            #return dict(db(db.pampers_order.order_id==vars['order_id']).delete())
-            #else:
-            #raise HTTP(400)
+    return locals()
+
+@request.restful()
+def TradeUpdate():
+    response.view ='generic.'+request.extension  #return  json
     def PUT(table_name,record_id,**vars):
         return db(db[table_name].order_id==record_id).update(**vars)
+    return locals()
+
+@request.restful()
+def TradeDelete():
+    response.view ='generic.'+request.extension  #return  json
     def DELETE(table_name,record_id):
         return db(db[table_name].order_id==record_id).delete()
     return locals()
 
 
-'''elif method=='put':
-return dict(db.pampers_order.validate_and_updata(**fields))
-def post_db_map(table_name,**vars):
-response.view ='generic.'+request.extension  #return  json
-if table_name == 'db_map':
-    return db.db_map.validate_and_insert(**vars)
-dict(counter=session.counter, now=request.now,
-                f=request.extension,s=request.view,
-                a=request.args,v=request.vars)
-                def post_db_map(table_name,**vars):
-    response.view ='generic.'+request.extension  #return  json
-    if table_name == 'db_map':
-        return db.db_map.validate_and_insert(**vars)
-dict(counter=session.counter, now=request.now,
-                f=request.extension,s=request.view,
-                a=request.args,v=request.vars)
-ttGetHistoryByField()
-ttGet
-        patterns=[
-            "/products[custom_order]",
-            "/product/{custom_order.user_name.startswith}",
-            "/product/{custom_order.user_name}/:field"
-        ]
-        "/product/{custom_order.id}",
-        "/products[custom_order]",
-                #patterns=['/products[db_map]']
-                '''
+

@@ -6,7 +6,6 @@
 function showdiv(targetid,objN){
 	var target=document.getElementById(targetid);
 	var clicktext=document.getElementById(objN);
-
 	if (target.style.display=="block"){
 		target.style.display="none";
 		clicktext.innerText="+ 详细信息";
@@ -36,7 +35,7 @@ DUP_KEY_LIST=['wrong_reason','order_id','dup_ID','user_name','dup_name','mobile'
 	centerId="cen"+str(orderInfo["order_id"])
 }}
 <center id="{{=centerId}}">
-<div style="background:#cccccc;WIDTH:70%">
+<div style="background:#777777;WIDTH:70%">
 <table width="80%">
 <tr><td><a id="{{=clickId}}" onClick="showdiv('{{=hideDivId}}','{{=clickId}}')"><h5>+ 详细信息</h5></a></td></tr>
 </table>
@@ -45,7 +44,7 @@ DUP_KEY_LIST=['wrong_reason','order_id','dup_ID','user_name','dup_name','mobile'
 <div id="{{=hideDivId}}" style="display:none">
 <table width="80%">
 {{for k,v in orderInfo.items():}}
-{{if k=='id' or k in DUP_KEY_LIST:
+{{if (k=='id') or (k in DUP_KEY_LIST):
 	continue
 else:
 }}
@@ -53,12 +52,14 @@ else:
 {{pass}}
 {{pass}}
 </table></div></div>
+
 <table width="80%">
 <tr><td><h3>对比信息</h3></td></tr>
 {{for k in DUP_KEY_LIST:}}
 <tr><td width="20%">{{=KEY_NAME.get(k,k)}}</td><td id="{{=k}}">{{=orderInfo[k]}}</td></tr>
 {{pass}}
 </table>
+
 <table width="80%">
 <tr>
 <td>
@@ -67,6 +68,7 @@ else:
 <option value="2">有冲突</option>
 <option value="3">无冲突</option>
 </SELECT>
+
 </td>
 <td><button onclick="submitForm('{{=formId}}','{{=centerId}}')">OK</button></tr>
 <tr style="display:none"><td><input name="order_id" value="{{=orderInfo['order_id']}}"/></td></tr>

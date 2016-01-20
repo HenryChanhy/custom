@@ -13,9 +13,11 @@
     </header>
 {{end}}
 
-{{=FORM(str(T('or import from csv file1'))+"  ",INPUT(_type='file',_name='csvfile1'),INPUT(_type='submit',_value='import'))}}
-{{=FORM(str(T('or import from csv file2'))+"  ",INPUT(_type='file',_name='csvfile2'),INPUT(_type='submit',_value='import'))}}
-
+{{=FORM(str(T('import from csv file1'))+"  ",INPUT(_type='file',_name='csvfile1'),INPUT(_type='submit',_value='import'))}}
+{{=FORM(str(T('import from csv file2'))+"  ",INPUT(_type='file',_name='csvfile2'),INPUT(_type='submit',_value='import'))}}
+{{=FORM(str(T('import from csv file3'))+"  ",INPUT(_type='file',_name='csvfile3'),INPUT(_type='submit',_value='import'))}}
+{{=FORM(str(T('import from csv file4'))+"  ",INPUT(_type='file',_name='csvfile4'),INPUT(_type='submit',_value='import'))}}
+<a href="http://127.0.0.1:8000/custom/appadmin/index">babybox_order</a>
 {{if 'message' in globals():}}
 <h2>{{=message}}</h2>
 <p class="lead">{{=T('How did you get here?')}}</p>
