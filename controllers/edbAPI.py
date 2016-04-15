@@ -20,7 +20,7 @@ import hashlib
 import chardet
 import requests
 import json
-
+from datetime import datetime
 import xml.etree.ElementTree as XML_ET
 
 def GetTimeStamp():
@@ -133,7 +133,8 @@ def EdbAPI(**arg):
                 filePath=log_file(req.content)
                 print "log_file in",filePath
                 return
-            return json.loads(req.content)
+            jsonobj=json.loads(req.content)
+            return jsonobj
             #xmlObj=XML_ET.fromstring(req.content)
             #if xmlObj.findall("error_code"):
             #    print "respond error"
@@ -161,11 +162,9 @@ def AddTrade(data):
     productXml=XML_ET.fromstring('<product_info><product_item></product_item></product_info>')
     orderInfo=orderXml.find("orderInfo")
     itemInfo=productXml.find("product_item")
-    
     if not "barCode" in data:
         d={"productName":data["product_title"],}
         data["barCode"]=GetBarCode(d)
-
     for k,v in data.items():
         if k in orderTag:
             tmp=XML_ET.SubElement(orderInfo,k)
@@ -184,25 +183,32 @@ def AddTrade(data):
 def test_main():
     #d={"ProductName":u"帮宝适特级绵柔NB号8片装","pagenum":"1"}
     #GetBarCode(dict(d))
+    a_row=db(db.trade.out_tid=='8212').select()
+    trade_content=a_row.as_list()[0]
+    for k,v in trade_content.items():
+        if isinstance(v,str):
+            trade_content[k]=v.decode('utf8')
+        if isinstance(v, datetime):
+            trade_content[k] = v.isoformat()
+    edbreturn=AddTrade(trade_content)
     data={
-    "out_tid":"CRMJ2015120728547",
-    "shop_id":"15",
-    "storage_id":"13",
+    "out_tid":"435666",
+    "shop_id":"38",
+    "storage_id":"38",
     "buyer_id":"莫晓燕",
-    "postcode":"000000",
-    "privince":"河北省",
-    "city":"沧州市",
-    "area":"长河区",
-    "express":"EMS",
-    "invoice_msg":"121212",
+    #"postcode":"000000",
+    #"privince":"河北省",
+    #"city":"沧州市",
+    #"area":"长河区",
+    #"express":"EMS",
+    #"invoice_msg":"121212",
     "order_date":"2015-12-10 13:00:00",
-    "barCode":"690314820785503",
+    "barCode":"33320154100037",
     "product_title":"测试修改没",
     "standard":"统一规格",
     "orderGoods_Num":"1",
     }
     print AddTrade(data)
-    
 if __name__=="__main__":
     test_main()
     

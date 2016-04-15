@@ -632,3 +632,2537 @@ success!
 success!
 success!
 success!
+timestamp: 2016-01-20T15:40:57.005000
+CREATE TABLE history(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20) UNIQUE,
+    ex_id CHAR(20),
+    promo_id CHAR(20),
+    barcode CHAR(20),
+    user_name CHAR(40),
+    mobile CHAR(13),
+    province CHAR(40),
+    city CHAR(40),
+    county CHAR(40),
+    address CHAR(80),
+    order_date CHAR(13),
+    product_name CHAR(20),
+    data_date CHAR(20),
+    channel CHAR(13),
+    stage CHAR(20),
+    city_class1 CHAR(20),
+    city_class2 CHAR(20),
+    memo1 CHAR(20),
+    memo2 CHAR(20),
+    address_bak CHAR(20)
+);
+success!
+timestamp: 2016-01-20T15:40:57.406000
+ALTER TABLE trade ADD servercost_cod CHAR(20);
+timestamp: 2016-01-20T15:40:57.553000
+ALTER TABLE trade ADD buyer_id CHAR(20);
+success!
+timestamp: 2016-01-20T15:40:57.720000
+CREATE TABLE AllBarcode(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_num CHAR(20),
+    product_id CHAR(20),
+    product_size CHAR(20),
+    product_name CHAR(20),
+    bar_code CHAR(20),
+    brand CHAR(20),
+    product_classify CHAR(20)
+);
+success!
+timestamp: 2016-01-20T15:40:57.829000
+CREATE TABLE original_data(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    SB_Internal_Member_ID CHAR(20),
+    Member_Account_ID CHAR(20),
+    Reward_ID CHAR(20),
+    Reward_Name CHAR(20),
+    Reward_Value CHAR(20),
+    Reward_Points CHAR(20),
+    Reward_Internal_Cost CHAR(20),
+    Issue_Date CHAR(20),
+    Issue_Location CHAR(20),
+    Redeemed_Date CHAR(20),
+    Redeemed_Location CHAR(20),
+    Cancel_Date CHAR(20),
+    Expiration_Date CHAR(20),
+    Reward_Barcode CHAR(20),
+    First_Name CHAR(20),
+    Last_Name CHAR(20),
+    Address CHAR(20),
+    City CHAR(20),
+    trade_state CHAR(20),
+    ZipCode CHAR(20),
+    Email_Address CHAR(20),
+    Mobil_Phone CHAR(20),
+    IssuedFlag CHAR(20),
+    RedeemFlag CHAR(20),
+    CanceledFlag CHAR(20),
+    REDEMPTION_STATUS CHAR(20),
+    DLVRYNBR_REJRSN CHAR(20),
+    DELIVERY_ADDRESS CHAR(80)
+);
+success!
+timestamp: 2016-01-20T15:40:57.928000
+CREATE TABLE product_info(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Reward_Name CHAR(20),
+    Reward_Value CHAR(20),
+    Reward_Points CHAR(20),
+    Reward_Internal_Cost CHAR(20),
+    product_id CHAR(20),
+    reserve_field CHAR(20)
+);
+success!
+timestamp: 2016-01-20T15:40:58.026000
+CREATE TABLE user_info(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id CHAR(20),
+    SB_Internal_Member_ID CHAR(20),
+    Member_Account_ID CHAR(20),
+    user_name CHAR(20),
+    address CHAR(20),
+    phone_num CHAR(20),
+    city CHAR(20),
+    province CHAR(20),
+    zip_code CHAR(20),
+    Country CHAR(20),
+    reserve_field CHAR(20)
+);
+success!
+timestamp: 2016-01-20T15:40:58.136000
+CREATE TABLE user2product(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    product_id CHAR(20),
+    trials_count CHAR(20),
+    user_id CHAR(20),
+    reserve_field CHAR(20)
+);
+success!
+timestamp: 2016-01-20T15:40:58.259000
+CREATE TABLE correct_BCB(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20),
+    ex_id CHAR(20),
+    shop_name CHAR(20),
+    telephone CHAR(20),
+    cellphone CHAR(20),
+    user_name CHAR(20),
+    address CHAR(20),
+    province CHAR(20),
+    city CHAR(20),
+    county CHAR(20),
+    product_order CHAR(20),
+    barcode CHAR(20),
+    product_name CHAR(20),
+    product_size CHAR(20),
+    store_name CHAR(20),
+    store_size CHAR(20),
+    product_quantity CHAR(20)
+);
+success!
+timestamp: 2016-01-20T15:40:58.369000
+CREATE TABLE incorrect_BCB(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20),
+    ex_id CHAR(20),
+    shop_name CHAR(20),
+    telephone CHAR(20),
+    cellphone CHAR(20),
+    user_name CHAR(20),
+    address CHAR(20),
+    province CHAR(20),
+    city CHAR(20),
+    county CHAR(20),
+    product_order CHAR(20),
+    barcode CHAR(20),
+    product_name CHAR(20),
+    product_size CHAR(20),
+    store_name CHAR(20),
+    store_size CHAR(20),
+    product_quantity CHAR(20),
+    wrong_reason CHAR(20),
+    status1 CHAR(20)
+);
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2016-01-21T11:32:13.222000
+CREATE TABLE auth_user(
+    id INT AUTO_INCREMENT NOT NULL,
+    first_name VARCHAR(128),
+    last_name VARCHAR(128),
+    email VARCHAR(512),
+    password VARCHAR(512),
+    registration_key VARCHAR(512),
+    reset_password_key VARCHAR(512),
+    registration_id VARCHAR(512),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+timestamp: 2016-01-21T11:35:07.563000
+CREATE TABLE auth_user(
+    id INT AUTO_INCREMENT NOT NULL,
+    first_name VARCHAR(128),
+    last_name VARCHAR(128),
+    email VARCHAR(512),
+    password VARCHAR(512),
+    registration_key VARCHAR(512),
+    reset_password_key VARCHAR(512),
+    registration_id VARCHAR(512),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+timestamp: 2016-01-21T11:41:22.364000
+CREATE TABLE auth_user(
+    id INT AUTO_INCREMENT NOT NULL,
+    first_name VARCHAR(128),
+    last_name VARCHAR(128),
+    email VARCHAR(512),
+    password VARCHAR(512),
+    registration_key VARCHAR(512),
+    reset_password_key VARCHAR(512),
+    registration_id VARCHAR(512),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.369000
+CREATE TABLE auth_group(
+    id INT AUTO_INCREMENT NOT NULL,
+    role VARCHAR(512),
+    description LONGTEXT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.375000
+CREATE TABLE auth_membership(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    group_id INT  , INDEX group_id__idx (group_id), FOREIGN KEY (group_id) REFERENCES auth_group (id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.381000
+CREATE TABLE auth_permission(
+    id INT AUTO_INCREMENT NOT NULL,
+    group_id INT  , INDEX group_id__idx (group_id), FOREIGN KEY (group_id) REFERENCES auth_group (id) ON DELETE CASCADE,
+    name VARCHAR(512),
+    table_name VARCHAR(512),
+    record_id INT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.388000
+CREATE TABLE auth_event(
+    id INT AUTO_INCREMENT NOT NULL,
+    time_stamp DATETIME,
+    client_ip VARCHAR(512),
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    origin VARCHAR(512),
+    description LONGTEXT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.394000
+CREATE TABLE auth_cas(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    created_on DATETIME,
+    service VARCHAR(512),
+    ticket VARCHAR(512),
+    renew CHAR(1),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.404000
+CREATE TABLE history_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    promo_id VARCHAR(20),
+    barcode VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    order_date VARCHAR(13),
+    product_name VARCHAR(20),
+    data_date VARCHAR(20),
+    channel VARCHAR(13),
+    stage VARCHAR(20),
+    city_class1 VARCHAR(20),
+    city_class2 VARCHAR(20),
+    memo1 VARCHAR(20),
+    memo2 VARCHAR(20),
+    address_bak VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.412000
+CREATE TABLE history(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    promo_id VARCHAR(20),
+    barcode VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    order_date VARCHAR(13),
+    product_name VARCHAR(20),
+    data_date VARCHAR(20),
+    channel VARCHAR(13),
+    stage VARCHAR(20),
+    city_class1 VARCHAR(20),
+    city_class2 VARCHAR(20),
+    memo1 VARCHAR(20),
+    memo2 VARCHAR(20),
+    address_bak VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.420000
+CREATE TABLE db_map(
+    id INT AUTO_INCREMENT NOT NULL,
+    table_type VARCHAR(20),
+    table_name VARCHAR(40),
+    field_name VARCHAR(40),
+    field_id VARCHAR(40),
+    field_order INT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.429000
+CREATE TABLE custom_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    product_tag VARCHAR(40),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.438000
+CREATE TABLE address_lack(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.449000
+CREATE TABLE wrong_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    wrong_reason VARCHAR(40),
+    dup_ID VARCHAR(40),
+    dup_ex VARCHAR(80),
+    dup_address VARCHAR(80),
+    dup_name VARCHAR(80),
+    dup_phone VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.457000
+CREATE TABLE pampers_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    class_city VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.466000
+CREATE TABLE pampers_history_dup(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    wrong_reason VARCHAR(40),
+    dup_ID VARCHAR(40),
+    dup_ex VARCHAR(80),
+    dup_address VARCHAR(80),
+    dup_name VARCHAR(80),
+    dup_phone VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.474000
+CREATE TABLE pampers_self_dup(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.484000
+CREATE TABLE pampers_addr_lack(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.491000
+CREATE TABLE pampers_result(
+    id INT AUTO_INCREMENT NOT NULL,
+    tag VARCHAR(40),
+    distribution VARCHAR(20),
+    Top4 VARCHAR(20),
+    A_city VARCHAR(20),
+    B_city VARCHAR(20),
+    C_city VARCHAR(20),
+    D_city VARCHAR(20),
+    village VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.515000
+CREATE TABLE trade(
+    id INT AUTO_INCREMENT NOT NULL,
+    tid VARCHAR(20),
+    out_tid VARCHAR(20),
+    shop_id VARCHAR(20),
+    storage_id VARCHAR(20),
+    buyer_id VARCHAR(20),
+    buyer_msg VARCHAR(20),
+    buyer_email VARCHAR(20),
+    buyer_alipay VARCHAR(20),
+    seller_remark VARCHAR(20),
+    consignee VARCHAR(20),
+    address VARCHAR(20),
+    postcode VARCHAR(20),
+    telephone VARCHAR(20),
+    mobilPhone VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    area VARCHAR(20),
+    actual_freight_get VARCHAR(20),
+    actual_RP VARCHAR(20),
+    ship_method VARCHAR(20),
+    express VARCHAR(20),
+    is_invoiceOpened VARCHAR(20),
+    invoice_type VARCHAR(20),
+    invoice_money VARCHAR(20),
+    invoice_title VARCHAR(20),
+    invoice_msg VARCHAR(20),
+    order_type VARCHAR(20),
+    process_status VARCHAR(20),
+    pay_status VARCHAR(20),
+    deliver_status VARCHAR(20),
+    is_COD VARCHAR(20),
+    serverCost_COD VARCHAR(20),
+    order_totalMoney VARCHAR(20),
+    product_totalMoney VARCHAR(20),
+    pay_method VARCHAR(20),
+    pay_commission VARCHAR(20),
+    pay_score VARCHAR(20),
+    return_score VARCHAR(20),
+    favorable_money VARCHAR(20),
+    alipay_transaction_no VARCHAR(20),
+    out_payNo VARCHAR(20),
+    out_express_method VARCHAR(20),
+    out_order_status VARCHAR(20),
+    order_date VARCHAR(20),
+    pay_date VARCHAR(20),
+    finish_date VARCHAR(20),
+    plat_type VARCHAR(20),
+    distributor_no VARCHAR(20),
+    WuLiu VARCHAR(20),
+    WuLiu_no VARCHAR(20),
+    in_memo VARCHAR(20),
+    other_remark VARCHAR(20),
+    actual_freight_pay VARCHAR(20),
+    ship_date_plan VARCHAR(20),
+    deliver_date_plan VARCHAR(20),
+    is_scorePay VARCHAR(20),
+    is_needInvoice VARCHAR(20),
+    barCode VARCHAR(20),
+    product_title VARCHAR(20),
+    standard VARCHAR(20),
+    out_price VARCHAR(20),
+    favorite_money VARCHAR(20),
+    orderGoods_Num VARCHAR(20),
+    gift_Num VARCHAR(20),
+    cost_Price VARCHAR(20),
+    t_id VARCHAR(20),
+    product_stockout VARCHAR(20),
+    is_Book VARCHAR(20),
+    is_presell VARCHAR(20),
+    is_Gift VARCHAR(20),
+    avg_price VARCHAR(20),
+    product_freight VARCHAR(20),
+    shop__id VARCHAR(20),
+    out__tid VARCHAR(20),
+    out_productId VARCHAR(20),
+    out_barCode VARCHAR(20),
+    product_intro VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:41:22.522000
+CREATE TABLE AllBarcode(
+    id INT AUTO_INCREMENT NOT NULL,
+    product_num VARCHAR(20),
+    product_id VARCHAR(20),
+    product_size VARCHAR(20),
+    product_name VARCHAR(20),
+    bar_code VARCHAR(20),
+    brand VARCHAR(20),
+    product_classify VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:42:23.953000
+CREATE TABLE WuLiuInfo(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20),
+    tracking_number VARCHAR(20),
+    tracking_company VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:42:23.971000
+CREATE TABLE original_data(
+    id INT AUTO_INCREMENT NOT NULL,
+    SB_Internal_Member_ID VARCHAR(20),
+    Member_Account_ID VARCHAR(20),
+    Reward_ID VARCHAR(20),
+    Reward_Name VARCHAR(20),
+    Reward_Value VARCHAR(20),
+    Reward_Points VARCHAR(20),
+    Reward_Internal_Cost VARCHAR(20),
+    Issue_Date VARCHAR(20),
+    Issue_Location VARCHAR(20),
+    Redeemed_Date VARCHAR(20),
+    Redeemed_Location VARCHAR(20),
+    Cancel_Date VARCHAR(20),
+    Expiration_Date VARCHAR(20),
+    Reward_Barcode VARCHAR(20),
+    First_Name VARCHAR(20),
+    Last_Name VARCHAR(20),
+    Address VARCHAR(20),
+    City VARCHAR(20),
+    trade_state VARCHAR(20),
+    ZipCode VARCHAR(20),
+    Email_Address VARCHAR(20),
+    Mobil_Phone VARCHAR(20),
+    IssuedFlag VARCHAR(20),
+    RedeemFlag VARCHAR(20),
+    CanceledFlag VARCHAR(20),
+    REDEMPTION_STATUS VARCHAR(20),
+    DLVRYNBR_REJRSN VARCHAR(20),
+    DELIVERY_ADDRESS VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:42:23.980000
+CREATE TABLE product_info(
+    id INT AUTO_INCREMENT NOT NULL,
+    Reward_Name VARCHAR(20),
+    Reward_Value VARCHAR(20),
+    Reward_Points VARCHAR(20),
+    Reward_Internal_Cost VARCHAR(20),
+    product_id VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:42:23.995000
+CREATE TABLE user_info(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id VARCHAR(20),
+    SB_Internal_Member_ID VARCHAR(20),
+    Member_Account_ID VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    phone_num VARCHAR(20),
+    city VARCHAR(20),
+    province VARCHAR(20),
+    zip_code VARCHAR(20),
+    Country VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:42:24.009000
+CREATE TABLE user2product(
+    id INT AUTO_INCREMENT NOT NULL,
+    product_id VARCHAR(20),
+    trials_count VARCHAR(20),
+    user_id VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:42:24.051000
+CREATE TABLE correct_BCB(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20),
+    ex_id VARCHAR(20),
+    shop_name VARCHAR(20),
+    telephone VARCHAR(20),
+    cellphone VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    county VARCHAR(20),
+    product_order VARCHAR(20),
+    barcode VARCHAR(20),
+    product_name VARCHAR(20),
+    product_size VARCHAR(20),
+    store_name VARCHAR(20),
+    store_size VARCHAR(20),
+    product_quantity VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T11:42:24.065000
+CREATE TABLE incorrect_BCB(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20),
+    ex_id VARCHAR(20),
+    shop_name VARCHAR(20),
+    telephone VARCHAR(20),
+    cellphone VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    county VARCHAR(20),
+    product_order VARCHAR(20),
+    barcode VARCHAR(20),
+    product_name VARCHAR(20),
+    product_size VARCHAR(20),
+    store_name VARCHAR(20),
+    store_size VARCHAR(20),
+    product_quantity VARCHAR(20),
+    wrong_reason VARCHAR(20),
+    status1 VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+success!
+timestamp: 2016-01-21T19:10:50.782000
+CREATE TABLE WuLiuInfo(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_id CHAR(20),
+    tracking_number CHAR(20),
+    tracking_company CHAR(20)
+);
+faked!
+timestamp: 2016-01-21T19:15:42.299000
+CREATE TABLE auth_user(
+    id INT AUTO_INCREMENT NOT NULL,
+    first_name VARCHAR(128),
+    last_name VARCHAR(128),
+    email VARCHAR(512),
+    password VARCHAR(512),
+    registration_key VARCHAR(512),
+    reset_password_key VARCHAR(512),
+    registration_id VARCHAR(512),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.304000
+CREATE TABLE auth_group(
+    id INT AUTO_INCREMENT NOT NULL,
+    role VARCHAR(512),
+    description LONGTEXT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.309000
+CREATE TABLE auth_membership(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    group_id INT  , INDEX group_id__idx (group_id), FOREIGN KEY (group_id) REFERENCES auth_group (id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.315000
+CREATE TABLE auth_permission(
+    id INT AUTO_INCREMENT NOT NULL,
+    group_id INT  , INDEX group_id__idx (group_id), FOREIGN KEY (group_id) REFERENCES auth_group (id) ON DELETE CASCADE,
+    name VARCHAR(512),
+    table_name VARCHAR(512),
+    record_id INT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.321000
+CREATE TABLE auth_event(
+    id INT AUTO_INCREMENT NOT NULL,
+    time_stamp DATETIME,
+    client_ip VARCHAR(512),
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    origin VARCHAR(512),
+    description LONGTEXT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.327000
+CREATE TABLE auth_cas(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    created_on DATETIME,
+    service VARCHAR(512),
+    ticket VARCHAR(512),
+    renew CHAR(1),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.337000
+CREATE TABLE history_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    promo_id VARCHAR(20),
+    barcode VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    order_date VARCHAR(13),
+    product_name VARCHAR(20),
+    data_date VARCHAR(20),
+    channel VARCHAR(13),
+    stage VARCHAR(20),
+    city_class1 VARCHAR(20),
+    city_class2 VARCHAR(20),
+    memo1 VARCHAR(20),
+    memo2 VARCHAR(20),
+    address_bak VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.346000
+CREATE TABLE history(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    promo_id VARCHAR(20),
+    barcode VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    order_date VARCHAR(13),
+    product_name VARCHAR(20),
+    data_date VARCHAR(20),
+    channel VARCHAR(13),
+    stage VARCHAR(20),
+    city_class1 VARCHAR(20),
+    city_class2 VARCHAR(20),
+    memo1 VARCHAR(20),
+    memo2 VARCHAR(20),
+    address_bak VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.353000
+CREATE TABLE db_map(
+    id INT AUTO_INCREMENT NOT NULL,
+    table_type VARCHAR(20),
+    table_name VARCHAR(40),
+    field_name VARCHAR(40),
+    field_id VARCHAR(40),
+    field_order INT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.362000
+CREATE TABLE custom_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    product_tag VARCHAR(40),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.372000
+CREATE TABLE address_lack(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.384000
+CREATE TABLE wrong_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    wrong_reason VARCHAR(40),
+    dup_ID VARCHAR(40),
+    dup_ex VARCHAR(80),
+    dup_address VARCHAR(80),
+    dup_name VARCHAR(80),
+    dup_phone VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.391000
+CREATE TABLE pampers_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    class_city VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.401000
+CREATE TABLE pampers_history_dup(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    wrong_reason VARCHAR(40),
+    dup_ID VARCHAR(40),
+    dup_ex VARCHAR(80),
+    dup_address VARCHAR(80),
+    dup_name VARCHAR(80),
+    dup_phone VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.409000
+CREATE TABLE pampers_self_dup(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.417000
+CREATE TABLE pampers_addr_lack(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.423000
+CREATE TABLE pampers_result(
+    id INT AUTO_INCREMENT NOT NULL,
+    tag VARCHAR(40),
+    distribution VARCHAR(20),
+    Top4 VARCHAR(20),
+    A_city VARCHAR(20),
+    B_city VARCHAR(20),
+    C_city VARCHAR(20),
+    D_city VARCHAR(20),
+    village VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.449000
+CREATE TABLE trade(
+    id INT AUTO_INCREMENT NOT NULL,
+    tid VARCHAR(20),
+    out_tid VARCHAR(20),
+    shop_id VARCHAR(20),
+    storage_id VARCHAR(20),
+    buyer_id VARCHAR(20),
+    buyer_msg VARCHAR(20),
+    buyer_email VARCHAR(20),
+    buyer_alipay VARCHAR(20),
+    seller_remark VARCHAR(20),
+    consignee VARCHAR(20),
+    address VARCHAR(20),
+    postcode VARCHAR(20),
+    telephone VARCHAR(20),
+    mobilPhone VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    area VARCHAR(20),
+    actual_freight_get VARCHAR(20),
+    actual_RP VARCHAR(20),
+    ship_method VARCHAR(20),
+    express VARCHAR(20),
+    is_invoiceOpened VARCHAR(20),
+    invoice_type VARCHAR(20),
+    invoice_money VARCHAR(20),
+    invoice_title VARCHAR(20),
+    invoice_msg VARCHAR(20),
+    order_type VARCHAR(20),
+    process_status VARCHAR(20),
+    pay_status VARCHAR(20),
+    deliver_status VARCHAR(20),
+    is_COD VARCHAR(20),
+    serverCost_COD VARCHAR(20),
+    order_totalMoney VARCHAR(20),
+    product_totalMoney VARCHAR(20),
+    pay_method VARCHAR(20),
+    pay_commission VARCHAR(20),
+    pay_score VARCHAR(20),
+    return_score VARCHAR(20),
+    favorable_money VARCHAR(20),
+    alipay_transaction_no VARCHAR(20),
+    out_payNo VARCHAR(20),
+    out_express_method VARCHAR(20),
+    out_order_status VARCHAR(20),
+    order_date VARCHAR(20),
+    pay_date VARCHAR(20),
+    finish_date VARCHAR(20),
+    plat_type VARCHAR(20),
+    distributor_no VARCHAR(20),
+    WuLiu VARCHAR(20),
+    WuLiu_no VARCHAR(20),
+    in_memo VARCHAR(20),
+    other_remark VARCHAR(20),
+    actual_freight_pay VARCHAR(20),
+    ship_date_plan VARCHAR(20),
+    deliver_date_plan VARCHAR(20),
+    is_scorePay VARCHAR(20),
+    is_needInvoice VARCHAR(20),
+    barCode VARCHAR(20),
+    product_title VARCHAR(20),
+    standard VARCHAR(20),
+    out_price VARCHAR(20),
+    favorite_money VARCHAR(20),
+    orderGoods_Num VARCHAR(20),
+    gift_Num VARCHAR(20),
+    cost_Price VARCHAR(20),
+    t_id VARCHAR(20),
+    product_stockout VARCHAR(20),
+    is_Book VARCHAR(20),
+    is_presell VARCHAR(20),
+    is_Gift VARCHAR(20),
+    avg_price VARCHAR(20),
+    product_freight VARCHAR(20),
+    shop__id VARCHAR(20),
+    out__tid VARCHAR(20),
+    out_productId VARCHAR(20),
+    out_barCode VARCHAR(20),
+    product_intro VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.456000
+CREATE TABLE AllBarcode(
+    id INT AUTO_INCREMENT NOT NULL,
+    product_num VARCHAR(20),
+    product_id VARCHAR(20),
+    product_size VARCHAR(20),
+    product_name VARCHAR(20),
+    bar_code VARCHAR(20),
+    brand VARCHAR(20),
+    product_classify VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.461000
+CREATE TABLE WuLiuInfo(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20),
+    tracking_number VARCHAR(20),
+    tracking_company VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.474000
+CREATE TABLE original_data(
+    id INT AUTO_INCREMENT NOT NULL,
+    SB_Internal_Member_ID VARCHAR(20),
+    Member_Account_ID VARCHAR(20),
+    Reward_ID VARCHAR(20),
+    Reward_Name VARCHAR(20),
+    Reward_Value VARCHAR(20),
+    Reward_Points VARCHAR(20),
+    Reward_Internal_Cost VARCHAR(20),
+    Issue_Date VARCHAR(20),
+    Issue_Location VARCHAR(20),
+    Redeemed_Date VARCHAR(20),
+    Redeemed_Location VARCHAR(20),
+    Cancel_Date VARCHAR(20),
+    Expiration_Date VARCHAR(20),
+    Reward_Barcode VARCHAR(20),
+    First_Name VARCHAR(20),
+    Last_Name VARCHAR(20),
+    Address VARCHAR(20),
+    City VARCHAR(20),
+    trade_state VARCHAR(20),
+    ZipCode VARCHAR(20),
+    Email_Address VARCHAR(20),
+    Mobil_Phone VARCHAR(20),
+    IssuedFlag VARCHAR(20),
+    RedeemFlag VARCHAR(20),
+    CanceledFlag VARCHAR(20),
+    REDEMPTION_STATUS VARCHAR(20),
+    DLVRYNBR_REJRSN VARCHAR(20),
+    DELIVERY_ADDRESS VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.482000
+CREATE TABLE product_info(
+    id INT AUTO_INCREMENT NOT NULL,
+    Reward_Name VARCHAR(20),
+    Reward_Value VARCHAR(20),
+    Reward_Points VARCHAR(20),
+    Reward_Internal_Cost VARCHAR(20),
+    product_id VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.490000
+CREATE TABLE user_info(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id VARCHAR(20),
+    SB_Internal_Member_ID VARCHAR(20),
+    Member_Account_ID VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    phone_num VARCHAR(20),
+    city VARCHAR(20),
+    province VARCHAR(20),
+    zip_code VARCHAR(20),
+    Country VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.496000
+CREATE TABLE user2product(
+    id INT AUTO_INCREMENT NOT NULL,
+    product_id VARCHAR(20),
+    trials_count VARCHAR(20),
+    user_id VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.505000
+CREATE TABLE correct_BCB(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20),
+    ex_id VARCHAR(20),
+    shop_name VARCHAR(20),
+    telephone VARCHAR(20),
+    cellphone VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    county VARCHAR(20),
+    product_order VARCHAR(20),
+    barcode VARCHAR(20),
+    product_name VARCHAR(20),
+    product_size VARCHAR(20),
+    store_name VARCHAR(20),
+    store_size VARCHAR(20),
+    product_quantity VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-01-21T19:15:42.514000
+CREATE TABLE incorrect_BCB(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20),
+    ex_id VARCHAR(20),
+    shop_name VARCHAR(20),
+    telephone VARCHAR(20),
+    cellphone VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    county VARCHAR(20),
+    product_order VARCHAR(20),
+    barcode VARCHAR(20),
+    product_name VARCHAR(20),
+    product_size VARCHAR(20),
+    store_name VARCHAR(20),
+    store_size VARCHAR(20),
+    product_quantity VARCHAR(20),
+    wrong_reason VARCHAR(20),
+    status1 VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2016-01-24T17:35:53.754000
+ALTER TABLE WuLiuInfo ADD orderid VARCHAR(20);
+faked!
+timestamp: 2016-01-24T17:35:53.757000
+ALTER TABLE WuLiuInfo ADD updatetime VARCHAR(20);
+faked!
+timestamp: 2016-01-24T17:35:53.759000
+ALTER TABLE WuLiuInfo ADD logisticcompany VARCHAR(20);
+faked!
+timestamp: 2016-01-24T17:35:53.762000
+ALTER TABLE WuLiuInfo ADD trackingno VARCHAR(20);
+faked!
+timestamp: 2016-01-24T17:35:53.764000
+ALTER TABLE WuLiuInfo ADD order_status VARCHAR(20);
+faked!
+timestamp: 2016-01-24T17:35:53.767000
+ALTER TABLE WuLiuInfo DROP COLUMN order_id;
+faked!
+timestamp: 2016-01-24T17:35:53.769000
+ALTER TABLE WuLiuInfo DROP COLUMN tracking_number;
+faked!
+timestamp: 2016-01-24T17:35:53.771000
+ALTER TABLE WuLiuInfo DROP COLUMN tracking_company;
+faked!
+success!
+timestamp: 2016-01-24T20:34:08.927000
+ALTER TABLE WuLiuInfo ADD orderid CHAR(20);
+faked!
+timestamp: 2016-01-24T20:34:08.929000
+ALTER TABLE WuLiuInfo ADD updatetime CHAR(20);
+faked!
+timestamp: 2016-01-24T20:34:08.930000
+ALTER TABLE WuLiuInfo ADD logisticcompany CHAR(20);
+faked!
+timestamp: 2016-01-24T20:34:08.932000
+ALTER TABLE WuLiuInfo ADD trackingno CHAR(20);
+faked!
+timestamp: 2016-01-24T20:34:08.935000
+ALTER TABLE WuLiuInfo ADD order_status CHAR(20);
+faked!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2016-01-25T18:25:59.935000
+ALTER TABLE trade ADD order_date__tmp DATETIME;
+faked!
+UPDATE trade SET order_date__tmp=order_date;
+faked!
+ALTER TABLE trade DROP COLUMN order_date;
+faked!
+ALTER TABLE trade ADD order_date DATETIME;
+faked!
+UPDATE trade SET order_date=order_date__tmp;
+faked!
+ALTER TABLE trade DROP COLUMN order_date__tmp;
+faked!
+success!
+timestamp: 2016-01-25T18:26:00.054000
+ALTER TABLE WuLiuInfo ADD updatetime__tmp DATETIME;
+faked!
+UPDATE WuLiuInfo SET updatetime__tmp=updatetime;
+faked!
+ALTER TABLE WuLiuInfo DROP COLUMN updatetime;
+faked!
+ALTER TABLE WuLiuInfo ADD updatetime DATETIME;
+faked!
+UPDATE WuLiuInfo SET updatetime=updatetime__tmp;
+faked!
+ALTER TABLE WuLiuInfo DROP COLUMN updatetime__tmp;
+faked!
+success!
+timestamp: 2016-02-15T10:27:40.656000
+ALTER TABLE trade ADD status VARCHAR(20);
+faked!
+timestamp: 2016-02-15T10:27:40.847000
+ALTER TABLE trade ADD address__tmp VARCHAR(100);
+faked!
+UPDATE trade SET address__tmp=address;
+faked!
+ALTER TABLE trade DROP COLUMN address;
+faked!
+ALTER TABLE trade ADD address VARCHAR(100);
+faked!
+UPDATE trade SET address=address__tmp;
+faked!
+ALTER TABLE trade DROP COLUMN address__tmp;
+faked!
+success!
+timestamp: 2016-03-01T13:13:52.303000
+ALTER TABLE history_order ADD t_id VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.366000
+ALTER TABLE history_order ADD status VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.368000
+ALTER TABLE history_order ADD process_status VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.371000
+ALTER TABLE history_order ADD product_totalmoney VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.377000
+ALTER TABLE history_order ADD is_cod VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.381000
+ALTER TABLE history_order ADD wuliu VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.383000
+ALTER TABLE history_order ADD other_remark VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.385000
+ALTER TABLE history_order ADD gift_num VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.388000
+ALTER TABLE history_order ADD consignee VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.390000
+ALTER TABLE history_order ADD telephone VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.392000
+ALTER TABLE history_order ADD shop_id VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.395000
+ALTER TABLE history_order ADD pay_date VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.397000
+ALTER TABLE history_order ADD invoice_type VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.401000
+ALTER TABLE history_order ADD out_tid VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.403000
+ALTER TABLE history_order ADD servercost_cod VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.405000
+ALTER TABLE history_order ADD pay_commission VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.409000
+ALTER TABLE history_order ADD out__tid VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.413000
+ALTER TABLE history_order ADD area VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.417000
+ALTER TABLE history_order ADD out_barcode VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.420000
+ALTER TABLE history_order ADD finish_date VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.424000
+ALTER TABLE history_order ADD buyer_alipay VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.428000
+ALTER TABLE history_order ADD order_type VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.433000
+ALTER TABLE history_order ADD out_express_method VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.437000
+ALTER TABLE history_order ADD is_scorepay VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.443000
+ALTER TABLE history_order ADD actual_rp VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.447000
+ALTER TABLE history_order ADD shop__id VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.451000
+ALTER TABLE history_order ADD distributor_no VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.453000
+ALTER TABLE history_order ADD storage_id VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.456000
+ALTER TABLE history_order ADD tid VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.462000
+ALTER TABLE history_order ADD ship_method VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.465000
+ALTER TABLE history_order ADD out_order_status VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.468000
+ALTER TABLE history_order ADD product_title VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.472000
+ALTER TABLE history_order ADD pay_status VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.475000
+ALTER TABLE history_order ADD buyer_id VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.477000
+ALTER TABLE history_order ADD is_book VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.480000
+ALTER TABLE history_order ADD province__tmp VARCHAR(20);
+faked!
+UPDATE history_order SET province__tmp=province;
+faked!
+ALTER TABLE history_order DROP COLUMN province;
+faked!
+ALTER TABLE history_order ADD province VARCHAR(20);
+faked!
+UPDATE history_order SET province=province__tmp;
+faked!
+ALTER TABLE history_order DROP COLUMN province__tmp;
+faked!
+timestamp: 2016-03-01T13:13:52.494000
+ALTER TABLE history_order ADD buyer_email VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.497000
+ALTER TABLE history_order ADD is_needinvoice VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.501000
+ALTER TABLE history_order ADD city__tmp VARCHAR(20);
+faked!
+UPDATE history_order SET city__tmp=city;
+faked!
+ALTER TABLE history_order DROP COLUMN city;
+faked!
+ALTER TABLE history_order ADD city VARCHAR(20);
+faked!
+UPDATE history_order SET city=city__tmp;
+faked!
+ALTER TABLE history_order DROP COLUMN city__tmp;
+faked!
+timestamp: 2016-03-01T13:13:52.516000
+ALTER TABLE history_order ADD wuliu_no VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.519000
+ALTER TABLE history_order ADD plat_type VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.521000
+ALTER TABLE history_order ADD ship_date_plan VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.524000
+ALTER TABLE history_order ADD actual_freight_get VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.527000
+ALTER TABLE history_order ADD pay_method VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.531000
+ALTER TABLE history_order ADD product_freight VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.534000
+ALTER TABLE history_order ADD standard VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.537000
+ALTER TABLE history_order ADD express VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.540000
+ALTER TABLE history_order ADD favorite_money VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.543000
+ALTER TABLE history_order ADD deliver_status VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.546000
+ALTER TABLE history_order ADD avg_price VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.549000
+ALTER TABLE history_order ADD invoice_money VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.552000
+ALTER TABLE history_order ADD order_date__tmp DATETIME;
+faked!
+UPDATE history_order SET order_date__tmp=order_date;
+faked!
+ALTER TABLE history_order DROP COLUMN order_date;
+faked!
+ALTER TABLE history_order ADD order_date DATETIME;
+faked!
+UPDATE history_order SET order_date=order_date__tmp;
+faked!
+ALTER TABLE history_order DROP COLUMN order_date__tmp;
+faked!
+timestamp: 2016-03-01T13:13:52.568000
+ALTER TABLE history_order ADD actual_freight_pay VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.571000
+ALTER TABLE history_order ADD seller_remark VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.574000
+ALTER TABLE history_order ADD return_score VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.577000
+ALTER TABLE history_order ADD is_gift VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.580000
+ALTER TABLE history_order ADD invoice_title VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.584000
+ALTER TABLE history_order ADD cost_price VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.588000
+ALTER TABLE history_order ADD deliver_date_plan VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.592000
+ALTER TABLE history_order ADD in_memo VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.595000
+ALTER TABLE history_order ADD product_intro VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.598000
+ALTER TABLE history_order ADD order_totalmoney VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.601000
+ALTER TABLE history_order ADD favorable_money VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.604000
+ALTER TABLE history_order ADD out_payno VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.607000
+ALTER TABLE history_order ADD is_presell VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.610000
+ALTER TABLE history_order ADD ordergoods_num VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.614000
+ALTER TABLE history_order ADD out_productid VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.617000
+ALTER TABLE history_order ADD is_invoiceopened VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.620000
+ALTER TABLE history_order ADD invoice_msg VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.623000
+ALTER TABLE history_order ADD alipay_transaction_no VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.627000
+ALTER TABLE history_order ADD product_stockout VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.631000
+ALTER TABLE history_order ADD mobilphone VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.635000
+ALTER TABLE history_order ADD out_price VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.638000
+ALTER TABLE history_order ADD pay_score VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.641000
+ALTER TABLE history_order ADD buyer_msg VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.644000
+ALTER TABLE history_order ADD address__tmp VARCHAR(100);
+faked!
+UPDATE history_order SET address__tmp=address;
+faked!
+ALTER TABLE history_order DROP COLUMN address;
+faked!
+ALTER TABLE history_order ADD address VARCHAR(100);
+faked!
+UPDATE history_order SET address=address__tmp;
+faked!
+ALTER TABLE history_order DROP COLUMN address__tmp;
+faked!
+timestamp: 2016-03-01T13:13:52.661000
+ALTER TABLE history_order ADD postcode VARCHAR(20);
+faked!
+timestamp: 2016-03-01T13:13:52.664000
+ALTER TABLE history_order DROP COLUMN city_class1;
+faked!
+timestamp: 2016-03-01T13:13:52.667000
+ALTER TABLE history_order DROP COLUMN address_bak;
+faked!
+timestamp: 2016-03-01T13:13:52.670000
+ALTER TABLE history_order DROP COLUMN city_class2;
+faked!
+timestamp: 2016-03-01T13:13:52.673000
+ALTER TABLE history_order DROP COLUMN order_id;
+faked!
+timestamp: 2016-03-01T13:13:52.677000
+ALTER TABLE history_order DROP COLUMN product_name;
+faked!
+timestamp: 2016-03-01T13:13:52.680000
+ALTER TABLE history_order DROP COLUMN promo_id;
+faked!
+timestamp: 2016-03-01T13:13:52.683000
+ALTER TABLE history_order DROP COLUMN county;
+faked!
+timestamp: 2016-03-01T13:13:52.687000
+ALTER TABLE history_order DROP COLUMN mobile;
+faked!
+timestamp: 2016-03-01T13:13:52.691000
+ALTER TABLE history_order DROP COLUMN ex_id;
+faked!
+timestamp: 2016-03-01T13:13:52.694000
+ALTER TABLE history_order DROP COLUMN memo1;
+faked!
+timestamp: 2016-03-01T13:13:52.697000
+ALTER TABLE history_order DROP COLUMN data_date;
+faked!
+timestamp: 2016-03-01T13:13:52.700000
+ALTER TABLE history_order DROP COLUMN user_name;
+faked!
+timestamp: 2016-03-01T13:13:52.702000
+ALTER TABLE history_order DROP COLUMN memo2;
+faked!
+timestamp: 2016-03-01T13:13:52.705000
+ALTER TABLE history_order DROP COLUMN channel;
+faked!
+timestamp: 2016-03-01T13:13:52.710000
+ALTER TABLE history_order DROP COLUMN stage;
+faked!
+timestamp: 2016-03-22T11:01:55.670000
+ALTER TABLE db_map ADD votes INT;
+faked!
+success!
+timestamp: 2016-04-05T11:15:10.037000
+CREATE TABLE auth_user(
+    id INT AUTO_INCREMENT NOT NULL,
+    first_name VARCHAR(128),
+    last_name VARCHAR(128),
+    email VARCHAR(512),
+    password VARCHAR(512),
+    registration_key VARCHAR(512),
+    reset_password_key VARCHAR(512),
+    registration_id VARCHAR(512),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.095000
+CREATE TABLE auth_group(
+    id INT AUTO_INCREMENT NOT NULL,
+    role VARCHAR(512),
+    description LONGTEXT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.098000
+CREATE TABLE auth_membership(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    group_id INT  , INDEX group_id__idx (group_id), FOREIGN KEY (group_id) REFERENCES auth_group (id) ON DELETE CASCADE,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.101000
+CREATE TABLE auth_permission(
+    id INT AUTO_INCREMENT NOT NULL,
+    group_id INT  , INDEX group_id__idx (group_id), FOREIGN KEY (group_id) REFERENCES auth_group (id) ON DELETE CASCADE,
+    name VARCHAR(512),
+    table_name VARCHAR(512),
+    record_id INT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.103000
+CREATE TABLE auth_event(
+    id INT AUTO_INCREMENT NOT NULL,
+    time_stamp DATETIME,
+    client_ip VARCHAR(512),
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    origin VARCHAR(512),
+    description LONGTEXT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.107000
+CREATE TABLE auth_cas(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id INT  , INDEX user_id__idx (user_id), FOREIGN KEY (user_id) REFERENCES auth_user (id) ON DELETE CASCADE,
+    created_on DATETIME,
+    service VARCHAR(512),
+    ticket VARCHAR(512),
+    renew CHAR(1),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.118000
+CREATE TABLE history_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    tid VARCHAR(20),
+    out_tid VARCHAR(20),
+    shop_id VARCHAR(20),
+    storage_id VARCHAR(20),
+    buyer_id VARCHAR(20),
+    buyer_msg VARCHAR(20),
+    buyer_email VARCHAR(20),
+    buyer_alipay VARCHAR(20),
+    seller_remark VARCHAR(20),
+    consignee VARCHAR(20),
+    address VARCHAR(100),
+    postcode VARCHAR(20),
+    telephone VARCHAR(20),
+    mobilPhone VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    area VARCHAR(20),
+    actual_freight_get VARCHAR(20),
+    actual_RP VARCHAR(20),
+    ship_method VARCHAR(20),
+    express VARCHAR(20),
+    is_invoiceOpened VARCHAR(20),
+    invoice_type VARCHAR(20),
+    invoice_money VARCHAR(20),
+    invoice_title VARCHAR(20),
+    invoice_msg VARCHAR(20),
+    order_type VARCHAR(20),
+    process_status VARCHAR(20),
+    pay_status VARCHAR(20),
+    deliver_status VARCHAR(20),
+    is_COD VARCHAR(20),
+    serverCost_COD VARCHAR(20),
+    order_totalMoney VARCHAR(20),
+    product_totalMoney VARCHAR(20),
+    pay_method VARCHAR(20),
+    pay_commission VARCHAR(20),
+    pay_score VARCHAR(20),
+    return_score VARCHAR(20),
+    favorable_money VARCHAR(20),
+    alipay_transaction_no VARCHAR(20),
+    out_payNo VARCHAR(20),
+    out_express_method VARCHAR(20),
+    out_order_status VARCHAR(20),
+    order_date DATETIME,
+    pay_date VARCHAR(20),
+    finish_date VARCHAR(20),
+    plat_type VARCHAR(20),
+    distributor_no VARCHAR(20),
+    WuLiu VARCHAR(20),
+    WuLiu_no VARCHAR(20),
+    in_memo VARCHAR(20),
+    other_remark VARCHAR(20),
+    actual_freight_pay VARCHAR(20),
+    ship_date_plan VARCHAR(20),
+    deliver_date_plan VARCHAR(20),
+    is_scorePay VARCHAR(20),
+    is_needInvoice VARCHAR(20),
+    barCode VARCHAR(20),
+    product_title VARCHAR(20),
+    standard VARCHAR(20),
+    out_price VARCHAR(20),
+    favorite_money VARCHAR(20),
+    orderGoods_Num VARCHAR(20),
+    gift_Num VARCHAR(20),
+    cost_Price VARCHAR(20),
+    t_id VARCHAR(20),
+    product_stockout VARCHAR(20),
+    is_Book VARCHAR(20),
+    is_presell VARCHAR(20),
+    is_Gift VARCHAR(20),
+    avg_price VARCHAR(20),
+    product_freight VARCHAR(20),
+    shop__id VARCHAR(20),
+    out__tid VARCHAR(20),
+    out_productId VARCHAR(20),
+    out_barCode VARCHAR(20),
+    product_intro VARCHAR(20),
+    status VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.124000
+CREATE TABLE history(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    promo_id VARCHAR(20),
+    barcode VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    order_date VARCHAR(13),
+    product_name VARCHAR(20),
+    data_date VARCHAR(20),
+    channel VARCHAR(13),
+    stage VARCHAR(20),
+    city_class1 VARCHAR(20),
+    city_class2 VARCHAR(20),
+    memo1 VARCHAR(20),
+    memo2 VARCHAR(20),
+    address_bak VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.128000
+CREATE TABLE db_map(
+    id INT AUTO_INCREMENT NOT NULL,
+    table_type VARCHAR(20),
+    table_name VARCHAR(40),
+    field_name VARCHAR(40),
+    field_id VARCHAR(40),
+    field_order INT,
+    votes INT,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.134000
+CREATE TABLE custom_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    product_tag VARCHAR(40),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.138000
+CREATE TABLE address_lack(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.143000
+CREATE TABLE wrong_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    shop_name VARCHAR(40),
+    ex_id VARCHAR(20),
+    telephone VARCHAR(13),
+    mobile VARCHAR(13),
+    user_name VARCHAR(40),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    product_id VARCHAR(40),
+    barcode VARCHAR(20),
+    specification VARCHAR(40),
+    ex_product_name VARCHAR(40),
+    product_name VARCHAR(40),
+    order_num INT,
+    ex_spec VARCHAR(40),
+    wrong_reason VARCHAR(40),
+    dup_ID VARCHAR(40),
+    dup_ex VARCHAR(80),
+    dup_address VARCHAR(80),
+    dup_name VARCHAR(80),
+    dup_phone VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.146000
+CREATE TABLE pampers_order(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    class_city VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.150000
+CREATE TABLE pampers_history_dup(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    wrong_reason VARCHAR(40),
+    dup_ID VARCHAR(40),
+    dup_ex VARCHAR(80),
+    dup_address VARCHAR(80),
+    dup_name VARCHAR(80),
+    dup_phone VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.153000
+CREATE TABLE pampers_self_dup(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.156000
+CREATE TABLE pampers_addr_lack(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20) UNIQUE,
+    ex_id VARCHAR(20),
+    user_name VARCHAR(40),
+    mobile VARCHAR(13),
+    province VARCHAR(40),
+    city VARCHAR(40),
+    county VARCHAR(40),
+    address VARCHAR(80),
+    pregnancy VARCHAR(40),
+    product_piece VARCHAR(40),
+    product_size VARCHAR(40),
+    date_time VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.159000
+CREATE TABLE pampers_result(
+    id INT AUTO_INCREMENT NOT NULL,
+    tag VARCHAR(40),
+    distribution VARCHAR(20),
+    Top4 VARCHAR(20),
+    A_city VARCHAR(20),
+    B_city VARCHAR(20),
+    C_city VARCHAR(20),
+    D_city VARCHAR(20),
+    village VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.165000
+CREATE TABLE trade(
+    id INT AUTO_INCREMENT NOT NULL,
+    tid VARCHAR(20),
+    out_tid VARCHAR(20),
+    shop_id VARCHAR(20),
+    storage_id VARCHAR(20),
+    buyer_id VARCHAR(20),
+    buyer_msg VARCHAR(20),
+    buyer_email VARCHAR(20),
+    buyer_alipay VARCHAR(20),
+    seller_remark VARCHAR(20),
+    consignee VARCHAR(20),
+    address VARCHAR(100),
+    postcode VARCHAR(20),
+    telephone VARCHAR(20),
+    mobilPhone VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    area VARCHAR(20),
+    actual_freight_get VARCHAR(20),
+    actual_RP VARCHAR(20),
+    ship_method VARCHAR(20),
+    express VARCHAR(20),
+    is_invoiceOpened VARCHAR(20),
+    invoice_type VARCHAR(20),
+    invoice_money VARCHAR(20),
+    invoice_title VARCHAR(20),
+    invoice_msg VARCHAR(20),
+    order_type VARCHAR(20),
+    process_status VARCHAR(20),
+    pay_status VARCHAR(20),
+    deliver_status VARCHAR(20),
+    is_COD VARCHAR(20),
+    serverCost_COD VARCHAR(20),
+    order_totalMoney VARCHAR(20),
+    product_totalMoney VARCHAR(20),
+    pay_method VARCHAR(20),
+    pay_commission VARCHAR(20),
+    pay_score VARCHAR(20),
+    return_score VARCHAR(20),
+    favorable_money VARCHAR(20),
+    alipay_transaction_no VARCHAR(20),
+    out_payNo VARCHAR(20),
+    out_express_method VARCHAR(20),
+    out_order_status VARCHAR(20),
+    order_date DATETIME,
+    pay_date VARCHAR(20),
+    finish_date VARCHAR(20),
+    plat_type VARCHAR(20),
+    distributor_no VARCHAR(20),
+    WuLiu VARCHAR(20),
+    WuLiu_no VARCHAR(20),
+    in_memo VARCHAR(20),
+    other_remark VARCHAR(20),
+    actual_freight_pay VARCHAR(20),
+    ship_date_plan VARCHAR(20),
+    deliver_date_plan VARCHAR(20),
+    is_scorePay VARCHAR(20),
+    is_needInvoice VARCHAR(20),
+    barCode VARCHAR(20),
+    product_title VARCHAR(20),
+    standard VARCHAR(20),
+    out_price VARCHAR(20),
+    favorite_money VARCHAR(20),
+    orderGoods_Num VARCHAR(20),
+    gift_Num VARCHAR(20),
+    cost_Price VARCHAR(20),
+    t_id VARCHAR(20),
+    product_stockout VARCHAR(20),
+    is_Book VARCHAR(20),
+    is_presell VARCHAR(20),
+    is_Gift VARCHAR(20),
+    avg_price VARCHAR(20),
+    product_freight VARCHAR(20),
+    shop__id VARCHAR(20),
+    out__tid VARCHAR(20),
+    out_productId VARCHAR(20),
+    out_barCode VARCHAR(20),
+    product_intro VARCHAR(20),
+    status VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.169000
+CREATE TABLE AllBarcode(
+    id INT AUTO_INCREMENT NOT NULL,
+    product_num VARCHAR(20),
+    product_id VARCHAR(20),
+    product_size VARCHAR(20),
+    product_name VARCHAR(20),
+    bar_code VARCHAR(20),
+    brand VARCHAR(20),
+    product_classify VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.171000
+CREATE TABLE WuLiuInfo(
+    id INT AUTO_INCREMENT NOT NULL,
+    orderId VARCHAR(20),
+    order_status VARCHAR(20),
+    logisticCompany VARCHAR(20),
+    trackingNo VARCHAR(20),
+    updateTime DATETIME,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.175000
+CREATE TABLE original_data(
+    id INT AUTO_INCREMENT NOT NULL,
+    SB_Internal_Member_ID VARCHAR(20),
+    Member_Account_ID VARCHAR(20),
+    Reward_ID VARCHAR(20),
+    Reward_Name VARCHAR(20),
+    Reward_Value VARCHAR(20),
+    Reward_Points VARCHAR(20),
+    Reward_Internal_Cost VARCHAR(20),
+    Issue_Date VARCHAR(20),
+    Issue_Location VARCHAR(20),
+    Redeemed_Date VARCHAR(20),
+    Redeemed_Location VARCHAR(20),
+    Cancel_Date VARCHAR(20),
+    Expiration_Date VARCHAR(20),
+    Reward_Barcode VARCHAR(20),
+    First_Name VARCHAR(20),
+    Last_Name VARCHAR(20),
+    Address VARCHAR(20),
+    City VARCHAR(20),
+    trade_state VARCHAR(20),
+    ZipCode VARCHAR(20),
+    Email_Address VARCHAR(20),
+    Mobil_Phone VARCHAR(20),
+    IssuedFlag VARCHAR(20),
+    RedeemFlag VARCHAR(20),
+    CanceledFlag VARCHAR(20),
+    REDEMPTION_STATUS VARCHAR(20),
+    DLVRYNBR_REJRSN VARCHAR(20),
+    DELIVERY_ADDRESS VARCHAR(80),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.178000
+CREATE TABLE product_info(
+    id INT AUTO_INCREMENT NOT NULL,
+    Reward_Name VARCHAR(20),
+    Reward_Value VARCHAR(20),
+    Reward_Points VARCHAR(20),
+    Reward_Internal_Cost VARCHAR(20),
+    product_id VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.181000
+CREATE TABLE user_info(
+    id INT AUTO_INCREMENT NOT NULL,
+    user_id VARCHAR(20),
+    SB_Internal_Member_ID VARCHAR(20),
+    Member_Account_ID VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    phone_num VARCHAR(20),
+    city VARCHAR(20),
+    province VARCHAR(20),
+    zip_code VARCHAR(20),
+    Country VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.183000
+CREATE TABLE user2product(
+    id INT AUTO_INCREMENT NOT NULL,
+    product_id VARCHAR(20),
+    trials_count VARCHAR(20),
+    user_id VARCHAR(20),
+    reserve_field VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.186000
+CREATE TABLE correct_BCB(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20),
+    ex_id VARCHAR(20),
+    shop_name VARCHAR(20),
+    telephone VARCHAR(20),
+    cellphone VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    county VARCHAR(20),
+    product_order VARCHAR(20),
+    barcode VARCHAR(20),
+    product_name VARCHAR(20),
+    product_size VARCHAR(20),
+    store_name VARCHAR(20),
+    store_size VARCHAR(20),
+    product_quantity VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T11:15:10.190000
+CREATE TABLE incorrect_BCB(
+    id INT AUTO_INCREMENT NOT NULL,
+    order_id VARCHAR(20),
+    ex_id VARCHAR(20),
+    shop_name VARCHAR(20),
+    telephone VARCHAR(20),
+    cellphone VARCHAR(20),
+    user_name VARCHAR(20),
+    address VARCHAR(20),
+    province VARCHAR(20),
+    city VARCHAR(20),
+    county VARCHAR(20),
+    product_order VARCHAR(20),
+    barcode VARCHAR(20),
+    product_name VARCHAR(20),
+    product_size VARCHAR(20),
+    store_name VARCHAR(20),
+    store_size VARCHAR(20),
+    product_quantity VARCHAR(20),
+    wrong_reason VARCHAR(20),
+    status1 VARCHAR(20),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB CHARACTER SET utf8;
+faked!
+timestamp: 2016-04-05T15:03:11.077000
+ALTER TABLE history_order ADD product_channel VARCHAR(20);
+faked!
+timestamp: 2016-04-05T15:03:11.093000
+ALTER TABLE history_order ADD address__tmp VARCHAR(100) NOT NULL;
+faked!
+UPDATE history_order SET address__tmp=address;
+faked!
+ALTER TABLE history_order DROP COLUMN address;
+faked!
+ALTER TABLE history_order ADD address VARCHAR(100) NOT NULL;
+faked!
+UPDATE history_order SET address=address__tmp;
+faked!
+ALTER TABLE history_order DROP COLUMN address__tmp;
+faked!
+timestamp: 2016-04-05T15:03:11.111000
+ALTER TABLE history_order ADD city_level VARCHAR(20);
+faked!
+timestamp: 2016-04-05T15:03:11.119000
+ALTER TABLE history_order ADD backupinfo VARCHAR(20);
+faked!
+timestamp: 2016-04-05T15:03:11.123000
+ALTER TABLE history_order ADD addr_hash VARCHAR(512);
+faked!
+timestamp: 2016-04-05T15:03:11.126000
+ALTER TABLE history_order ADD examine_status VARCHAR(20);
+faked!
+timestamp: 2016-04-05T15:03:11.129000
+ALTER TABLE history_order ADD mobilphone__tmp VARCHAR(20) UNIQUE;
+faked!
+UPDATE history_order SET mobilphone__tmp=mobilphone;
+faked!
+ALTER TABLE history_order DROP COLUMN mobilphone;
+faked!
+ALTER TABLE history_order ADD mobilphone VARCHAR(20) UNIQUE;
+faked!
+UPDATE history_order SET mobilphone=mobilphone__tmp;
+faked!
+ALTER TABLE history_order DROP COLUMN mobilphone__tmp;
+faked!
+timestamp: 2016-04-05T15:03:11.149000
+ALTER TABLE history_order ADD data_date VARCHAR(20);
+faked!
+timestamp: 2016-04-05T15:03:11.153000
+ALTER TABLE history_order DROP COLUMN t_id;
+faked!
+timestamp: 2016-04-05T15:03:11.155000
+ALTER TABLE history_order DROP COLUMN product_totalmoney;
+faked!
+timestamp: 2016-04-05T15:03:11.159000
+ALTER TABLE history_order DROP COLUMN is_cod;
+faked!
+timestamp: 2016-04-05T15:03:11.162000
+ALTER TABLE history_order DROP COLUMN wuliu;
+faked!
+timestamp: 2016-04-05T15:03:11.164000
+ALTER TABLE history_order DROP COLUMN other_remark;
+faked!
+timestamp: 2016-04-05T15:03:11.168000
+ALTER TABLE history_order DROP COLUMN gift_num;
+faked!
+timestamp: 2016-04-05T15:03:11.171000
+ALTER TABLE history_order DROP COLUMN telephone;
+faked!
+timestamp: 2016-04-05T15:03:11.174000
+ALTER TABLE history_order DROP COLUMN product_stockout;
+faked!
+timestamp: 2016-04-05T15:03:11.177000
+ALTER TABLE history_order DROP COLUMN pay_date;
+faked!
+timestamp: 2016-04-05T15:03:11.181000
+ALTER TABLE history_order DROP COLUMN invoice_type;
+faked!
+timestamp: 2016-04-05T15:03:11.184000
+ALTER TABLE history_order DROP COLUMN servercost_cod;
+faked!
+timestamp: 2016-04-05T15:03:11.187000
+ALTER TABLE history_order DROP COLUMN product_intro;
+faked!
+timestamp: 2016-04-05T15:03:11.190000
+ALTER TABLE history_order DROP COLUMN out__tid;
+faked!
+timestamp: 2016-04-05T15:03:11.193000
+ALTER TABLE history_order DROP COLUMN avg_price;
+faked!
+timestamp: 2016-04-05T15:03:11.195000
+ALTER TABLE history_order DROP COLUMN pay_score;
+faked!
+timestamp: 2016-04-05T15:03:11.199000
+ALTER TABLE history_order DROP COLUMN out_barcode;
+faked!
+timestamp: 2016-04-05T15:03:11.202000
+ALTER TABLE history_order DROP COLUMN finish_date;
+faked!
+timestamp: 2016-04-05T15:03:11.205000
+ALTER TABLE history_order DROP COLUMN buyer_alipay;
+faked!
+timestamp: 2016-04-05T15:03:11.208000
+ALTER TABLE history_order DROP COLUMN out_express_method;
+faked!
+timestamp: 2016-04-05T15:03:11.211000
+ALTER TABLE history_order DROP COLUMN is_scorepay;
+faked!
+timestamp: 2016-04-05T15:03:11.215000
+ALTER TABLE history_order DROP COLUMN actual_rp;
+faked!
+timestamp: 2016-04-05T15:03:11.217000
+ALTER TABLE history_order DROP COLUMN distributor_no;
+faked!
+timestamp: 2016-04-05T15:03:11.220000
+ALTER TABLE history_order DROP COLUMN tid;
+faked!
+timestamp: 2016-04-05T15:03:11.223000
+ALTER TABLE history_order DROP COLUMN ship_method;
+faked!
+timestamp: 2016-04-05T15:03:11.226000
+ALTER TABLE history_order DROP COLUMN out_order_status;
+faked!
+timestamp: 2016-04-05T15:03:11.229000
+ALTER TABLE history_order DROP COLUMN shop__id;
+faked!
+timestamp: 2016-04-05T15:03:11.232000
+ALTER TABLE history_order DROP COLUMN is_book;
+faked!
+timestamp: 2016-04-05T15:03:11.235000
+ALTER TABLE history_order DROP COLUMN status;
+faked!
+timestamp: 2016-04-05T15:03:11.238000
+ALTER TABLE history_order DROP COLUMN ship_date_plan;
+faked!
+timestamp: 2016-04-05T15:03:11.241000
+ALTER TABLE history_order DROP COLUMN is_needinvoice;
+faked!
+timestamp: 2016-04-05T15:03:11.243000
+ALTER TABLE history_order DROP COLUMN seller_remark;
+faked!
+timestamp: 2016-04-05T15:03:11.250000
+ALTER TABLE history_order DROP COLUMN actual_freight_get;
+faked!
+timestamp: 2016-04-05T15:03:11.254000
+ALTER TABLE history_order DROP COLUMN wuliu_no;
+faked!
+timestamp: 2016-04-05T15:03:11.257000
+ALTER TABLE history_order DROP COLUMN pay_commission;
+faked!
+timestamp: 2016-04-05T15:03:11.261000
+ALTER TABLE history_order DROP COLUMN buyer_email;
+faked!
+timestamp: 2016-04-05T15:03:11.264000
+ALTER TABLE history_order DROP COLUMN product_freight;
+faked!
+timestamp: 2016-04-05T15:03:11.267000
+ALTER TABLE history_order DROP COLUMN favorite_money;
+faked!
+timestamp: 2016-04-05T15:03:11.270000
+ALTER TABLE history_order DROP COLUMN invoice_money;
+faked!
+timestamp: 2016-04-05T15:03:11.272000
+ALTER TABLE history_order DROP COLUMN actual_freight_pay;
+faked!
+timestamp: 2016-04-05T15:03:11.275000
+ALTER TABLE history_order DROP COLUMN return_score;
+faked!
+timestamp: 2016-04-05T15:03:11.278000
+ALTER TABLE history_order DROP COLUMN is_gift;
+faked!
+timestamp: 2016-04-05T15:03:11.280000
+ALTER TABLE history_order DROP COLUMN out_price;
+faked!
+timestamp: 2016-04-05T15:03:11.283000
+ALTER TABLE history_order DROP COLUMN cost_price;
+faked!
+timestamp: 2016-04-05T15:03:11.286000
+ALTER TABLE history_order DROP COLUMN deliver_date_plan;
+faked!
+timestamp: 2016-04-05T15:03:11.288000
+ALTER TABLE history_order DROP COLUMN order_totalmoney;
+faked!
+timestamp: 2016-04-05T15:03:11.291000
+ALTER TABLE history_order DROP COLUMN favorable_money;
+faked!
+timestamp: 2016-04-05T15:03:11.293000
+ALTER TABLE history_order DROP COLUMN out_payno;
+faked!
+timestamp: 2016-04-05T15:03:11.297000
+ALTER TABLE history_order DROP COLUMN is_presell;
+faked!
+timestamp: 2016-04-05T15:03:11.299000
+ALTER TABLE history_order DROP COLUMN ordergoods_num;
+faked!
+timestamp: 2016-04-05T15:03:11.302000
+ALTER TABLE history_order DROP COLUMN out_productid;
+faked!
+timestamp: 2016-04-05T15:03:11.304000
+ALTER TABLE history_order DROP COLUMN is_invoiceopened;
+faked!
+timestamp: 2016-04-05T15:03:11.307000
+ALTER TABLE history_order DROP COLUMN invoice_msg;
+faked!
+timestamp: 2016-04-05T15:03:11.309000
+ALTER TABLE history_order DROP COLUMN alipay_transaction_no;
+faked!
+timestamp: 2016-04-05T15:03:11.312000
+ALTER TABLE history_order DROP COLUMN invoice_title;
+faked!
+timestamp: 2016-04-05T15:03:11.315000
+ALTER TABLE history_order DROP COLUMN pay_method;
+faked!
+timestamp: 2016-04-05T15:03:11.317000
+ALTER TABLE history_order DROP COLUMN buyer_msg;
+faked!
+timestamp: 2016-04-05T15:03:11.320000
+ALTER TABLE history_order DROP COLUMN in_memo;
+faked!
+timestamp: 2016-04-05T15:03:11.323000
+ALTER TABLE history_order DROP COLUMN buyer_id;
+faked!
+timestamp: 2016-04-06T10:38:18.950000
+ALTER TABLE trade ADD sim_trade VARCHAR(512);
+faked!
+timestamp: 2016-04-06T10:38:18.961000
+ALTER TABLE trade ADD tc_return VARCHAR(20);
+faked!
+timestamp: 2016-04-06T10:38:18.967000
+ALTER TABLE trade ADD oti_return VARCHAR(512);
+faked!
+timestamp: 2016-04-06T10:38:19.020000
+ALTER TABLE trade ADD city_class VARCHAR(10);
+faked!
+timestamp: 2016-04-06T10:38:19.052000
+ALTER TABLE trade ADD edb_return VARCHAR(512);
+faked!
+success!

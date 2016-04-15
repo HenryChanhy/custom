@@ -10,6 +10,7 @@
 # #######################################################################
 import re
 from simhash import Simhash,SimhashIndex
+from snownlp import SnowNLP
 import time
 import hashlib
 import openpyxl
@@ -68,6 +69,175 @@ def display_form():
         db.wrong_order.dup_phone])
     return locals()
 
+def csv():
+    import gluon.contenttype
+    response.headers['Content-Type'] = \
+        gluon.contenttype.contenttype('.csv')
+    db = eval_in_global_env(request.args[0])
+
+    if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
+        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
+    else:
+        qry = 'db.trade.id>0'
+    query = eval_in_global_env(qry)
+    response.headers['Content-disposition'] = 'attachment; filename=%s_%s_%s.csv'\
+    % ('trade',request.vars.begin_line,request.vars.end_line)
+    return str(db(query, ignore_common_filters=True).select(limitby=(int(request.vars.begin_line),int(request.vars.end_line))))
+#############################################################
+# ###########################################################
+# ## insert a new record
+# ###########################################################
+def insert():
+    (db, table) = get_table(request)
+    form = SQLFORM(db[table],ignore_rw=ignore_rw)
+    if form.accepts(request.vars, session):
+        response.flash = T('new record inserted')
+    return dict(form=form, table=db[table])
+import copy,datetime
+global_env = copy.copy(globals())
+global_env['datetime'] = datetime
+def eval_in_global_env(text):
+    exec ('_ret=%s' % text, {}, global_env)
+    return global_env['_ret']
+
+def himin_distance(i1,i2):
+    f=64
+    x = (i1 ^ i2) & ((1 << 64) - 1)
+    ans = 0
+    while x:
+        ans += 1
+        x &= x - 1
+    return ans
+
+
+def test_display_form():
+    import re
+    import gluon.contenttype
+    db = eval_in_global_env(request.args[0])
+    dbname = request.args[0]
+    try:
+        is_imap = db._uri.startswith("imap://")
+    except (KeyError, AttributeError, TypeError):
+        is_imap = False
+
+    totaltradenum=db(db.trade.id>0).count()
+    nrows = 0
+    step = 100
+    fields = []
+    if is_imap:
+        step = 3
+    locateform = FORM(TABLE(TR(
+    TD(INPUT(_name='locate', _value=request.vars.locate,_style='height:26px;width:45px;')),
+    TD(INPUT(_type='submit', _value=T('Locate'),_style='height:26px;width:60px;text-align:center;color:blue;')))),
+    _action=URL(r=request,args=request.args))
+
+    start=0
+    if request.vars.start:
+        start = int(request.vars.start)
+    elif request.vars.locate:
+        if 0< int(request.vars.locate) < totaltradenum/step:
+            start = (int(request.vars.locate)-1)*step
+        else:
+            response.flash = T("out of range")
+    else:
+        start = 0
+    stop = start + step
+    table = "trade"
+    rows = []
+    orderby = request.vars.orderby
+    if orderby:
+        orderby = dbname + '.' + orderby
+        if orderby == session.last_orderby:
+            if orderby[0] == '~':
+                orderby = orderby[1:]
+            else:
+                orderby = '~' + orderby
+    session.last_orderby = orderby
+    #session.last_query = request.vars.query
+
+    if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
+        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
+    else:
+        qry = 'db.trade.id>0'
+    query = eval_in_global_env(qry)
+    nrows = db(query, ignore_common_filters=True).count()
+    rows = db(query, ignore_common_filters=True).select(limitby=(start,stop))
+    tb=None
+    #buf=db().select(db.history_order.consignee,db.history_order.addr_hash).as_list()
+
+    # begin handle upload csv
+    csv_export_file=None
+    if (request.vars.begin_line) and (request.vars.end_line):
+        #import gluon.contenttype
+        #response.headers['Content-Type'] = gluon.contenttype.contenttype('.csv')
+        #import cStringIO
+        #stream=cStringIO.StringIO()
+        #db(query,ignore_common_filters=True).select(limitby=(int(request.vars.begin_line),int(request.vars.end_line))).export_to_csv_file(stream)
+        #response.headers['Content-disposition'] = 'filename=ex%s%s.csv' %(request.vars.begin_line,request.vars.end_line)
+        #response.write(stream.getvalue())
+        import cStringIO
+        import csv
+        csv_export_file = cStringIO.StringIO()
+        csv_file = csv.writer(csv_export_file)
+        rs=db(query,ignore_common_filters=True).select(limitby=(int(request.vars.begin_line),int(request.vars.end_line)))
+        for r in rs.as_list():
+            csv_file.writerow(r.values())
+        response.files.append(csv_export_file)
+
+    return dict(
+        csv_fi=response.files,
+        locateform=locateform,
+        table=table,
+        start=start,
+        stop=stop,
+        step=step,
+        nrows=nrows,
+        rows=rows,
+        #buf=buf,
+        #sim0=sim0,
+        query=request.vars.query,
+        tb=tb
+    )
+
+def echo_rownum():
+    trade_items=db(db.trade.mobilPhone.like(request.vars.id)).select().as_list()[0]
+    return ''.join([DIV(SPAN(k,_class='items'),SPAN(v,_class='item')).xml() for k,v in trade_items if k])
+
+def month_input():
+    return dict()
+
+def month_selector():
+    if not request.vars.month:
+        return ''
+    months = ['January', 'February', 'March', 'April', 'May',
+    'June', 'July', 'August', 'September' ,'October',
+    'November', 'December']
+    month_start = request.vars.month.capitalize()
+    selected = [m for m in months if m.startswith(month_start)]
+    return DIV(*[DIV(k,
+    _onclick="jQuery('#month').val('%s')" % k,
+    _onmouseover="this.style.backgroundColor='yellow'",
+    _onmouseout="this.style.backgroundColor='white'"
+    ) for k in selected])
+
+
+def add_db():
+    rows=db(db.history_order.id>0).select()
+    r0=rows.first()
+    #r0.out_tid=r0.tid
+    r0.update_record(out_tid=r0.tid)
+    return locals()
+
+def list_items():
+    items = db().select(db.db_map.ALL)
+    return dict(items=items)
+
+def vote():
+    item = db.trade[request.vars.id]
+    new_votes = item.votes + 1
+    item.update_record(votes=new_votes)
+    return str(new_votes)
+
 def display_pampers_result():
     grid = SQLFORM.grid(db.pampers_result)
     return locals()
@@ -76,8 +246,28 @@ def display_pampers_order():
     grid = SQLFORM.grid(db.pampers_order)
     return locals()
 
+def display_trade_order():
+    grid = SQLFORM.grid(db.trade)
+    return locals()
+
 def check_order():
-    orderList=db(db.wrong_order).select().as_list()
+    orderList=db(db.WuLiuInfo).select().as_list()
+    return locals()
+
+def trade_proc():
+    essential_field=['consignee','address','province','city','area','mobilPhone','out_tid','shop_id','order_date','barCode','product_title','standard','out__tid']
+    trade_list=db(db.trade).select().as_list()
+    trade_draw=[]
+    for each_trade in trade_list[0:30]:
+        content={}
+        for field in essential_field:
+            content[field]=each_trade[field]
+        trade_draw.append(content)
+    WuLiu_list=db(db.WuLiuInfo).select().as_list()
+    WuLiu_draw=[]
+    for i in range(0,len(WuLiu_list)/10):
+        WuLiu_draw.append(WuLiu_list[i*10:(i+1)*10])
+    WuLiu_draw.append(WuLiu_list[(len(WuLiu_list)/10)*10:len(WuLiu_list)])
     return locals()
 
 def process_order():
@@ -678,14 +868,7 @@ def statistics(list1):
         dict1[list1[i]]=li
     return dict1
 
-def himin_distance(i1,i2):
-    f=64
-    x = (i1 ^ i2) & ((1 << 64) - 1)
-    ans = 0
-    while x:
-        ans += 1
-        x &= x - 1
-    return ans
+
     
 def add_BBS_20151222(ws4):
     field_list=['order_id','ex_id','shop_name','telephone','cellphone','user_name','address',
@@ -991,6 +1174,3 @@ def TradeDelete():
     def DELETE(table_name,record_id):
         return db(db[table_name].order_id==record_id).delete()
     return locals()
-
-
-
