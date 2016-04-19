@@ -13,8 +13,8 @@
 <h2>{{=T("Available Databases and Tables")}}</h2>
   {{if not databases:}}{{=T("No databases in this application")}}{{pass}}
   <ul class="nav nav-tabs" id="myTab">
-  <li class="active" ><a href="#alltables" data-toggle="tab">Tables</a></li>
-  <li><a href="#hooks" data-toggle="tab">Hooks</a></li>
+    <li class="active" ><a href="#alltables" data-toggle="tab">Tables</a></li>
+    <li><a href="#hooks" data-toggle="tab">Hooks</a></li>
   </ul>
   <div class="tab-content">
       <div class="tab-pane active" id="alltables">
@@ -48,12 +48,12 @@
         </table>
       </div>
       <div class="tab-pane" id="hooks">
-      {{=LOAD('appadmin', 'hooks', ajax=True)}}
+        {{=LOAD('appadmin', 'hooks', ajax=True)}}
       </div>
   </div>
+
 {{elif request.function=='select':}}
-  <h2>{{=XML(str(T("Database %s select"))%A(request.args[0],_href=URL('index'))) }}
-  </h2>
+  <h2>{{=XML(str(T("Database %s select"))%A(request.args[0],_href=URL('index'))) }}</h2>
   {{if tb:}}
   <h3>{{=T('Traceback')}}</h3>
   <pre>
@@ -113,7 +113,8 @@
       {{=T("Record id")}} {{=A(request.args[2],_href=URL('update',args=request.args[:3]))}}
     {{pass}}
   </h2>
-  <h3>{{=T("Edit current record")}}</h3><br/><br/>{{=form}}
+  <h3>{{=T("Edit current record")}}</h3><br/><br/>
+{{=form}}
 
 {{elif request.function=='state':}}
   <h2>{{=T("Internal State")}}</h2>
@@ -124,15 +125,12 @@
   <br/><h3>{{=T("Current session")}}</h3>
   {{=BEAUTIFY(session)}}
 
-
 {{elif request.function == 'ccache':}}
 <h2>{{T("Cache")}}</h2>
 <div class="list">
-
   <div class="list-header">
     <h3>{{T("Statistics")}}</h3>
   </div>
-
   <div class="content">
     <h4>{{=T("Overview")}}</h4>
     <p>{{=T.M("Number of entries: **%s**", total['entries'])}}</p>

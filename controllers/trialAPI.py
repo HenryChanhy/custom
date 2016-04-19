@@ -84,14 +84,14 @@ def TrialAPI(**arg):
     def _TrialAPI(func):
         def __TrialAPI(data):
             #url="http://vip802.6x86.com/edb2/rest/index.aspx"
-            SysData={"apiKey":"qhT49hGFv5rks",}
-            ExData={"apiSecret":"wh76BtGfks7fVbkiu",}
+            SysData={"apiKey":"57Hyjts8HHty",}
+            ExData={"apiSecret":"iO7hbmH8-rbt6Hg_Yg6",}
             param=func(data)
             param.update(SysData)
             param.update(data)
             #url="http://IP+PORT/TrialCenter/order/Pampers/ST/"+arg["method"]
             #url="http://nwct.biz:18910/TrialCenter/order/Pampers/ST/"+arg["method"]
-            url="http://122.193.31.8:8080/TrialCenter/order/Pampers/ST/"+arg["method"]
+            url="http://122.193.31.5:8080/TrialCenter/order/Pampers/ST/"+arg["method"]
             #param["method"]=arg["method"]
             param["timestamp"]=GetTimeStamp()
             #param["timestamp"]="201512161115"
@@ -112,22 +112,7 @@ def TrialAPI(**arg):
 
             jsparam=json.dumps(param)
             req=requests.post(url,jsparam,verify=False)
-
-            if not req.ok:
-                print "requests FAIL"
-                log_file("%s %s"%(arg,data))
-                filePath=log_file(req.content)
-                print "log_file in",filePath
-                return
-            xmlObj=XML_ET.fromstring(req.content)
-
-            if xmlObj.findall("error"):
-                print "respond error"
-                log_file("%s %s"%(arg,data))
-                filePath=log_file(req.content)
-                print "log_file in",filePath
-                return
-            return HandleResult(arg["method"],data,xmlObj)
+            return json.loads(req.content)
         return __TrialAPI
     return _TrialAPI
 
@@ -147,7 +132,7 @@ def addTrade(data):
 #测试用，可删除
 def test_OTI():
     orderinfo={
-	"order_id": "46",
+	"order_id": "4",
 	"tracking_number": "13",
 	"tracking_company": "ZTO"
     }
@@ -155,11 +140,12 @@ def test_OTI():
 
 def test_TOS():
     data={
-    "order_id": "46",
+    "order_id": "1",
 	"status": "1",
-    #"messge":"订单重复"
+    "message":"订单重复"
     }
-    print updateTOS(data)
+    jsonobj= updateTOS(data)
+    return jsonobj
 
 def test_addTrade():
     data0={"product_totalMoney":"0","storage_id":"11",

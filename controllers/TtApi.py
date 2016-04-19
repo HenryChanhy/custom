@@ -168,6 +168,7 @@ def AddTradeToEdb():
             essential_field=vars.keys()
             essential_field.sort()
             SigStr=""
+            orderdata={}
             for field in essential_field:
                 if field =="sig" or field =="apiSecret":
                     continue
@@ -179,36 +180,20 @@ def AddTradeToEdb():
                         SigStr=SigStr+u"{"
                         for j in k:
                             SigStr=SigStr+unicode(j)+u"="+unicode(d[j])+u"&"
+                            orderdata[j]=d[j]
                         SigStr=SigStr[0:len(SigStr)-1]
                         SigStr=SigStr+u"}"
                     SigStr=SigStr+u"]"+u"&"
+                elif field =="apiKey" or field =="timeStamp":
+                    SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
                 else:
                     SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
+                    orderdata[field]=vars[field]
             this_sig=MD5Sign((SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'))
-            AllBarcode=db().select(db.AllBarcode.bar_code).as_list()
+
             if (vars['sig']==this_sig) and (ts-int(vars['timestamp'])<180) and \
-            ((vars['apiKey']).decode('unicode_escape')==(this_apiKey)) and\
-            (vars['product_info'][0]['barCode'] in AllBarcode):
+            ((vars['apiKey']).decode('unicode_escape')==(this_apiKey)):
                 msg.append({'is_success':'true','response_Msg':'import to TaoTongGroup successfully'})
-                content={}
-                for field in essential_field:
-                    if field =="sig" or field =="apiKey" or field=="timestamp":
-                        continue
-                    elif field=="product_info":
-                        for f in vars["product_info"][0].keys():
-                            content[f]=vars["product_info"][0][f]
-                    else:
-                        content[field]=vars[field]
-                data={"order_id":'out_tid',"status": "0"}
-                updateTOS(data)
-                order_phone=db().select(db.trade.mobilPhone).as_list()
-                if not {'mobilPhone':content['mobilPhone']} in order_phone:
-                    data["status"]=1
-                    db.trade.insert(**content)
-                else:
-                    data["status"]=2
-                    data["messge"]='duplicated trade order'
-                updateTOS(data)
             else:
                 msg.append({'is_success':'false','response_Msg':'wrong identifier params sig or barCode'})
         else:
@@ -218,25 +203,65 @@ def AddTradeToEdb():
     return locals()
 
 
-#@auth.requires_login()
 @request.restful()
 def GetEdbOrderInfo():
-    response.view ='generic.'+request.extension  #return  json
+    WuLiu_dict={}
+    response.view ='generic.'+request.extension
     def GET(*args,**vars):
         keys=vars.keys()
         content={}
-        if ('order_id' in keys)and('tracking_number' in keys) and\
-        ('tracking_company' in keys):
-            content['is_success']=True
-            content.update(vars)
-            order_info={
-	        "order_id": vars['order_id'],
-	        "tracking_number":vars['tracking_number'],
-	        "tracking_company":vars['tracking_company']}
-            updateOTI(order_info)
+        if ('orderId' in keys)and('status' in keys) and\
+('logisticCompany' in keys)and('trackingNo' in keys) and\
+('updateTime' in keys)and('app_key' in keys):
+            WuLiu_dict={
+'EMS':'1','HTKY':'10','ZJS':'11','STO':'12','ZDY':'13','ZDY':'14','YUNDA':'15',
+'FEDEX':'16','DBL':'17','RFD':'18','ZT':'19','STO':'2','POSTB':'20','SF':'6',
+'STO':'21','OTHER':'22','OTHER':'23','UC':'24','FAST':'25','STO':'26','SF':'7',
+'TTKDEX':'27','SF':'28','SF':'29','EMS':'3','ZTO':'30','STO':'31','YUNDA':'32',
+'SF':'33','SF':'34','YUNDA':'35','YTO':'36','TTKDEX':'37','YTO':'4','TTKDEX':'5',
+'YUNDA':'8','ZTO':'9'}
+            order_info={}
+            for k,v in vars.items():
+                if k=='app_key':
+                    continue
+                elif k=='status':
+                    order_info['order_status']=v
+                elif k=='orderId':
+                    order_info['orderId']=v.replace('TC','')
+                else:
+                    order_info[k]=v
+            db.WuLiuInfo.update_or_insert(db.WuLiuInfo.orderId==order_info['orderId'],**order_info)
+            if db(db.trade.out_tid.like(order_info['orderId'])).select():
+                WuLiu_info={"order_id": order_info['orderId'],
+	            "tracking_number":order_info['trackingNo']}
+                if order_info['logisticCompany'] in WuLiu_dict.keys():
+                    WuLiu_info["tracking_company"]=str(WuLiu_dict[order_info['logisticCompany']])
+                    result=updateOTI(WuLiu_info)
+                    if result['result']=='true':
+                        content['isSuccess']=True
+                        content['errorCode']=1
+                        content['errorMsg']='处理成功'
+                    else:
+                        if result['error']=='1032':
+                            content['isSuccess']=True
+                            content['errorCode']=1
+                            content['errorMsg']='处理成功'
+                        else:
+                            content['isSuccess']=False
+                            content['errorCode']=2
+                            content['errorMsg']='订单不存在'
+                else:
+                    content['isSuccess']=False
+                    content['errorCode']=5
+                    content['errorMsg']='物流公司不存在'
+            else:
+                content['isSuccess']=False
+                content['errorCode']=2
+                content['errorMsg']='订单号不存在'
         else:
-            content['is_success']=False
-            content['wrong_reason']='absence of essential field'
+            content['isSuccess']=False
+            content['errorCode']=9
+            content['wrong_reason']='订单号格式错误'
         return content
     return locals()
 

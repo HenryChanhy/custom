@@ -1,0 +1,215 @@
+
+  {{if tb:}}
+  <h3>{{=T('Traceback')}}</h3>
+  <pre>
+    {{=tb}}
+  </pre>
+  {{pass}}
+
+  <table border="1" style="height:28px">
+   <tr style="height:27px;">
+    <td>{{=T("%s selected", nrows)}}</td>
+    <td>&#8195;</td>
+    <td>
+    {{=A('\xe9\xa6\x96\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=0)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    </td>
+    <td>
+    {{if start>0:}}
+    {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=start-step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    {{else:}}
+    {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href="#0",_style='height:25px;width:95px;text-decoration:none;color:888888;')}}
+    {{pass}}
+    </td>
+    <td>
+    {{if stop<nrows:}}
+    {{=A('\xe4\xb8\x8b\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=start+step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    {{else:}}
+    {{=A('\xe4\xb8\x8b\xe9\xa1\xb5',_href="#0",_style='height:25px;width:95px;text-decoration:none;color:888888;')}}
+    {{pass}}
+    </td>
+    <td>
+    {{=A('\xe5\xb0\xbe\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=nrows-(nrows%step))),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    </td>
+    <td>
+    {{=A(str(T('New Record')),_href=URL('insert',args=[request.args[0],table]),_class="btn btn-default",_style='height:25px;width:70px;color:blue;')}}
+    </td>
+    <td> <button onclick="HiddenToolbar(this);">{{='\xe6\x98\xbe\xe7\xa4\xba\xe5\xb7\xa5\xe5\x85\xb7\xe6\xa0\x8f'}}</button></td>
+    <td> <button onclick="HiddenDetail(this);">{{='\xe6\x98\xbe\xe7\xa4\xba\xe5\xb7\xa5\xe5\x85\xb7\xe6\xa0\x8f'}}</button></td>
+   </tr>
+  </table>
+
+
+     {{if rows:}}
+      <table id="table1" border="1" rules="cols">
+        <thead id="thead1" style="display:block;">
+          <tr id="trade_head">
+            <th id="consignee" align="left">{{='\xe6\x94\xb6\xe8\xb4\xa7\xe4\xba\xba'}}</th>
+            <th id="mobilPhone" align="left">{{='\xe6\x89\x8b\xe6\x9c\xba\xe5\x8f\xb7'}}</th>
+            <th id="order_date" align="left">{{='\xe8\xae\xa2\xe5\x8d\x95\xe6\x97\xa5\xe6\x9c\x9f'}}</th>
+            <th id="out_tid" align="left">{{='\xe5\x8d\x95\xe5\x8f\xb7'}}</th>
+            <th id="status" align="left" >{{='\xe7\x8a\xb6\xe6\x80\x81'}}</th>
+            <th id="product_title" align="left">{{='\xe4\xba\xa7\xe5\x93\x81\xe5\x90\x8d'}}</th>
+            <th id="address" align="left">{{='\xe5\x9c\xb0\xe5\x9d\x80'}}</th>
+          </tr>
+        </thead>
+        <tbody id="tbody1">
+          {{for i,row in enumerate(rows.as_list()):}}
+            <tr onclick="SetPointedColor(this);">
+              <td class="consignee"><div>{{=row['consignee']}}</div></td>
+              <td class="mobilPhone"><div>{{=row['mobilPhone']}} &#8194;</div></td>
+              <td class="order_date"><div>{{=row['order_date']}} &#8194;</div></td>
+              <td class="out_tid"><div>{{=row['out_tid']}} &#8194;</div></td>
+              <td class="status"><div>{{=row['status']}} &#8194;&#8194;</div></td>
+              <td class="product_title"><div>{{=row['product_title'][row['product_title'].find('\xe6\x9f\x94')+3:]}} &#8194;</div></td>
+              <td class="address"><div>{{=row['address']}}</div></td>
+            </tr>
+            {{pass}}
+          </tbody>
+        </table>
+    {{pass}}
+
+  <table id="table2" style="display: none">
+   <tr>
+    <th>{{=T("trade details")}}</th>
+    <td>&#8195;</td>
+    <td>
+      <form enctype="multipart/form-data" action="{{=URL(r=request, args=request.args)}}" method="post">
+        <select name="updatefield" style="height:26px;width:60px;">
+          <option value="status" selected>status</option>
+          <option value="pay_status">pay_status</option>
+          <option value="process_status">process_status</option>
+          <option value="deliver_status">deliver_status</option>
+        </select>
+        =
+        <input name="newvalue" value="0" style="height:26px;width:20px;"/>
+        <input type="submit" value="Update" style="height:26px;width:52px;text-align:left;color:#0000ff"/>
+      </form>
+    </td>
+    <td>&#8195;</td>
+    <td>{{=locateform}}  </td>
+    <td>&#8195;</td>
+    <td style="height: 26px;background-color: #006666">
+      <form enctype="multipart/form-data" action="{{=URL(r=request, args=request.args)}}" method="post">
+        <select name="qryfield" style="height:26px;width:60px;">
+          <option value="db.trade.out_tid" selected>out_tid</option>
+          <option value="db.trade.id" >id</option>
+          <option value="db.trade.mobilPhone">mobilPhone</option>
+          <option value="db.trade.consignee">consignee</option>
+        </select>
+        <select name="qryoperater" style="height:26px;width:45px;">
+          <option value="==">=</option>
+          <option value="&#60">&#60</option>
+          <option value="&#62">&#62</option>
+          <option value="&#60=">&#8804</option>
+          <option value="&#62=">&#8805</option>
+        </select>
+        <input name="qryvalue" style="height:26px;width:50px;" value="0"/>
+        <input type="submit" value="Query" style="height:26px;width:53px;text-align:center;color:#0000ff;"/>
+      </form>
+    </td>
+
+    </tr>
+  </table>
+
+<div id="detailTable" style="display:none">
+    {{for num,row in enumerate(rows.as_list()):}}
+      <div class="detailcontent" style="display: none">
+      {{for k,v in row.items():}}
+      {{if v:}}
+        <span class="items">{{=k}}:</span>
+        <span class="item">{{=v}} </span>
+        {{pass}}
+      {{pass}}
+      </div>
+    {{pass}}
+</div>
+
+<div>
+
+</div>
+
+<table><tr>
+     <td><form>
+        <input name="begin_line" value="0" style="height:26px;width:25px;"/>
+         -
+        <input name="end_line" style="height:26px;width:25px;"/>
+        <input type="submit" value="Export CSV" style="height:26px;width:100px;text-align:center;color:#0000ff"/>
+     </form></td>
+ </tr></table>
+
+<script>
+    var pointed_node0;
+    var detail_node0;
+    var detail_node1;
+    window.onload=function(){
+        pointed_node0 = document.getElementById("tbody1").firstElementChild;
+        pointed_node0.style.backgroundColor='00ff00';
+        detail_node0=document.getElementsByClassName("detailcontent")[0];
+        detail_node0.style.display='inline';
+
+        document.getElementById('consignee').style.width = document.getElementsByClassName('consignee')[0].offsetWidth-2;
+        document.getElementById('mobilPhone').style.width = document.getElementsByClassName('mobilPhone')[0].offsetWidth-2;
+        document.getElementById('order_date').style.width = document.getElementsByClassName('order_date')[0].offsetWidth-3;
+        document.getElementById('out_tid').style.width = document.getElementsByClassName('out_tid')[0].offsetWidth-2;
+        document.getElementById('product_title').style.width = document.getElementsByClassName('product_title')[0].offsetWidth-3;
+        document.getElementById('status').style.width = document.getElementsByClassName('status')[0].offsetWidth-2;
+        document.getElementById('address').style.width = document.getElementsByClassName('address')[0].offsetWidth-2;
+        document.getElementById('tbody1').style.width=document.getElementById('thead1').offsetWidth;
+    };
+    function SetPointedColor(p_id){
+        pointed_node0.style.backgroundColor='transparent';
+        p_id.style.backgroundColor='00ff00';
+        pointed_node0=p_id;
+        detail_node0.style.display='none';
+        detail_node1=document.getElementsByClassName("detailcontent")[p_id.rowIndex-1];
+        detail_node1.style.display='inline';
+        detail_node0=detail_node1;
+    }
+    function HiddenToolbar(btn_hid){
+        var objtb;
+        objtb=document.getElementById('table2');
+        if( objtb.style.display=='none'){
+            objtb.style.display='inline';
+            btn_hid.innerHTML='hide';
+        }
+        else{
+            objtb.style.display='none';
+            btn_hid.innerHTML='show';
+        }
+    }
+
+    function HiddenDetail(btn_hid){
+        var objtb;
+        objtb=document.getElementById('detailTable');
+        if( objtb.style.display=='none'){
+            objtb.style.display='block';
+            btn_hid.innerHTML='hD';
+        }
+        else{
+            objtb.style.display='none';
+            btn_hid.innerHTML='sD';
+        }
+    }
+</script>
+
+
+<style>
+td.consignee{white-space:nowrap;color:#0000ff;line-height: 23px;}
+td.mobilPhone{white-space:nowrap;}
+td.order_date{white-space:nowrap;color:blue;}
+td.out_tid{white-space:nowrap;}
+td.status{white-space:nowrap;color:blue}
+td.product_title{white-space:nowrap;overflow: hidden;}
+td.address{white-space:nowrap;overflow: hidden;color:blue;}
+
+#table1{border-spacing:0 0;border-collapse:collapse;}
+#tbody1{display:block;
+        height: 320px;
+        overflow: auto;
+        }
+#trade_head th{color:#ffffff;background-color:#ff00ff;border:none;white-space:nowrap;}
+
+#detailTable>{display: none}
+#detailTable{border:1px solid #006600;}
+.items{color:blue;}
+</style>
