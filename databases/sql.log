@@ -3166,3 +3166,36 @@ timestamp: 2016-04-06T10:38:19.052000
 ALTER TABLE trade ADD edb_return VARCHAR(512);
 faked!
 success!
+timestamp: 2016-04-26T10:23:06.180000
+ALTER TABLE user_info ADD log_status VARCHAR(20);
+faked!
+timestamp: 2016-04-26T10:23:06.241000
+ALTER TABLE user_info ADD passwd VARCHAR(20);
+faked!
+timestamp: 2016-04-26T10:23:06.250000
+ALTER TABLE user_info DROP COLUMN reserve_field;
+faked!
+timestamp: 2016-04-26T10:35:26.934000
+ALTER TABLE user_info ADD mobilphone VARCHAR(20);
+faked!
+timestamp: 2016-04-26T10:35:26.939000
+ALTER TABLE user_info DROP COLUMN province;
+faked!
+timestamp: 2016-04-26T10:35:26.942000
+ALTER TABLE user_info DROP COLUMN city;
+faked!
+timestamp: 2016-04-26T10:35:26.944000
+ALTER TABLE user_info DROP COLUMN country;
+faked!
+timestamp: 2016-04-26T10:35:26.947000
+ALTER TABLE user_info DROP COLUMN sb_internal_member_id;
+faked!
+timestamp: 2016-04-26T10:35:26.949000
+ALTER TABLE user_info DROP COLUMN phone_num;
+faked!
+timestamp: 2016-04-26T10:35:26.951000
+ALTER TABLE user_info DROP COLUMN member_account_id;
+faked!
+timestamp: 2016-04-26T10:35:26.954000
+ALTER TABLE user_info DROP COLUMN zip_code;
+faked!

@@ -59,7 +59,7 @@
               <td class="mobilPhone"><div>{{=row['mobilPhone']}} &#8194;</div></td>
               <td class="order_date"><div>{{=row['order_date']}} &#8194;</div></td>
               <td class="out_tid"><div>{{=row['out_tid']}} &#8194;</div></td>
-              <td class="status"><div>{{=row['status']}} &#8194;&#8194;</div></td>
+
               <td class="product_title"><div>{{=row['product_title'][row['product_title'].find('\xe6\x9f\x94')+3:]}} &#8194;</div></td>
               <td class="address"><div>{{=row['address']}}</div></td>
             </tr>
@@ -124,8 +124,15 @@
     {{pass}}
 </div>
 
-<div>
-
+<div id="simTable">
+    {{for row in simaddr:}}
+      <div class="simcontent" style="display: none">
+      {{for r in row:}}
+        <span class="sitems">{{=r['address']}},</span>
+        <span class="sitem">{{=r['id']}}£»</span>
+      {{pass}}
+      </div>
+    {{pass}}
 </div>
 
 <table><tr>
@@ -141,12 +148,15 @@
     var pointed_node0;
     var detail_node0;
     var detail_node1;
+    var sim_node0;
+    var sim_node1;
     window.onload=function(){
         pointed_node0 = document.getElementById("tbody1").firstElementChild;
         pointed_node0.style.backgroundColor='00ff00';
         detail_node0=document.getElementsByClassName("detailcontent")[0];
         detail_node0.style.display='inline';
-
+        sim_node0=document.getElementsByClassName("simcontent")[0];
+        sim_node0.style.display='inline';
         document.getElementById('consignee').style.width = document.getElementsByClassName('consignee')[0].offsetWidth-2;
         document.getElementById('mobilPhone').style.width = document.getElementsByClassName('mobilPhone')[0].offsetWidth-2;
         document.getElementById('order_date').style.width = document.getElementsByClassName('order_date')[0].offsetWidth-3;
@@ -164,6 +174,11 @@
         detail_node1=document.getElementsByClassName("detailcontent")[p_id.rowIndex-1];
         detail_node1.style.display='inline';
         detail_node0=detail_node1;
+
+        sim_node0.style.display='none';
+        sim_node1=document.getElementsByClassName("simcontent")[p_id.rowIndex-1];
+        sim_node1.style.display='inline';
+        sim_node0=sim_node1;
     }
     function HiddenToolbar(btn_hid){
         var objtb;
@@ -211,5 +226,8 @@ td.address{white-space:nowrap;overflow: hidden;color:blue;}
 
 #detailTable>{display: none}
 #detailTable{border:1px solid #006600;}
+
+
+#simTable{border:1px solid #006600;}
 .items{color:blue;}
 </style>

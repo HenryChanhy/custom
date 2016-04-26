@@ -59,6 +59,70 @@ def import_csv(csvfile):
 def get_feature(s):
     return [s[i:i+1] for i in range(max(len(s)-1+1,1))]
 
+def user():
+    """
+    exposes:
+    http://..../[app]/default/user/login
+    http://..../[app]/default/user/logout
+    http://..../[app]/default/user/register
+    http://..../[app]/default/user/profile
+    http://..../[app]/default/user/retrieve_password
+    http://..../[app]/default/user/change_password
+    http://..../[app]/default/user/manage_users (requires membership in
+    http://..../[app]/default/user/bulk_register
+    use @auth.requires_login()
+        @auth.requires_membership('group name')
+        @auth.requires_permission('read','table name',record_id)
+    to decorate functions that need access control
+    """
+    return dict(form=auth())
+
+
+def search_by_phone():
+    '''if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
+        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
+    else:
+        qry = 'db.trade.id>0'
+    '''
+    ret=[]
+    can_log=0
+    log_state=0
+    if (request.vars.loginname)and(request.vars.password):
+        name=request.vars.loginname
+        pswd=request.vars.password
+        ret=db(db.user_info.user_name==name).select().first()
+        if not ret:
+            can_log=0
+            log_state=1
+        else:
+            if ret['log_status']=='1':
+                can_log=0
+                log_state=5 #用户已登陆
+            elif ret['passwd']==pswd:
+                can_log=1
+                log_state=2
+                ret.update_record(log_status='1')
+            else:
+                can_log=0
+                log_state=3
+    return dict(
+        log_state=log_state,
+        can_log=can_log
+    )
+
+def search_trade():
+    mobil=request.vars.input_mobil
+    search_result = db(db.trade.mobilPhone==mobil).select(db.trade.id,db.trade.address)
+    if search_result:
+        return search_result.first()['address']
+    else:
+        return "此号码不存在"
+
+def test_ajax():
+    return dict()
+def echo():
+    return request.vars.your_message
+
 #@auth.requires_login()
 def display_form():
     grid = SQLFORM.grid(db.wrong_order,fields=\
@@ -99,7 +163,6 @@ global_env['datetime'] = datetime
 def eval_in_global_env(text):
     exec ('_ret=%s' % text, {}, global_env)
     return global_env['_ret']
-
 def himin_distance(i1,i2):
     f=64
     x = (i1 ^ i2) & ((1 << 64) - 1)
@@ -108,7 +171,6 @@ def himin_distance(i1,i2):
         ans += 1
         x &= x - 1
     return ans
-
 
 def test_display_form():
     import re
@@ -119,9 +181,8 @@ def test_display_form():
         is_imap = db._uri.startswith("imap://")
     except (KeyError, AttributeError, TypeError):
         is_imap = False
-
     totaltradenum=db(db.trade.id>0).count()
-    nrows = 0
+
     step = 100
     fields = []
     if is_imap:
@@ -130,7 +191,6 @@ def test_display_form():
     TD(INPUT(_name='locate', _value=request.vars.locate,_style='height:26px;width:45px;')),
     TD(INPUT(_type='submit', _value=T('Locate'),_style='height:26px;width:60px;text-align:center;color:blue;')))),
     _action=URL(r=request,args=request.args))
-
     start=0
     if request.vars.start:
         start = int(request.vars.start)
@@ -143,7 +203,6 @@ def test_display_form():
         start = 0
     stop = start + step
     table = "trade"
-    rows = []
     orderby = request.vars.orderby
     if orderby:
         orderby = dbname + '.' + orderby
@@ -154,16 +213,63 @@ def test_display_form():
                 orderby = '~' + orderby
     session.last_orderby = orderby
     #session.last_query = request.vars.query
-
     if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
         qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
     else:
         qry = 'db.trade.id>0'
+
+    nrows = 0
+    rows = []
     query = eval_in_global_env(qry)
-    nrows = db(query, ignore_common_filters=True).count()
-    rows = db(query, ignore_common_filters=True).select(limitby=(start,stop))
+    #nrows = db(query, ignore_common_filters=True).count()
+    #rows = db(query, ignore_common_filters=True).select(limitby=(start,stop))
     tb=None
-    #buf=db().select(db.history_order.consignee,db.history_order.addr_hash).as_list()
+    patt_feature=re.compile("[\w+|\(+|\)+|一+|二+|三+|四+|五+|六+|七+|八+|九+|十+|零+]+".decode('utf8'))
+    patt_keywd=re.compile("[号|楼|单元|路|栋|区|室|园|组|大道|村|幢|城|公司|对面|座|弄|店|期|大|巷|场|旁|公寓|省|市|医院|广场|中心|大厦|门|口|院|镇|苑|层|街|景|居|宿舍|房|部|科|都|学|厂|上|银行|方|后|家属|面|下|户|收|处|内|向|队|馆|校|斜|社|所|商|站|局|行|庭|段|团]+".decode('utf8'))
+    simaddr=[]
+    nrows=100
+    rows=db(db.history_order.id>0).select(limitby=(2000,2100))
+    for r in rows:
+        raddr=r['backupinfo'].decode('utf8')
+        rprov=r['province']
+        rcity=r['city']
+        rarea=r['area']
+        sim_buf=[]
+        addr_feature=re.findall(patt_feature,raddr)
+        nwords=len(addr_feature)
+
+        if nwords==2:
+            sim_buf=db(db.history_order.backupinfo.contains(addr_feature[0].encode('utf8'))&
+                      db.history_order.backupinfo.contains(addr_feature[1].encode('utf8'))&
+                      db.history_order.province.contains(rprov)&
+                      db.history_order.city.contains(rcity)&
+                      db.history_order.area.contains(rarea)).select(db.history_order.address,db.history_order.id)
+        elif nwords==3:
+            sim_buf=db(db.history_order.backupinfo.contains(addr_feature[0].encode('utf8'))&
+                      db.history_order.backupinfo.contains(addr_feature[1].encode('utf8'))&
+                      db.history_order.backupinfo.contains(addr_feature[2].encode('utf8'))&
+                      db.history_order.province.contains(rprov)&
+                      db.history_order.city.contains(rcity)&
+                      db.history_order.area.contains(rarea)).select(db.history_order.address,db.history_order.id)
+        else:
+            bare_addr=re.sub(patt_feature,'',raddr)
+            keywd=re.split(patt_keywd,bare_addr)
+            sp='%'
+            for i in keywd:
+                if i:
+                    sp=sp+i.encode('utf8')+'%'
+            sim_buf=db(db.history_order.backupinfo.like(sp)&
+                      db.history_order.province.contains(rprov)&
+                      db.history_order.city.contains(rcity)&
+                      db.history_order.area.contains(rarea)).select(db.history_order.address,db.history_order.id)
+            if len(sim_buf)>5 :
+                sim_buf2=[]
+                if nwords!=0:
+                    for s in sim_buf:
+                        if addr_feature[0] in s['address'].decode('utf8'):
+                            sim_buf2.append(s)
+                sim_buf=sim_buf2
+        simaddr.append(sim_buf)
 
     # begin handle upload csv
     csv_export_file=None
@@ -193,8 +299,7 @@ def test_display_form():
         step=step,
         nrows=nrows,
         rows=rows,
-        #buf=buf,
-        #sim0=sim0,
+        simaddr=simaddr,
         query=request.vars.query,
         tb=tb
     )
@@ -1035,24 +1140,6 @@ def index():
             else:pass
         pampers_census()
     return dict()
-
-def user():
-    """
-    exposes:
-    http://..../[app]/default/user/login
-    http://..../[app]/default/user/logout
-    http://..../[app]/default/user/register
-    http://..../[app]/default/user/profile
-    http://..../[app]/default/user/retrieve_password
-    http://..../[app]/default/user/change_password
-    http://..../[app]/default/user/manage_users (requires membership in
-    http://..../[app]/default/user/bulk_register
-    use @auth.requires_login()
-        @auth.requires_membership('group name')
-        @auth.requires_permission('read','table name',record_id)
-    to decorate functions that need access control
-    """
-    return dict(form=auth())
 
 @cache.action()
 def download():
