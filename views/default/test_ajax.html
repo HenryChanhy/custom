@@ -1,0 +1,21 @@
+{{include 'web2py_ajax.html'}}
+<!--
+<form>
+<input name="qaq" onkeyup="ajax('echo', ['qaq'], 'target')" />
+</form>
+<div id="target" style="font-size: large;color:red;"></div>-->
+
+<div id="target"></div>
+
+<form id="myform">
+<input name="your_message" id="your_message" />
+<input type="submit" />
+</form>
+
+<script>
+jQuery('#myform').submit(function() {
+ajax('{{=URL('echo')}}',
+['your_message'], 'target');
+return false;
+});
+</script>

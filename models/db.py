@@ -430,16 +430,12 @@ db.define_table('product_info',
 
 db.define_table('user_info',
                 Field('user_id',length=20),
-                Field('SB_Internal_Member_ID',length=20),
-                Field('Member_Account_ID',length=20),
                 Field('user_name',length=20),
                 Field('address',length=20),
-                Field('phone_num',length=20),
-                Field('city',length=20),
-                Field('province',length=20),
-                Field('zip_code',length=20),
-                Field('Country',length=20),
-                Field('reserve_field',length=20))
+                Field('mobilPhone',length=20),
+                Field('passwd',length=20),
+                Field('log_status',length=20)
+                )
 
 db.define_table('user2product',
                 Field('product_id',length=20),
