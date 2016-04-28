@@ -8,6 +8,7 @@
 ## - download is for downloading files uploaded in the db (does streaming)
 ####rowcontent['mobile'] in db().select(db.history_order.mobile)#########
 # #######################################################################
+import os
 import re
 from simhash import Simhash,SimhashIndex
 from snownlp import SnowNLP
@@ -59,6 +60,26 @@ def import_csv(csvfile):
 def get_feature(s):
     return [s[i:i+1] for i in range(max(len(s)-1+1,1))]
 
+
+
+def GetTimeStamp():
+    t=time.localtime()
+    lst=[]
+    for i in xrange(len(t)):
+        if i>=5:
+            break
+        v=str(t[i]).zfill(2)
+        lst.append(v)
+    reStr="".join(lst)
+    return reStr
+def log_file(user,msg):
+    dir=os.getcwd()
+    fileName="log_access.txt"
+    finalPath=os.path.join(dir,fileName)
+    with open(finalPath,"ab") as f:
+        f.write("[%s:%s],%s\r\n"%(GetTimeStamp(),user,msg))
+    return finalPath
+
 def user():
     """
     exposes:
@@ -75,53 +96,52 @@ def user():
         @auth.requires_permission('read','table name',record_id)
     to decorate functions that need access control
     """
-    return dict(form=auth())
+    form=auth()
+    return dict(form=form)
 
-
+@auth.requires_login()
 def search_by_phone():
-    '''if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
-        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
-    else:
-        qry = 'db.trade.id>0'
-    '''
-    ret=[]
-    can_log=0
-    log_state=0
-    if (request.vars.loginname)and(request.vars.password):
-        name=request.vars.loginname
-        pswd=request.vars.password
-        ret=db(db.user_info.user_name==name).select().first()
-        if not ret:
-            can_log=0
-            log_state=1
-        else:
-            if ret['log_status']=='1':
-                can_log=0
-                log_state=5 #用户已登陆
-            elif ret['passwd']==pswd:
-                can_log=1
-                log_state=2
-                ret.update_record(log_status='1')
-            else:
-                can_log=0
-                log_state=3
-    return dict(
-        log_state=log_state,
-        can_log=can_log
-    )
-
+        return dict(
+            current_user='%(first_name)s' %(auth.user),
+            log_state=0,
+            can_log=1
+        )
 def search_trade():
     mobil=request.vars.input_mobil
-    search_result = db(db.trade.mobilPhone==mobil).select(db.trade.id,db.trade.address)
+    current_user=request.vars.user
+    search_result = db(db.trade.mobilPhone.like(mobil)).select(db.trade.out_tid,db.trade.wrong_reason,db.trade.address,db.trade.status,db.trade.shop_id)
+    log_file(current_user,mobil)
+
     if search_result:
-        return search_result.first()['address']
+        result=search_result.first()
+        shopid=result['shop_id']
+        recv_addr=result['address']
+        if result['status']=='2':
+            reason=result['wrong_reason']
+            return DIV(DIV("shop_id:",shopid),BR(),
+                       DIV("wrong_reason:",reason),BR(),
+                       DIV("address:",recv_addr),
+                       _align="left",_style="padding-left: 5cm")
+        elif result['status']=='3':
+            trackingno=db(db.WuLiuInfo.orderId.like(result['out_tid'])).select(db.WuLiuInfo.trackingNo)
+            return DIV(DIV("shop_id:",shopid),BR(),
+                       DIV("WuLiu:",trackingno.first()['trackingNo']),BR(),
+                       DIV("address:",recv_addr),
+                       _align="left",_style="padding-left: 5cm")
+        else:
+            return DIV(DIV("shop_id:",shopid),BR(),
+                       DIV("订单未审核"),BR(),
+                       DIV("address:",recv_addr),
+                       _align="left",_style="padding-left: 5cm")
     else:
         return "此号码不存在"
 
 def test_ajax():
     return dict()
 def echo():
-    return request.vars.your_message
+    return request.vars.your_mes
+def main():
+    return log_file("wang","18794757802")
 
 #@auth.requires_login()
 def display_form():
@@ -1260,4 +1280,7 @@ def TradeDelete():
     response.view ='generic.'+request.extension  #return  json
     def DELETE(table_name,record_id):
         return db(db[table_name].order_id==record_id).delete()
-    return locals()
+    return local
+
+if __name__=='__main__':
+    main()

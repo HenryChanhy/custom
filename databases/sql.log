@@ -3199,3 +3199,288 @@ faked!
 timestamp: 2016-04-26T10:35:26.954000
 ALTER TABLE user_info DROP COLUMN zip_code;
 faked!
+timestamp: 2016-04-28T13:46:47.679000
+ALTER TABLE user_info ADD phone_num VARCHAR(20);
+faked!
+timestamp: 2016-04-28T13:46:47.748000
+ALTER TABLE user_info DROP COLUMN mobilphone;
+faked!
+timestamp: 2016-04-28T13:53:44.508000
+ALTER TABLE user_info ADD mobilphone VARCHAR(20);
+faked!
+timestamp: 2016-04-28T13:53:44.513000
+ALTER TABLE user_info DROP COLUMN phone_num;
+faked!
+timestamp: 2016-04-28T15:40:58.922000
+ALTER TABLE history_order ADD product_channel VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:58.944000
+ALTER TABLE history_order ADD address__tmp VARCHAR(100) NOT NULL;
+faked!
+UPDATE history_order SET address__tmp=address;
+faked!
+ALTER TABLE history_order DROP COLUMN address;
+faked!
+ALTER TABLE history_order ADD address VARCHAR(100) NOT NULL;
+faked!
+UPDATE history_order SET address=address__tmp;
+faked!
+ALTER TABLE history_order DROP COLUMN address__tmp;
+faked!
+timestamp: 2016-04-28T15:40:58.962000
+ALTER TABLE history_order ADD city_level VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:58.969000
+ALTER TABLE history_order ADD backupinfo VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:58.972000
+ALTER TABLE history_order ADD addr_hash VARCHAR(512);
+faked!
+timestamp: 2016-04-28T15:40:58.976000
+ALTER TABLE history_order ADD examine_status VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:58.980000
+ALTER TABLE history_order ADD mobilphone__tmp VARCHAR(20) UNIQUE;
+faked!
+UPDATE history_order SET mobilphone__tmp=mobilphone;
+faked!
+ALTER TABLE history_order DROP COLUMN mobilphone;
+faked!
+ALTER TABLE history_order ADD mobilphone VARCHAR(20) UNIQUE;
+faked!
+UPDATE history_order SET mobilphone=mobilphone__tmp;
+faked!
+ALTER TABLE history_order DROP COLUMN mobilphone__tmp;
+faked!
+timestamp: 2016-04-28T15:40:59.005000
+ALTER TABLE history_order ADD data_date VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:59.013000
+ALTER TABLE history_order DROP COLUMN t_id;
+faked!
+timestamp: 2016-04-28T15:40:59.017000
+ALTER TABLE history_order DROP COLUMN status;
+faked!
+timestamp: 2016-04-28T15:40:59.020000
+ALTER TABLE history_order DROP COLUMN product_totalmoney;
+faked!
+timestamp: 2016-04-28T15:40:59.024000
+ALTER TABLE history_order DROP COLUMN is_cod;
+faked!
+timestamp: 2016-04-28T15:40:59.028000
+ALTER TABLE history_order DROP COLUMN wuliu;
+faked!
+timestamp: 2016-04-28T15:40:59.032000
+ALTER TABLE history_order DROP COLUMN other_remark;
+faked!
+timestamp: 2016-04-28T15:40:59.035000
+ALTER TABLE history_order DROP COLUMN product_intro;
+faked!
+timestamp: 2016-04-28T15:40:59.038000
+ALTER TABLE history_order DROP COLUMN gift_num;
+faked!
+timestamp: 2016-04-28T15:40:59.041000
+ALTER TABLE history_order DROP COLUMN invoice_money;
+faked!
+timestamp: 2016-04-28T15:40:59.046000
+ALTER TABLE history_order DROP COLUMN out_productid;
+faked!
+timestamp: 2016-04-28T15:40:59.050000
+ALTER TABLE history_order DROP COLUMN pay_date;
+faked!
+timestamp: 2016-04-28T15:40:59.053000
+ALTER TABLE history_order DROP COLUMN invoice_title;
+faked!
+timestamp: 2016-04-28T15:40:59.056000
+ALTER TABLE history_order DROP COLUMN buyer_email;
+faked!
+timestamp: 2016-04-28T15:40:59.061000
+ALTER TABLE history_order DROP COLUMN servercost_cod;
+faked!
+timestamp: 2016-04-28T15:40:59.064000
+ALTER TABLE history_order DROP COLUMN pay_commission;
+faked!
+timestamp: 2016-04-28T15:40:59.067000
+ALTER TABLE history_order DROP COLUMN seller_remark;
+faked!
+timestamp: 2016-04-28T15:40:59.071000
+ALTER TABLE history_order DROP COLUMN pay_score;
+faked!
+timestamp: 2016-04-28T15:40:59.074000
+ALTER TABLE history_order DROP COLUMN out_barcode;
+faked!
+timestamp: 2016-04-28T15:40:59.078000
+ALTER TABLE history_order DROP COLUMN actual_freight_get;
+faked!
+timestamp: 2016-04-28T15:40:59.082000
+ALTER TABLE history_order DROP COLUMN out_express_method;
+faked!
+timestamp: 2016-04-28T15:40:59.085000
+ALTER TABLE history_order DROP COLUMN invoice_type;
+faked!
+timestamp: 2016-04-28T15:40:59.089000
+ALTER TABLE history_order DROP COLUMN actual_rp;
+faked!
+timestamp: 2016-04-28T15:40:59.092000
+ALTER TABLE history_order DROP COLUMN shop__id;
+faked!
+timestamp: 2016-04-28T15:40:59.095000
+ALTER TABLE history_order DROP COLUMN distributor_no;
+faked!
+timestamp: 2016-04-28T15:40:59.098000
+ALTER TABLE history_order DROP COLUMN tid;
+faked!
+timestamp: 2016-04-28T15:40:59.102000
+ALTER TABLE history_order DROP COLUMN ship_method;
+faked!
+timestamp: 2016-04-28T15:40:59.105000
+ALTER TABLE history_order DROP COLUMN out_order_status;
+faked!
+timestamp: 2016-04-28T15:40:59.108000
+ALTER TABLE history_order DROP COLUMN cost_price;
+faked!
+timestamp: 2016-04-28T15:40:59.112000
+ALTER TABLE history_order DROP COLUMN product_stockout;
+faked!
+timestamp: 2016-04-28T15:40:59.115000
+ALTER TABLE history_order DROP COLUMN finish_date;
+faked!
+timestamp: 2016-04-28T15:40:59.121000
+ALTER TABLE history_order DROP COLUMN is_scorepay;
+faked!
+timestamp: 2016-04-28T15:40:59.125000
+ALTER TABLE history_order DROP COLUMN ship_date_plan;
+faked!
+timestamp: 2016-04-28T15:40:59.128000
+ALTER TABLE history_order DROP COLUMN product_freight;
+faked!
+timestamp: 2016-04-28T15:40:59.130000
+ALTER TABLE history_order DROP COLUMN actual_freight_pay;
+faked!
+timestamp: 2016-04-28T15:40:59.134000
+ALTER TABLE history_order DROP COLUMN avg_price;
+faked!
+timestamp: 2016-04-28T15:40:59.137000
+ALTER TABLE history_order DROP COLUMN wuliu_no;
+faked!
+timestamp: 2016-04-28T15:40:59.140000
+ALTER TABLE history_order DROP COLUMN out__tid;
+faked!
+timestamp: 2016-04-28T15:40:59.145000
+ALTER TABLE history_order DROP COLUMN return_score;
+faked!
+timestamp: 2016-04-28T15:40:59.149000
+ALTER TABLE history_order DROP COLUMN is_gift;
+faked!
+timestamp: 2016-04-28T15:40:59.152000
+ALTER TABLE history_order DROP COLUMN out_price;
+faked!
+timestamp: 2016-04-28T15:40:59.154000
+ALTER TABLE history_order DROP COLUMN deliver_date_plan;
+faked!
+timestamp: 2016-04-28T15:40:59.158000
+ALTER TABLE history_order DROP COLUMN is_needinvoice;
+faked!
+timestamp: 2016-04-28T15:40:59.161000
+ALTER TABLE history_order DROP COLUMN order_totalmoney;
+faked!
+timestamp: 2016-04-28T15:40:59.164000
+ALTER TABLE history_order DROP COLUMN favorable_money;
+faked!
+timestamp: 2016-04-28T15:40:59.167000
+ALTER TABLE history_order DROP COLUMN out_payno;
+faked!
+timestamp: 2016-04-28T15:40:59.170000
+ALTER TABLE history_order DROP COLUMN is_presell;
+faked!
+timestamp: 2016-04-28T15:40:59.172000
+ALTER TABLE history_order DROP COLUMN ordergoods_num;
+faked!
+timestamp: 2016-04-28T15:40:59.175000
+ALTER TABLE history_order DROP COLUMN buyer_alipay;
+faked!
+timestamp: 2016-04-28T15:40:59.179000
+ALTER TABLE history_order DROP COLUMN is_invoiceopened;
+faked!
+timestamp: 2016-04-28T15:40:59.182000
+ALTER TABLE history_order DROP COLUMN invoice_msg;
+faked!
+timestamp: 2016-04-28T15:40:59.184000
+ALTER TABLE history_order DROP COLUMN alipay_transaction_no;
+faked!
+timestamp: 2016-04-28T15:40:59.187000
+ALTER TABLE history_order DROP COLUMN favorite_money;
+faked!
+timestamp: 2016-04-28T15:40:59.190000
+ALTER TABLE history_order DROP COLUMN telephone;
+faked!
+timestamp: 2016-04-28T15:40:59.193000
+ALTER TABLE history_order DROP COLUMN is_book;
+faked!
+timestamp: 2016-04-28T15:40:59.196000
+ALTER TABLE history_order DROP COLUMN pay_method;
+faked!
+timestamp: 2016-04-28T15:40:59.198000
+ALTER TABLE history_order DROP COLUMN buyer_msg;
+faked!
+timestamp: 2016-04-28T15:40:59.201000
+ALTER TABLE history_order DROP COLUMN in_memo;
+faked!
+timestamp: 2016-04-28T15:40:59.204000
+ALTER TABLE history_order DROP COLUMN buyer_id;
+faked!
+timestamp: 2016-04-28T15:40:59.328000
+ALTER TABLE trade ADD sim_trade VARCHAR(512);
+faked!
+timestamp: 2016-04-28T15:40:59.342000
+ALTER TABLE trade ADD tc_return VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:59.347000
+ALTER TABLE trade ADD oti_return VARCHAR(512);
+faked!
+timestamp: 2016-04-28T15:40:59.404000
+ALTER TABLE trade ADD city_class VARCHAR(10);
+faked!
+timestamp: 2016-04-28T15:40:59.439000
+ALTER TABLE trade ADD edb_return VARCHAR(512);
+faked!
+success!
+timestamp: 2016-04-28T15:40:59.538000
+ALTER TABLE user_info ADD log_status VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:59.542000
+ALTER TABLE user_info ADD passwd VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:59.544000
+ALTER TABLE user_info ADD mobilphone VARCHAR(20);
+faked!
+timestamp: 2016-04-28T15:40:59.549000
+ALTER TABLE user_info DROP COLUMN province;
+faked!
+timestamp: 2016-04-28T15:40:59.551000
+ALTER TABLE user_info DROP COLUMN city;
+faked!
+timestamp: 2016-04-28T15:40:59.554000
+ALTER TABLE user_info DROP COLUMN reserve_field;
+faked!
+timestamp: 2016-04-28T15:40:59.557000
+ALTER TABLE user_info DROP COLUMN country;
+faked!
+timestamp: 2016-04-28T15:40:59.560000
+ALTER TABLE user_info DROP COLUMN sb_internal_member_id;
+faked!
+timestamp: 2016-04-28T15:40:59.563000
+ALTER TABLE user_info DROP COLUMN phone_num;
+faked!
+timestamp: 2016-04-28T15:40:59.565000
+ALTER TABLE user_info DROP COLUMN zip_code;
+faked!
+timestamp: 2016-04-28T15:40:59.568000
+ALTER TABLE user_info DROP COLUMN member_account_id;
+faked!
+timestamp: 2016-04-28T16:23:50.365000
+ALTER TABLE trade ADD wrong_reason VARCHAR(20);
+faked!
+timestamp: 2016-04-28T16:23:50.508000
+ALTER TABLE trade DROP COLUMN sim_trade;
+faked!
