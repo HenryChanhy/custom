@@ -63,10 +63,10 @@ mail = auth.settings.mailer
 mail.settings.server = 'logging' if request.is_local else myconf.take('smtp.server')
 mail.settings.sender = myconf.take('smtp.sender')
 mail.settings.login = myconf.take('smtp.login')
-
 ## configure auth policy
+
 auth.settings.registration_requires_verification = False
-auth.settings.registration_requires_approval = False
+auth.settings.registration_requires_approval = True
 auth.settings.reset_password_requires_verification = True
 
 #########################################################################
@@ -371,7 +371,7 @@ db.define_table('trade',
                 Field('tc_return',length=20),
                 Field('edb_return'),
                 Field('oti_return'),
-                Field('sim_trade')
+                Field('wrong_reason',length=20)
                 )
 db.define_table('AllBarcode',
                 Field('product_num',length=20),
