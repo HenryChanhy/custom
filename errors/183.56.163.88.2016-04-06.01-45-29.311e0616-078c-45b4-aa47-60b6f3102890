@@ -1,0 +1,449 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.NameError'> global name 'true' is not defined"
+p3
+sS'layer'
+p4
+S'/home/www-data/web2py/applications/pampers1/controllers/TtApi.py'
+p5
+sS'code'
+p6
+S'__author__ = \'Administrator\'\nfrom simhash import Simhash,SimhashIndex\nimport xml.etree.ElementTree as XML_ET\nimport os\nimport sys\nimport time\nimport hashlib\nimport chardet\nimport requests\nimport json\nimport openpyxl\nfrom datetime import datetime\nfrom time import mktime\n\ndef cmp(x,y):\n    x1=x.lower()\n    y1=y.lower()\n    if x1>y1:\n        return 1\n    if x1<y1:\n        return -1\n    return 0\n\ndef GetTimeStamp():\n    t=time.localtime()\n    lst=[]\n    for i in xrange(len(t)):\n        if i>=5:\n            break\n        v=str(t[i]).zfill(2)\n        lst.append(v)\n    reStr="".join(lst)\n    return reStr\n\ndef log_file(msg):\n    dir=os.getcwd()\n    fileName="err.txt"\n    finalPath=os.path.join(dir,fileName)\n    with open(finalPath,"ab") as f:\n        f.write("[%s] %s\\r\\n"%(GetTimeStamp(),msg))\n    return finalPath\n\ndef MD5Sign(md5Str):\n    m=hashlib.md5()\n    m.update(md5Str)\n    return m.hexdigest().upper()\n\ndef TrialAPI(**arg):\n    def _TrialAPI(func):\n        def __TrialAPI(data):\n            SysData={"apiKey":"57Hyjts8HHty",}\n            ExData={"apiSecret":"iO7hbmH8-rbt6Hg_Yg6",}\n            param=func(data)\n            param.update(SysData)\n            param.update(data)\n            url="http://122.193.31.8:8080/TrialCenter/order/Pampers/ST/"+arg["method"]\n            param["timestamp"]=str(int(time.time()))\n            paraList=[]\n            for k,v in param.items():\n                if isinstance(v,str):\n                    paraList.append(k+"="+str(v))\n            paraList.sort(cmp)\n            md5Str="&".join(paraList)\n            md5Str=md5Str+ExData["apiSecret"]\n            param["sig"]=MD5Sign(md5Str)\n            log_file("%s %s"%(md5Str,param["sig"]))\n            jsparam=json.dumps(param)\n            req=requests.post(url,jsparam,verify=False)\n            return json.loads(req.content)\n        return __TrialAPI\n    return _TrialAPI\n\n@TrialAPI(method="updateOrderTrackingInfo")\ndef updateOTI(data):\n    return {}\n\n@TrialAPI(method="updateTrialOrderStatus")\ndef updateTOS(data):\n    return {}\n\n@request.restful()\ndef test_TOS():\n    response.view =\'generic.\'+request.extension  #return json\n    def GET(*args,**vars):\n        barcode_dict={\'62015092412001\':\'6903148240014\',\'62015092480001\':\'6903148238905\',\n                     \'2015092412002\':\'6903148240021\',\'2015092480002\':\'6903148238912\',\n                     \'33320151016001\':\'6903148238912\',\'33320151016002\':\'6903148238905\'}\n        keys=vars.keys()\n        result={}\n        if (\'out_tid\' in keys) and (\'status\' in keys) and (\'appKey\' in keys):\n            if vars[\'appKey\']==\'updateandtos\':\n                a_row=db(db.trade.out_tid.like(vars[\'out_tid\'])).select()\n                if a_row:\n                    a_row.first().update_record(status=vars[\'status\'])\n                    data={"order_id":vars[\'out_tid\'],\'status\':vars[\'status\']}\n                    if vars[\'status\']==\'2\':\n                        data[\'message\']=vars[\'msg\']\n                    else:\n                        trade_content=a_row.as_list()[0]\n                        if \'province\' in trade_content.keys():\n                            trade_content[\'privince\']=trade_content[\'province\']\n                        for k,v in trade_content.items():\n                            if isinstance(v,str):\n                                trade_content[k]=v.decode(\'utf8\')\n                            if isinstance(v, datetime):\n                                trade_content[k] = v.isoformat()\n                        if trade_content[\'barCode\'] in barcode_dict.keys():\n                            trade_content[\'barCode\']=barcode_dict[trade_content[\'barCode\']]\n                        trade_content[\'out_tid\']=\'TC\'+trade_content[\'out_tid\']\n                        if a_row.as_list()[0][\'edb_return\']==None or a_row.as_list()[0][\'edb_return\']!=\'True\':\n                            edbreturn=AddTrade(trade_content)\n                            try:\n                                a_row.first().update_record(edb_return=edbreturn[\'Success\'][\'items\'][\'item\'][0][\'is_success\'])\n                            except:\n                                a_row.first().update_record(edb_return=edbreturn)\n                            result[\'edb_return\']=edbreturn\n                    if a_row.as_list()[0][\'tc_return\']==None or a_row.as_list()[0][\'tc_return\']!=\'true\':\n                        ctreturn=updateTOS(data)\n                        a_row.first().update_record(tc_return=ctreturn[\'result\'])\n                        result[\'CT_return\']=ctreturn\n                    result[\'is_success\']=\'t\'\n                else:\n                    result[\'is_success\']=\'o\'\n            else:\n                result[\'is_success\']=\'f\'\n        else:\n            result[\'is_success\']=\'f\'\n        return result\n    return locals()\n    \'\'\'wb=openpyxl.load_workbook(\'/home/20160121_27\xe6\xba\x90\xe6\x95\xb0\xe6\x8d\xae60658\xe6\x9d\xa1.xlsx\')\n    wst= wb.get_sheet_by_name(name = \'true\')\n    wsw= wb.get_sheet_by_name(name = \'wrong\')\n    for i in range(2,wst.max_row+1):\n        outtid=wst.cell(row=i,column=3).value.encode(\'utf8\')\n        data={"order_id":outtid}\n        data["status"]="3"\n        result=updateTOS(data)\n        log_file("%s %s"%(data,result))\n        db(db.trade.out_tid==wst.cell(row=i,column=3).value).select().first().update_record(status=3)\n    for i in range(2,wsw.max_row+1):\n        outtid=wsw.cell(row=i,column=3).value.encode(\'utf8\')\n        data={"order_id":outtid}\n        data["status"]="2"\n        data["message"]=wsw.cell(row=i,column=17).value.encode(\'utf8\')\n        result=updateTOS(data)\n        log_file("%s %s"%(data,result))\n        db(db.trade.out_tid==wsw.cell(row=i,column=3).value).select().first().update_record(status=2)\'\'\'\n\n#\xe6\xb5\x8b\xe8\xaf\x95\xe7\x94\xa8\xef\xbc\x8c\xe5\x8f\xaf\xe5\x88\xa0\xe9\x99\xa4\ndef test_OTI():\n    orderinfo={\n\t"order_id": "8444",\n\t"tracking_number": "3100901633843",\n\t"tracking_company": "17"\n    }\n    result=updateOTI(orderinfo)\n    log_file("%s %s"%(orderinfo,result))\n\ndef EdbAPI(**arg):\n    def _EdbAPI(func):\n        def __EdbAPI(data):\n            #url="http://vip79.edb04.net/edb2/rest/openapi/index.aspx"\n            url="http://vip79.edb04.net/rest/index.aspx"\n            SysData={\n                "appkey":"5a7b7896",\n                "dbhost":"edb_a77527",\n                "format":"json",\n                "v":2.0,\n                "slencry":0,\n                "Ip":"117.79.148.228",\n                }\n            ExData={\n                "appscret":"1f5b75edd28d480e968feecbc38f2c73",\n                "token":"7041e7424cb4410f8370f10a2d3a285a",\n                }\n            param=func(data)\n            param.update(SysData)\n            param["method"]=arg["method"]\n            param["timestamp"]=GetTimeStamp()\n            paraList=[]\n            for k,v in param.items():\n                if k=="appkey":\n                    continue\n                if not str(v):\n                    continue\n                paraList.append(k+str(v))\n            for k,v in ExData.items():\n                paraList.append(k+str(v))\n            paraList.sort(cmp)\n            md5Str="".join(paraList)\n            md5Str=SysData["appkey"]+"appkey"+SysData["appkey"]+md5Str\n            param["sign"]=MD5Sign(md5Str)\n            req=requests.post(url,param)\n            if not req.ok:\n                print "requests FAIL"\n                log_file("%s %s"%(arg,data))\n                filePath=log_file(req.content)\n                print "log_file in",filePath\n                return\n            return json.loads(req.content)\n        return __EdbAPI\n    return _EdbAPI\n\n@EdbAPI(method="edbTradeAdd")\ndef AddTrade(data):\n    orderTag=(\'out_tid\',\'shop_id\',\'storage_id\',\'buyer_id\',\'buyer_msg\',\'buyer_email\',\'buyer_alipay\',\'seller_remark\',\'consignee\',\'address\',\'postcode\',\'telephone\',\'mobilPhone\',\'privince\',\'city\',\'area\',\'actual_freight_get\',\'actual_RP\',\'ship_method\',\'express\',\'is_invoiceOpened\',\'invoice_type\',\'invoice_money\',\'invoice_title\',\'invoice_msg\',\'order_type\',\'process_status\',\'pay_status\',\'deliver_status\',\'is_COD\',\'serverCost_COD\',\'order_totalMoney\',\'product_totalMoney\',\'pay_method\',\'pay_commission\',\'pay_score\',\'return_score\',\'favorable_money\',\'alipay_transaction_no\',\'out_payNo\',\'out_express_method\',\'out_order_status\',\'order_date\',\'pay_date\',\'finish_date\',\'plat_type\',\'distributor_no\',\'WuLiu\',\'WuLiu_no\',\'in_memo\',\'other_remark\',\'actual_freight_pay\',\'ship_date_plan\',\'deliver_date_plan\',\'is_scorePay\',\'is_needInvoice\')\n    productTag=(\'barCode\',\'product_title\',\'standard\',\'out_price\',\'favorite_money\',\'orderGoods_Num\',\'gift_Num\',\'cost_Price\',\'tid\',\'product_stockout\',\'is_Book\',\'is_presell\',\'is_Gift\',\'avg_price\',\'product_freight\',\'shop_id\',\'out_tid\',\'out_productId\',\'out_barCode\',\'product_intro\')\n    orderXml=XML_ET.fromstring(\'<info><orderInfo></orderInfo></info>\')\n    productXml=XML_ET.fromstring(\'<product_info><product_item></product_item></product_info>\')\n    orderInfo=orderXml.find("orderInfo")\n    itemInfo=productXml.find("product_item")\n    for k,v in data.items():\n        if k in orderTag:\n            tmp=XML_ET.SubElement(orderInfo,k)\n            tmp.text=v\n        if k in productTag:\n            tmp=XML_ET.SubElement(itemInfo,k)\n            tmp.text=v\n    orderInfo.append(productXml)\n    finalStr=XML_ET.tostring(orderXml,"utf8")\n    result={}\n    result["xmlValues"]=finalStr[37:]\n    return result\n\ndef test_2edb():\n    wb=openpyxl.load_workbook(\'/home/trade20160125h_36\xef\xbc\x88100\xe6\x9d\xa1\xe6\xb5\x8b\xe8\xaf\x9571\xe6\x9d\xa1\xe5\x90\x88\xe6\xa0\xbc\xef\xbc\x89.xlsx\')\n    wst= wb.get_sheet_by_name(name = \'true71\')\n    results=[]\n    for i in range(2,wst.max_row+1):\n        outtid=wst.cell(row=i,column=28).value.encode(\'utf8\')\n        trade_content=db(db.trade.out_tid==wst.cell(row=i,column=28).value).select().first()\n        for k,v in trade_content.items():\n            if isinstance(v,str):\n                trade_content[k]=v.decode(\'utf8\')\n            if isinstance(v, datetime):\n                trade_content[k] = v.isoformat()\n    result=AddTrade(trade_content)\n    return result\n\n\n#{\'bar_code\':vars[\'product_info\'][0][\'barCode\']} in AllBarcode\n#@auth.requires_login()\n@request.restful()\ndef AddTradeToEdb():\n    response.view =\'generic.\'+request.extension  #return  json\n    def POST(tablename,**vars):\n        msg=[]\n        jsonObj={}\n        keys=vars.keys()\n        for k in keys:\n            k.decode(\'unicode_escape\')\n        if (\'apiKey\' in keys)and(\'product_info\' in keys)and\\\n        (\'timestamp\' in keys)and(\'sig\' in keys) and\\\n        (\'out_tid\' in keys)and (\'shop_id\' in keys)and\\\n        (\'consignee\' in keys)and(\'address\' in keys)and\\\n        (\'postcode\' in keys)and(\'mobilPhone\' in keys)and\\\n        (\'order_date\' in keys)and(\'storage_id\' in keys)and\\\n        (\'barCode\' in vars[\'product_info\'][0].keys())and \\\n        (\'product_title\' in vars[\'product_info\'][0].keys())and \\\n        (\'standard\' in vars[\'product_info\'][0].keys())and\\\n        (\'out__tid\' in vars[\'product_info\'][0].keys()):\n            ts=int(time.time())\n            this_apiKey=\'A6BEA59B\'\n            this_apiSecret=\'1F6F088755B094DDAD3C7AEFEA73A1A1\'\n            essential_field=vars.keys()\n            essential_field.sort()\n            SigStr=""\n            edbdata={}\n            for field in essential_field:\n                if field =="sig" or field =="apiSecret":\n                    continue\n                elif field =="product_info":\n                    SigStr=SigStr+unicode(field)+u"="+u"["\n                    for d in vars["product_info"]:\n                        k=d.keys()\n                        k.sort()\n                        SigStr=SigStr+u"{"\n                        for j in k:\n                            SigStr=SigStr+unicode(j)+u"="+unicode(d[j])+u"&"\n                            edbdata[j]=d[j]\n                        SigStr=SigStr[0:len(SigStr)-1]\n                        SigStr=SigStr+u"}"\n                    SigStr=SigStr+u"]"+u"&"\n                else:\n                    SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"\n                    if (field != \'apiKey\') and (field !=\'timestamp\'):\n                        edbdata[field]=vars[field]\n            edbdata[\'address\']=edbdata[\'address\'].replace(\'\\r\',\'\')\n            edbdata[\'address\']=edbdata[\'address\'].replace(\',\',\'-\')\n            if (\'province\' in keys):\n                edbdata[\'province\']=edbdata[\'province\'].replace(\'\\r\',\'\')\n                edbdata[\'province\']=edbdata[\'province\'].replace(\',\',\'-\')\n            if (\'city\' in keys):\n                edbdata[\'city\']=edbdata[\'city\'].replace(\'\\r\',\'\')\n                edbdata[\'city\']=edbdata[\'city\'].replace(\',\',\'-\')\n            if (\'area\' in keys):\n                edbdata[\'area\']=edbdata[\'area\'].replace(\'\\r\',\'\')\n                edbdata[\'area\']=edbdata[\'area\'].replace(\',\',\'-\')\n            if (\'consignee\' in keys):\n                edbdata[\'consignee\']=edbdata[\'consignee\'].replace(\'\\r\',\'\')\n                edbdata[\'consignee\']=edbdata[\'consignee\'].replace(\',\',\'-\')\n            if (\'plat_type\' in keys):\n                if edbdata[\'plat_type\']==None :\n                    edbdata[\'plat_type\']=\'TrialCenter\'\n            this_sig=MD5Sign((SigStr[0:len(SigStr)-1]+this_apiSecret).encode(\'utf8\'))\n            #AllBarcode=db().select(db.AllBarcode.bar_code).as_list()\n            if (vars[\'sig\']==this_sig) and (ts-int(vars[\'timestamp\'])<180) and \\\n            ((vars[\'apiKey\']).decode(\'unicode_escape\')==(this_apiKey)):\n                #getorderid=db.trade.update_or_insert(db.trade.out_tid==edbdata[\'out_tid\'],**edbdata)\n                if db(db.trade.out_tid==edbdata[\'out_tid\']).select():\n                    msg.append({\'is_success\':\'true\',\'response_Msg\':\'duplicate trade\'})\n                else:\n                    tcpid=db.trade.insert(**edbdata)\n                    if tcpid:\n                        msg.append({\'is_success\':\'true\',\'response_Msg\':\'import to TaoTongGroup successfully\'})\n                    else:\n                        msg.append({\'is_success\':\'false\',\'response_Msg\':\'unexpected data\'})\n            else:\n                msg.append({\'is_success\':\'false\',\'response_Msg\':\'wrong verification\'})\n        else:\n            msg.append({\'is_success\':\'false\',\'response_Msg\':\'absence of essential field\'})\n        jsonObj[\'item\']=msg\n        return jsonObj\n    return locals()\n\n#@auth.requires_login()\n@request.restful()\ndef GetEdbOrderInfo():\n    WuLiu_dict={}\n    response.view =\'generic.\'+request.extension\n    def GET(*args,**vars):\n        keys=vars.keys()\n        content={}\n        if (\'orderId\' in keys)and(\'status\' in keys) and\\\n(\'logisticCompany\' in keys)and(\'trackingNo\' in keys) and\\\n(\'updateTime\' in keys)and(\'app_key\' in keys):\n            WuLiu_dict={\n\'EMS\':\'1\',\'HTKY\':\'10\',\'ZJS\':\'11\',\'STO\':\'12\',\'ZDY\':\'13\',\'ZDY\':\'14\',\'YUNDA\':\'15\',\n\'FEDEX\':\'16\',\'DBL\':\'17\',\'RFD\':\'18\',\'ZT\':\'19\',\'STO\':\'2\',\'POSTB\':\'20\',\'SF\':\'6\',\n\'STO\':\'21\',\'OTHER\':\'22\',\'OTHER\':\'23\',\'UC\':\'24\',\'FAST\':\'25\',\'STO\':\'26\',\'SF\':\'7\',\n\'TTKDEX\':\'27\',\'SF\':\'28\',\'SF\':\'29\',\'EMS\':\'3\',\'ZTO\':\'30\',\'STO\':\'31\',\'YUNDA\':\'32\',\n\'SF\':\'33\',\'SF\':\'34\',\'YUNDA\':\'35\',\'YTO\':\'36\',\'TTKDEX\':\'37\',\'YTO\':\'4\',\'TTKDEX\':\'5\',\n\'YUNDA\':\'8\',\'ZTO\':\'9\'}\n            order_info={}\n            for k,v in vars.items():\n                if k==\'app_key\':\n                    continue\n                elif k==\'status\':\n                    order_info[\'order_status\']=v\n                elif k==\'orderId\':\n                    order_info[\'orderId\']=v.replace(\'TC\',\'\')\n                else:\n                    order_info[k]=v\n            db.WuLiuInfo.update_or_insert(db.WuLiuInfo.orderId==order_info[\'orderId\'],**order_info)\n            trade_exist=db(db.trade.out_tid.like(order_info[\'orderId\'])).select()\n            if trade_exist:\n                WuLiu_info={"order_id": order_info[\'orderId\'],\n\t            "tracking_number":order_info[\'trackingNo\']}\n                if order_info[\'logisticCompany\'] in WuLiu_dict.keys():\n                    WuLiu_info["tracking_company"]=str(WuLiu_dict[order_info[\'logisticCompany\']])\n                    result=updateOTI(WuLiu_info)\n                    if result[\'result\']==\'true\':\n                        content[\'isSuccess\']=True\n                        content[\'errorCode\']=1\n                        content[\'errorMsg\']=\'\xe5\xa4\x84\xe7\x90\x86\xe6\x88\x90\xe5\x8a\x9f\'\n                    else:\n                        if result[\'error\']==\'1032\':\n                            content[\'isSuccess\']=True\n                            content[\'errorCode\']=1\n                            content[\'errorMsg\']=\'\xe5\xa4\x84\xe7\x90\x86\xe6\x88\x90\xe5\x8a\x9f\'\n                        else:\n                            content[\'isSuccess\']=False\n                            content[\'errorCode\']=2\n                            content[\'errorMsg\']=\'\xe8\xae\xa2\xe5\x8d\x95\xe4\xb8\x8d\xe5\xad\x98\xe5\x9c\xa8\'\n                else:\n                    content[\'isSuccess\']=False\n                    content[\'errorCode\']=5\n                    content[\'errorMsg\']=\'\xe7\x89\xa9\xe6\xb5\x81\xe5\x85\xac\xe5\x8f\xb8\xe4\xb8\x8d\xe5\xad\x98\xe5\x9c\xa8\'\n                trade_exist.first().update_record(oti_return=content[\'errorCode\'])\n            else:\n                content[\'isSuccess\']=true\n                content[\'errorCode\']=1\n                content[\'errorMsg\']=\'\xe7\x89\xa9\xe6\xb5\x81\xe4\xbf\xa1\xe6\x81\xaf\xe5\xb7\xb2\xe4\xbf\x9d\xe5\xad\x98\'\n        else:\n            content[\'isSuccess\']=False\n            content[\'errorCode\']=9\n            content[\'wrong_reason\']=\'\xe8\xae\xa2\xe5\x8d\x95\xe5\x8f\xb7\xe6\xa0\xbc\xe5\xbc\x8f\xe9\x94\x99\xe8\xaf\xaf\'\n        return content\n    return locals()\n\n#@auth.requires_login()\n#@request.restful()\ndef TradeGet():\n    response.view =\'generic.\'+request.extension  #return  json\n    def GET(*args,**vars):\n        patterns=[\n            "/products[db_map]",\n            "/productid/{db_map.id}",\n            "/product_exid/{db_map.field_order}",\n            "/product/{custom_order.user_name.startswith}",\n            "/product/{custom_order.user_name}/:field",\n            "/trades[trade]",\n            "/tradeTid/{trade.tid}",\n            "/tradeOut/{trade.out_tid}"\n        ]\n        #patterns = \'auto\'\n        parser = db.parse_as_rest(patterns,args,vars)\n        if parser.status == 200:\n            return dict(content=parser.response)\n        else:\n            raise HTTP(parser.status,parser.error)\n    return locals()\n\n#@request.restful()\ndef TradeUpdate():\n    response.view =\'generic.\'+request.extension  #return  json\n    def PUT(table_name,record_id,**vars):\n        return db(db[table_name].order_id==record_id).update(**vars)\n    return locals()\n\n#@request.restful()\ndef TradeDelete():\n    response.view =\'generic.\'+request.extension  #return  json\n    def DELETE(table_name,record_id):\n        return db(db[table_name].order_id==record_id).delete()\n    return locals()\n\nif __name__=="__main__":\n    test_TOS()\n\nresponse._vars=response._caller(GetEdbOrderInfo)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__hash__'
+p12
+S"<method-wrapper '__hash__' of exceptions.NameError object>"
+p13
+sS'__setattr__'
+p14
+S"<method-wrapper '__setattr__' of exceptions.NameError object>"
+p15
+sS'__reduce_ex__'
+p16
+S'<built-in method __reduce_ex__ of exceptions.NameError object>'
+p17
+sS'__getslice__'
+p18
+S"<method-wrapper '__getslice__' of exceptions.NameError object>"
+p19
+sS'__getitem__'
+p20
+S"<method-wrapper '__getitem__' of exceptions.NameError object>"
+p21
+sS'__setstate__'
+p22
+S'<built-in method __setstate__ of exceptions.NameError object>'
+p23
+sS'args'
+p24
+S'("global name \'true\' is not defined",)'
+p25
+sS'__reduce__'
+p26
+S'<built-in method __reduce__ of exceptions.NameError object>'
+p27
+sS'__str__'
+p28
+S"<method-wrapper '__str__' of exceptions.NameError object>"
+p29
+sS'__format__'
+p30
+S'<built-in method __format__ of exceptions.NameError object>'
+p31
+sS'__getattribute__'
+p32
+S"<method-wrapper '__getattribute__' of exceptions.NameError object>"
+p33
+sS'__class__'
+p34
+S"<type 'exceptions.NameError'>"
+p35
+sS'__unicode__'
+p36
+S'<built-in method __unicode__ of exceptions.NameError object>'
+p37
+sS'__delattr__'
+p38
+S"<method-wrapper '__delattr__' of exceptions.NameError object>"
+p39
+sS'__subclasshook__'
+p40
+S'<built-in method __subclasshook__ of type object>'
+p41
+sS'__repr__'
+p42
+S"<method-wrapper '__repr__' of exceptions.NameError object>"
+p43
+sS'__dict__'
+p44
+S'{}'
+p45
+sS'__sizeof__'
+p46
+S'<built-in method __sizeof__ of exceptions.NameError object>'
+p47
+sS'__doc__'
+p48
+S"'Name not found globally.'"
+p49
+sS'__init__'
+p50
+S"<method-wrapper '__init__' of exceptions.NameError object>"
+p51
+sS'__new__'
+p52
+S'<built-in method __new__ of type object>'
+p53
+ssS'evalue'
+p54
+S"global name 'true' is not defined"
+p55
+sS'request'
+p56
+cgluon.html
+XML_unpickle
+p57
+(S's\x00=\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>pampers1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>183.56.163.88</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>TtApi</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_LENGTH</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_TYPE</td><td style="vertical-align:top;">:</td><td><div>text/xml; charset=utf-8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">DOCUMENT_ROOT</td><td style="vertical-align:top;">:</td><td><div>/usr/share/nginx/html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONTENT_TYPE</td><td style="vertical-align:top;">:</td><td><div>text/xml; charset=utf-8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>int.taotonggroup.com</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/pampers1/TtApi/GetEdbOrderInfo.xml</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div>orderId=BBS2016032200002&amp;status=S&amp;logisticCompany=STO&amp;trackingNo=220674116766&amp;updateTime=2016-04-06%2001:45:21&amp;app_key=451dc82935d406c33a1c214e7b1b62e6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>183.56.163.88</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>55137</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_URI</td><td style="vertical-align:top;">:</td><td><div>/pampers1/TtApi/GetEdbOrderInfo?orderId=BBS2016032200002&amp;status=S&amp;logisticCompany=STO&amp;trackingNo=220674116766&amp;updateTime=2016-04-06%2001:45:21&amp;app_key=451dc82935d406c33a1c214e7b1b62e6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>iz94xhl4hr8z</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>443</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>nginx/1.4.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">UWSGI_SCHEME</td><td style="vertical-align:top;">:</td><td><div>https</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/www-data/web2py/applications/pampers1/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_length</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_type</td><td style="vertical-align:top;">:</td><td><div>text/xml; charset=utf-8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">document_root</td><td style="vertical-align:top;">:</td><td><div>/usr/share/nginx/html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_content_type</td><td style="vertical-align:top;">:</td><td><div>text/xml; charset=utf-8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>int.taotonggroup.com</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>iZ94xhl4hr8Z</div></td></tr><tr><td><div>iz94xhl4hr8z</div></td></tr><tr><td><div>10.172.40.151</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/pampers1/TtApi/GetEdbOrderInfo.xml</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div>orderId=BBS2016032200002&amp;status=S&amp;logisticCompany=STO&amp;trackingNo=220674116766&amp;updateTime=2016-04-06%2001:45:21&amp;app_key=451dc82935d406c33a1c214e7b1b62e6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>183.56.163.88</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>55137</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/pampers1/TtApi/GetEdbOrderInfo?orderId=BBS2016032200002&amp;status=S&amp;logisticCompany=STO&amp;trackingNo=220674116766&amp;updateTime=2016-04-06%2001:45:21&amp;app_key=451dc82935d406c33a1c214e7b1b62e6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>iz94xhl4hr8z</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>443</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>nginx/1.4.6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi.node</td><td style="vertical-align:top;">:</td><td><div>iZ94xhl4hr8Z</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi.version</td><td style="vertical-align:top;">:</td><td><div>2.0.12</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_node</td><td style="vertical-align:top;">:</td><td><div>iZ94xhl4hr8Z</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_scheme</td><td style="vertical-align:top;">:</td><td><div>https</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_version</td><td style="vertical-align:top;">:</td><td><div>2.0.12</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.13.4-stable+timestamp.2015.12.26.04.59.39</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;wsgi_errors&#x27;, mode &#x27;w&#x27; at 0x7f3f19f84c90&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;built-in function uwsgi_sendfile&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;uwsgi._Input object at 0x7f3f19333ee8&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>https</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;wsgi_errors&#x27;, mode &#x27;w&#x27; at 0x7f3f19f84c90&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;built-in function uwsgi_sendfile&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;uwsgi._Input object at 0x7f3f19333ee8&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>https</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>xml</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py/applications/pampers1/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>GetEdbOrderInfo</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/www-data/web2py/applications/pampers1/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>iZ94xhl4hr8Z</div></td></tr><tr><td><div>iz94xhl4hr8z</div></td></tr><tr><td><div>10.172.40.151</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.13.4-stable+timestamp.2015.12.26.04.59.39</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_scheduler</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_shell</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2016, 4, 6, 1, 45, 29, 199981)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_args</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">raw_extension</td><td style="vertical-align:top;">:</td><td><div>xml</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/pampers1/TtApi/GetEdbOrderInfo.xml</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2016, 4, 5, 17, 45, 29, 200030)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0x7f3f191a64d0&gt;</div></td></tr></table></div>'
+tRp58
+sS'frames'
+p59
+(lp60
+(dp61
+S'file'
+p62
+S'/home/www-data/web2py/gluon/restricted.py'
+p63
+sS'dump'
+p64
+(dp65
+S'environment'
+p66
+S"{'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'ASSIGNJS': <function ASSIGNJS>, 'AddTrade': <function __EdbAPI>, 'AddTradeToEdb': <function AddTradeToEdb>, 'AppConfig': <function AppConfig>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, ...}"
+p67
+sS'ccode'
+p68
+S'<code object <module> at 0x7f3f18e894b0, file "/...lications/pampers1/controllers/TtApi.py", line 1>'
+p69
+ssS'lnum'
+p70
+I227
+sS'lines'
+p71
+(dp72
+I224
+S'            ccode = code'
+p73
+sI225
+S'        else:'
+p74
+sI226
+S'            ccode = compile2(code, layer)'
+p75
+sI227
+S'        exec ccode in environment'
+p76
+sI228
+S'    except HTTP:'
+p77
+sI229
+S'        raise'
+p78
+sI230
+S'    except RestrictedError:'
+p79
+sI231
+S'        # do not encapsulate (obfuscate) the original RestrictedError'
+p80
+sI222
+S'    try:'
+p81
+sI223
+S'        if isinstance(code, types.CodeType):'
+p82
+ssS'call'
+p83
+S'(code="__author__ = \'Administrator\'\\nfrom simhash import...response._vars=response._caller(GetEdbOrderInfo)\\n", environment={\'A\': <class \'gluon.html.A\'>, \'ANY_OF\': <class \'gluon.validators.ANY_OF\'>, \'ASSIGNJS\': <function ASSIGNJS>, \'AddTrade\': <function __EdbAPI>, \'AddTradeToEdb\': <function AddTradeToEdb>, \'AppConfig\': <function AppConfig>, \'Auth\': <class \'gluon.tools.Auth\'>, \'B\': <class \'gluon.html.B\'>, \'BEAUTIFY\': <class \'gluon.html.BEAUTIFY\'>, \'BODY\': <class \'gluon.html.BODY\'>, ...}, layer=\'/home/www-data/web2py/applications/pampers1/controllers/TtApi.py\')'
+p84
+sS'func'
+p85
+S'restricted'
+p86
+sa(dp87
+g62
+S'/home/www-data/web2py/applications/pampers1/controllers/TtApi.py'
+p88
+sg64
+(dp89
+sg70
+I431
+sg71
+(dp90
+I420
+S''
+sI421
+S'#@request.restful()'
+p91
+sI422
+S'def TradeDelete():'
+p92
+sI423
+S"    response.view ='generic.'+request.extension  #return  json"
+p93
+sI424
+S'    def DELETE(table_name,record_id):'
+p94
+sI425
+S'        return db(db[table_name].order_id==record_id).delete()'
+p95
+sI426
+S'    return locals()'
+p96
+sI427
+S''
+sI428
+S'if __name__=="__main__":'
+p97
+sI429
+S'    test_TOS()'
+p98
+ssg83
+S'()'
+p99
+sg85
+S'<module>'
+p100
+sa(dp101
+g62
+S'/home/www-data/web2py/gluon/globals.py'
+p102
+sg64
+(dp103
+S'self'
+p104
+S'undefined'
+p105
+sS'f'
+S'<function GetEdbOrderInfo>'
+p106
+ssg70
+I412
+sg71
+(dp107
+I416
+S"        self.generic_patterns = ['*']"
+p108
+sI407
+S"        self.flash = ''            # used by the default view layout"
+p109
+sI408
+S'        self.meta = Storage()      # used by web2py_ajax.html'
+p110
+sI409
+S'        self.menu = []             # used by the default view layout'
+p111
+sI410
+S'        self.files = []            # used by web2py_ajax.html'
+p112
+sI411
+S'        self._vars = None'
+p113
+sI412
+S'        self._caller = lambda f: f()'
+p114
+sI413
+S'        self._view_environment = None'
+p115
+sI414
+S'        self._custom_commit = None'
+p116
+sI415
+S'        self._custom_rollback = None'
+p117
+ssg83
+S'(f=<function GetEdbOrderInfo>)'
+p118
+sg85
+S'<lambda>'
+p119
+sa(dp120
+g62
+S'/home/www-data/web2py/gluon/globals.py'
+p121
+sg64
+(dp122
+S'rest_action'
+p123
+S'<function GET>'
+p124
+sS'_self'
+p125
+S"<Storage {'_vars': <Storage {'orderId': 'BBS2016... '/home/www-data/web2py/applications/pampers1/'}>"
+p126
+sS'_self.args'
+p127
+S'[]'
+p128
+sS'builtingetattr'
+p129
+S'<built-in function getattr>'
+p130
+ssg70
+I378
+sg71
+(dp131
+I373
+S'                rest_action = _action().get(method, None)'
+p132
+sI374
+S'                if not (rest_action and method == method.upper()'
+p133
+sI375
+S'                        and callable(rest_action)):'
+p134
+sI376
+S'                    raise HTTP(405, "method not allowed")'
+p135
+sI377
+S'                try:'
+p136
+sI378
+S"                    return rest_action(*_self.args, **getattr(_self, 'vars', {}))"
+p137
+sI379
+S'                except TypeError, e:'
+p138
+sI380
+S'                    exc_type, exc_value, exc_traceback = sys.exc_info()'
+p139
+sI381
+S'                    if len(traceback.extract_tb(exc_traceback)) == 1:'
+p140
+sI382
+S'                        raise HTTP(400, "invalid arguments")'
+p141
+ssg83
+S"(_action=<function GetEdbOrderInfo>, _self=<Storage {'_vars': <Storage {'orderId': 'BBS2016... '/home/www-data/web2py/applications/pampers1/'}>, *a=(), **b={})"
+p142
+sg85
+S'f'
+sa(dp143
+g62
+S'/home/www-data/web2py/applications/pampers1/controllers/TtApi.py'
+p144
+sg64
+(dp145
+S'content'
+p146
+g45
+sS'true'
+p147
+g105
+ssg70
+I381
+sg71
+(dp148
+I384
+S'        else:'
+p149
+sI385
+S"            content['isSuccess']=False"
+p150
+sI376
+S"                    content['isSuccess']=False"
+p151
+sI377
+S"                    content['errorCode']=5"
+p152
+sI378
+S"                    content['errorMsg']='\xe7\x89\xa9\xe6\xb5\x81\xe5\x85\xac\xe5\x8f\xb8\xe4\xb8\x8d\xe5\xad\x98\xe5\x9c\xa8'"
+p153
+sI379
+S"                trade_exist.first().update_record(oti_return=content['errorCode'])"
+p154
+sI380
+S'            else:'
+p155
+sI381
+S"                content['isSuccess']=true"
+p156
+sI382
+S"                content['errorCode']=1"
+p157
+sI383
+S"                content['errorMsg']='\xe7\x89\xa9\xe6\xb5\x81\xe4\xbf\xa1\xe6\x81\xaf\xe5\xb7\xb2\xe4\xbf\x9d\xe5\xad\x98'"
+p158
+ssg83
+S"(*args=(), **vars={'app_key': '451dc82935d406c33a1c214e7b1b62e6', 'logisticCompany': 'STO', 'orderId': 'BBS2016032200002', 'status': 'S', 'trackingNo': '220674116766', 'updateTime': '2016-04-06 01:45:21'})"
+p159
+sg85
+S'GET'
+p160
+sasS'pyver'
+p161
+S'Python 2.7.6: /usr/local/bin/uwsgi (prefix: /usr)'
+p162
+sS'session'
+p163
+g57
+(S's\x1a\x00\x00\x00<div><table></table></div>'
+tRp164
+sS'etype'
+p165
+S"<type 'exceptions.NameError'>"
+p166
+sS'date'
+p167
+S'Wed Apr  6 01:45:29 2016'
+p168
+sS'response'
+p169
+g57
+(S's\xce>\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0x7f3f192d0730&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_pampers1</td><td style="vertical-align:top;">:</td><td><div>183.56.163.88-dc33a96c-a782-413e-a02e-aca2227de8d0<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">form_label_separator</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">formstyle</td><td style="vertical-align:top;">:</td><td><div>bootstrap3_inline</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>*.xml</div></td></tr><tr><td><div>*.json</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">google_analytics_id</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">logo</td><td style="vertical-align:top;">:</td><td><div><a class="navbar-brand" href="http://www.web2py.com/" id="web2py-logo"><b>web<span>2</span>py</b>&trade;&nbsp;</a></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div><table><tr><td><div>Home</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/pampers1/default/index.xml</div></td></tr><tr><td><div><table></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>My Sites</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/site.xml</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>This App</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>#</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Design</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/design.xml/pampers1</div></td></tr></table></div></td></tr><tr><td><div><li class="divider"></li></div></td></tr><tr><td><div><table><tr><td><div>Controller</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/edit.xml/pampers1/controllers/TtApi.py</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>View</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/edit.xml/pampers1/views/TtApi/GetEdbOrderInfo.xml</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>DB Model</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/edit.xml/pampers1/models/db.py</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Menu Model</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/edit.xml/pampers1/models/menu.py</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Config.ini</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/edit.xml/pampers1/private/appconfig.ini</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Layout</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/edit.xml/pampers1/views/layout.html</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Stylesheet</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/edit.xml/pampers1/static/css/web2py-bootstrap3.css</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Database</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/pampers1/appadmin/index.xml</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Errors</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/errors.xml/pampers1</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>About</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>/admin/default/about.xml/pampers1</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>web2py.com</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>#</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Download</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/examples/default/download</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Support</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/examples/default/support</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Demo</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://web2py.com/demo_admin</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Quick Examples</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://web2py.com/examples/default/examples</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>FAQ</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://web2py.com/AlterEgo</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Videos</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/examples/default/videos/</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Free Applications</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://web2py.com/appliances</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Plugins</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://web2py.com/plugins</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Recipes</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://web2pyslices.com/</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Documentation</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>#</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Online book</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book</div></td></tr></table></div></td></tr><tr><td><div><li class="divider"></li></div></td></tr><tr><td><div><table><tr><td><div>Preface</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/00</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Introduction</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/01</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Python</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/02</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Overview</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/03</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>The Core</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/04</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>The Views</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/05</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Database</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/06</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Forms and Validators</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/07</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Email and SMS</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/08</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Access Control</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/09</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Services</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/10</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Ajax Recipes</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/11</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Components and Plugins</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/12</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Deployment Recipes</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/13</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Other Recipes</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/14</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Helping web2py</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/book/default/chapter/15</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Buy web2py\'s book</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://stores.lulu.com/web2py</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Community</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>None</div></td></tr><tr><td><div><table><tr><td><div><table><tr><td><div>Groups</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://www.web2py.com/examples/default/usergroups</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Twitter</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://twitter.com/web2py</div></td></tr></table></div></td></tr><tr><td><div><table><tr><td><div>Live Chat</div></td></tr><tr><td><div>False</div></td></tr><tr><td><div>http://webchat.freenode.net/?channels=web2py</div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">author</td><td style="vertical-align:top;">:</td><td><div>Your Name &lt;you@example.com&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">description</td><td style="vertical-align:top;">:</td><td><div>a cool new app</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generator</td><td style="vertical-align:top;">:</td><td><div>Web2py Web Framework</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">keywords</td><td style="vertical-align:top;">:</td><td><div>web2py, python, framework</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^TtApi/\\w+\\.py$</div></td></tr><tr><td><div>^TtApi/GetEdbOrderInfo/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>183.56.163.88</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_key</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_pampers1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py/applications/pampers1/sessions/183.56.163.88-dc33a96c-a782-413e-a02e-aca2227de8d0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>c0762cbf4baf7f9af97c051e7fcb8083</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>183.56.163.88-dc33a96c-a782-413e-a02e-aca2227de8d0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_pampers1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>pampers1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">subtitle</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">title</td><td style="vertical-align:top;">:</td><td><div>Pampers1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>generic.xml</div></td></tr></table></div>'
+tRp170
+sS'locals'
+p171
+(dp172
+S'vars'
+p173
+S"{'app_key': '451dc82935d406c33a1c214e7b1b62e6', 'logisticCompany': 'STO', 'orderId': 'BBS2016032200002', 'status': 'S', 'trackingNo': '220674116766', 'updateTime': '2016-04-06 01:45:21'}"
+p174
+sS'keys'
+p175
+S"['orderId', 'status', 'updateTime', 'logisticCompany', 'trackingNo', 'app_key']"
+p176
+sS'k'
+S"'app_key'"
+p177
+sg24
+S'()'
+p178
+sS'order_info'
+p179
+S"{'logisticCompany': 'STO', 'orderId': 'BBS2016032200002', 'order_status': 'S', 'trackingNo': '220674116766', 'updateTime': '2016-04-06 01:45:21'}"
+p180
+sS'content'
+p181
+g45
+sS'WuLiu_dict'
+p182
+S"{'DBL': '17', 'EMS': '3', 'FAST': '25', 'FEDEX': '16', 'HTKY': '10', 'OTHER': '23', 'POSTB': '20', 'RFD': '18', 'SF': '34', 'STO': '31', ...}"
+p183
+sS'v'
+S"'451dc82935d406c33a1c214e7b1b62e6'"
+p184
+sS'trade_exist'
+p185
+S'<Rows (0)>'
+p186
+sssS'traceback'
+p187
+S'Traceback (most recent call last):\n  File "/home/www-data/web2py/gluon/restricted.py", line 227, in restricted\n    exec ccode in environment\n  File "/home/www-data/web2py/applications/pampers1/controllers/TtApi.py", line 431, in <module>\n  File "/home/www-data/web2py/gluon/globals.py", line 412, in <lambda>\n    self._caller = lambda f: f()\n  File "/home/www-data/web2py/gluon/globals.py", line 378, in f\n    return rest_action(*_self.args, **getattr(_self, \'vars\', {}))\n  File "/home/www-data/web2py/applications/pampers1/controllers/TtApi.py", line 381, in GET\n    content[\'isSuccess\']=true\nNameError: global name \'true\' is not defined\n'
+p188
+s.

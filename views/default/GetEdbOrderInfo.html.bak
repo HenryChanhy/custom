@@ -1,0 +1,3 @@
+{{extend 'layout.html'}}
+<h1>这是 default/GetEdbOrderInfo.html 模板</h1>
+{{=BEAUTIFY(response._vars)}}

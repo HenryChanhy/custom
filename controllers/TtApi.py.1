@@ -1,0 +1,482 @@
+__author__ = 'Administrator'
+from simhash import Simhash,SimhashIndex
+import xml.etree.ElementTree as XML_ET
+import os
+import sys
+import time
+import hashlib
+import chardet
+import requests
+import json
+import openpyxl
+from datetime import datetime
+from time import mktime
+
+def cmp(x,y):
+    x1=x.lower()
+    y1=y.lower()
+    if x1>y1:
+        return 1
+    if x1<y1:
+        return -1
+    return 0
+
+def GetTimeStamp():
+    t=time.localtime()
+    lst=[]
+    for i in xrange(len(t)):
+        if i>=5:
+            break
+        v=str(t[i]).zfill(2)
+        lst.append(v)
+    reStr="".join(lst)
+    return reStr
+
+def log_file(msg):
+    dir=os.getcwd()
+    fileName="err.txt"
+    finalPath=os.path.join(dir,fileName)
+    with open(finalPath,"ab") as f:
+        f.write("[%s] %s\r\n"%(GetTimeStamp(),msg))
+    return finalPath
+
+def MD5Sign(md5Str):
+    m=hashlib.md5()
+    m.update(md5Str)
+    return m.hexdigest().upper()
+
+def TrialAPI(**arg):
+    def _TrialAPI(func):
+        def __TrialAPI(data):
+            SysData={"apiKey":"57Hyjts8HHty",}
+            ExData={"apiSecret":"iO7hbmH8-rbt6Hg_Yg6",}
+            param=func(data)
+            param.update(SysData)
+            param.update(data)
+            url="http://122.193.31.8:8080/TrialCenter/order/Pampers/ST/"+arg["method"]
+            param["timestamp"]=str(int(time.time()))
+            paraList=[]
+            for k,v in param.items():
+                if isinstance(v,str):
+                    paraList.append(k+"="+str(v))
+            paraList.sort(cmp)
+            md5Str="&".join(paraList)
+            md5Str=md5Str+ExData["apiSecret"]
+            param["sig"]=MD5Sign(md5Str)
+            log_file("%s %s"%(md5Str,param["sig"]))
+            jsparam=json.dumps(param)
+            req=requests.post(url,jsparam,verify=False)
+            return json.loads(req.content)
+        return __TrialAPI
+    return _TrialAPI
+
+@TrialAPI(method="updateOrderTrackingInfo")
+def updateOTI(data):
+    return {}
+
+@TrialAPI(method="updateTrialOrderStatus")
+def updateTOS(data):
+    return {}
+
+@request.restful()
+def test_TOS():
+    response.view ='generic.'+request.extension  #return json
+    def GET(*args,**vars):
+        barcode_dict={'62015092412001':'6903148240014','62015092480001':'6903148238905',
+                     '2015092412002':'6903148240021','2015092480002':'6903148238912',
+                     '33320151016001':'6903148238912','33320151016002':'6903148238905'}
+        keys=vars.keys()
+        result={}
+        if ('out_tid' in keys) and ('status' in keys) and ('appKey' in keys):
+            if vars['appKey']=='updateandtos':
+                a_row=db(db.trade.out_tid.like(vars['out_tid'])).select()
+                if a_row:
+                    if a_row[0]['oti_return']==1:
+                        result['is_success']='t'
+                    else:
+                        a_row.first().update_record(status=vars['status'])
+                        data={"order_id":vars['out_tid'],'status':vars['status']}
+                        if vars['status']=='2':
+                            data['message']=vars['msg']
+                        else:
+                            trade_content=a_row.as_list()[0]
+                            if 'province' in trade_content.keys():
+                                trade_content['privince']=trade_content['province']
+                            for k,v in trade_content.items():
+                                if isinstance(v,str):
+                                    trade_content[k]=v.decode('utf8')
+                                if isinstance(v, datetime):
+                                    trade_content[k] = v.isoformat()
+                            if trade_content['barCode'] in barcode_dict.keys():
+                                trade_content['barCode']=barcode_dict[trade_content['barCode']]
+                            trade_content['out_tid']='TC'+trade_content['out_tid']
+                            if a_row.as_list()[0]['edb_return']==None or a_row.as_list()[0]['edb_return']!='True':
+                                edbreturn=AddTrade(trade_content)
+                                try:
+                                    a_row.first().update_record(edb_return=edbreturn['Success']['items']['item'][0]['is_success'])
+                                except:
+                                    a_row.first().update_record(edb_return=edbreturn)
+                                result['edb_return']=edbreturn
+                        if a_row.as_list()[0]['tc_return']==None or a_row.as_list()[0]['tc_return']!='true':
+                            ctreturn=updateTOS(data)
+                            a_row.first().update_record(tc_return=ctreturn['result'])
+                            result['CT_return']=ctreturn
+                        result['is_success']='t'
+                else:
+                    result['is_success']='o'
+            else:
+                result['is_success']='f'
+        else:
+            result['is_success']='f'
+        return result
+    return locals()
+    '''wb=openpyxl.load_workbook('/home/20160121_27源数据60658条.xlsx')
+    wst= wb.get_sheet_by_name(name = 'true')
+    wsw= wb.get_sheet_by_name(name = 'wrong')
+    for i in range(2,wst.max_row+1):
+        outtid=wst.cell(row=i,column=3).value.encode('utf8')
+        data={"order_id":outtid}
+        data["status"]="3"
+        result=updateTOS(data)
+        log_file("%s %s"%(data,result))
+        db(db.trade.out_tid==wst.cell(row=i,column=3).value).select().first().update_record(status=3)
+    for i in range(2,wsw.max_row+1):
+        outtid=wsw.cell(row=i,column=3).value.encode('utf8')
+        data={"order_id":outtid}
+        data["status"]="2"
+        data["message"]=wsw.cell(row=i,column=17).value.encode('utf8')
+        result=updateTOS(data)
+        log_file("%s %s"%(data,result))
+        db(db.trade.out_tid==wsw.cell(row=i,column=3).value).select().first().update_record(status=2)'''
+
+@request.restful()
+def onlyToEDB():
+    response.view ='generic.'+request.extension  #return json
+    def GET(*args,**vars):
+        barcode_dict={'62015092412001':'6903148240014','62015092480001':'6903148238905',
+                     '2015092412002':'6903148240021','2015092480002':'6903148238912',
+                     '33320151016001':'6903148238912','33320151016002':'6903148238905'}
+        keys=vars.keys()
+        result={}
+        if ('out_tid' in keys) and ('status' in keys) and ('appKey' in keys):
+            if vars['appKey']=='updateandtos':
+                a_row=db(db.trade.out_tid.like(vars['out_tid'])).select()
+                if a_row:
+                    a_row.first().update_record(status=vars['status'])
+                    data={"order_id":vars['out_tid'],'status':vars['status']}
+                    if vars['status']=='2':
+                        data['message']=vars['msg']
+                    else:
+                        trade_content=a_row.as_list()[0]
+                        if 'province' in trade_content.keys():
+                            trade_content['privince']=trade_content['province']
+                        for k,v in trade_content.items():
+                            if isinstance(v,str):
+                                trade_content[k]=v.decode('utf8')
+                            if isinstance(v, datetime):
+                                trade_content[k] = v.isoformat()
+                        if trade_content['barCode'] in barcode_dict.keys():
+                            trade_content['barCode']=barcode_dict[trade_content['barCode']]
+                        if a_row.as_list()[0]['edb_return']==None or a_row.as_list()[0]['edb_return']!='True':
+                            edbreturn=AddTrade(trade_content)
+                            try:
+                                a_row.first().update_record(edb_return=edbreturn['Success']['items']['item'][0]['is_success'])
+                            except:
+                                a_row.first().update_record(edb_return=edbreturn)
+                            result['edb_return']=edbreturn
+                    result['is_success']='t'
+                else:
+                    result['is_success']='o'
+            else:
+                result['is_success']='f'
+        else:
+            result['is_success']='f'
+        return result
+    return locals()
+
+#测试用，可删除
+def test_OTI():
+    orderinfo={
+	"order_id": "8444",
+	"tracking_number": "3100901633843",
+	"tracking_company": "17"
+    }
+    result=updateOTI(orderinfo)
+    log_file("%s %s"%(orderinfo,result))
+
+def EdbAPI(**arg):
+    def _EdbAPI(func):
+        def __EdbAPI(data):
+            #url="http://vip79.edb04.net/edb2/rest/openapi/index.aspx"
+            url="http://vip79.edb04.net/rest/index.aspx"
+            SysData={
+                "appkey":"5a7b7896",
+                "dbhost":"edb_a77527",
+                "format":"json",
+                "v":2.0,
+                "slencry":0,
+                "Ip":"117.79.148.228",
+                }
+            ExData={
+                "appscret":"1f5b75edd28d480e968feecbc38f2c73",
+                "token":"7041e7424cb4410f8370f10a2d3a285a",
+                }
+            param=func(data)
+            param.update(SysData)
+            param["method"]=arg["method"]
+            param["timestamp"]=GetTimeStamp()
+            paraList=[]
+            for k,v in param.items():
+                if k=="appkey":
+                    continue
+                if not str(v):
+                    continue
+                paraList.append(k+str(v))
+            for k,v in ExData.items():
+                paraList.append(k+str(v))
+            paraList.sort(cmp)
+            md5Str="".join(paraList)
+            md5Str=SysData["appkey"]+"appkey"+SysData["appkey"]+md5Str
+            param["sign"]=MD5Sign(md5Str)
+            req=requests.post(url,param)
+            if not req.ok:
+                print "requests FAIL"
+                log_file("%s %s"%(arg,data))
+                filePath=log_file(req.content)
+                print "log_file in",filePath
+                return
+            return json.loads(req.content)
+        return __EdbAPI
+    return _EdbAPI
+
+@EdbAPI(method="edbTradeAdd")
+def AddTrade(data):
+    orderTag=('out_tid','shop_id','storage_id','buyer_id','buyer_msg','buyer_email','buyer_alipay','seller_remark','consignee','address','postcode','telephone','mobilPhone','privince','city','area','actual_freight_get','actual_RP','ship_method','express','is_invoiceOpened','invoice_type','invoice_money','invoice_title','invoice_msg','order_type','process_status','pay_status','deliver_status','is_COD','serverCost_COD','order_totalMoney','product_totalMoney','pay_method','pay_commission','pay_score','return_score','favorable_money','alipay_transaction_no','out_payNo','out_express_method','out_order_status','order_date','pay_date','finish_date','plat_type','distributor_no','WuLiu','WuLiu_no','in_memo','other_remark','actual_freight_pay','ship_date_plan','deliver_date_plan','is_scorePay','is_needInvoice')
+    productTag=('barCode','product_title','standard','out_price','favorite_money','orderGoods_Num','gift_Num','cost_Price','tid','product_stockout','is_Book','is_presell','is_Gift','avg_price','product_freight','shop_id','out_tid','out_productId','out_barCode','product_intro')
+    orderXml=XML_ET.fromstring('<info><orderInfo></orderInfo></info>')
+    productXml=XML_ET.fromstring('<product_info><product_item></product_item></product_info>')
+    orderInfo=orderXml.find("orderInfo")
+    itemInfo=productXml.find("product_item")
+    for k,v in data.items():
+        if k in orderTag:
+            tmp=XML_ET.SubElement(orderInfo,k)
+            tmp.text=v
+        if k in productTag:
+            tmp=XML_ET.SubElement(itemInfo,k)
+            tmp.text=v
+    orderInfo.append(productXml)
+    finalStr=XML_ET.tostring(orderXml,"utf8")
+    result={}
+    result["xmlValues"]=finalStr[37:]
+    return result
+
+def test_2edb():
+    wb=openpyxl.load_workbook('/home/trade20160125h_36（100条测试71条合格）.xlsx')
+    wst= wb.get_sheet_by_name(name = 'true71')
+    results=[]
+    for i in range(2,wst.max_row+1):
+        outtid=wst.cell(row=i,column=28).value.encode('utf8')
+        trade_content=db(db.trade.out_tid==wst.cell(row=i,column=28).value).select().first()
+        for k,v in trade_content.items():
+            if isinstance(v,str):
+                trade_content[k]=v.decode('utf8')
+            if isinstance(v, datetime):
+                trade_content[k] = v.isoformat()
+    result=AddTrade(trade_content)
+    return result
+
+
+#{'bar_code':vars['product_info'][0]['barCode']} in AllBarcode
+#@auth.requires_login()
+@request.restful()
+def AddTradeToEdb():
+    response.view ='generic.'+request.extension  #return  json
+    def POST(tablename,**vars):
+        msg=[]
+        jsonObj={}
+        keys=vars.keys()
+        for k in keys:
+            k.decode('unicode_escape')
+        if ('apiKey' in keys)and('product_info' in keys)and\
+        ('timestamp' in keys)and('sig' in keys) and\
+        ('out_tid' in keys)and ('shop_id' in keys)and\
+        ('consignee' in keys)and('address' in keys)and\
+        ('postcode' in keys)and('mobilPhone' in keys)and\
+        ('order_date' in keys)and('storage_id' in keys)and\
+        ('barCode' in vars['product_info'][0].keys())and \
+        ('product_title' in vars['product_info'][0].keys())and \
+        ('standard' in vars['product_info'][0].keys())and\
+        ('out__tid' in vars['product_info'][0].keys()):
+            ts=int(time.time())
+            this_apiKey='A6BEA59B'
+            this_apiSecret='1F6F088755B094DDAD3C7AEFEA73A1A1'
+            essential_field=vars.keys()
+            essential_field.sort()
+            SigStr=""
+            edbdata={}
+            for field in essential_field:
+                if field =="sig" or field =="apiSecret":
+                    continue
+                elif field =="product_info":
+                    SigStr=SigStr+unicode(field)+u"="+u"["
+                    for d in vars["product_info"]:
+                        k=d.keys()
+                        k.sort()
+                        SigStr=SigStr+u"{"
+                        for j in k:
+                            SigStr=SigStr+unicode(j)+u"="+unicode(d[j])+u"&"
+                            edbdata[j]=d[j]
+                        SigStr=SigStr[0:len(SigStr)-1]
+                        SigStr=SigStr+u"}"
+                    SigStr=SigStr+u"]"+u"&"
+                else:
+                    SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
+                    if (field != 'apiKey') and (field !='timestamp'):
+                        edbdata[field]=vars[field]
+            edbdata['address']=edbdata['address'].replace('\r','')
+            edbdata['address']=edbdata['address'].replace(',','-')
+            if ('province' in keys):
+                edbdata['province']=edbdata['province'].replace('\r','')
+                edbdata['province']=edbdata['province'].replace(',','-')
+            if ('city' in keys):
+                edbdata['city']=edbdata['city'].replace('\r','')
+                edbdata['city']=edbdata['city'].replace(',','-')
+            if ('area' in keys):
+                edbdata['area']=edbdata['area'].replace('\r','')
+                edbdata['area']=edbdata['area'].replace(',','-')
+            if ('consignee' in keys):
+                edbdata['consignee']=edbdata['consignee'].replace('\r','')
+                edbdata['consignee']=edbdata['consignee'].replace(',','-')
+            if ('plat_type' in keys):
+                if edbdata['plat_type']==None :
+                    edbdata['plat_type']='TrialCenter'
+            this_sig=MD5Sign((SigStr[0:len(SigStr)-1]+this_apiSecret).encode('utf8'))
+            #AllBarcode=db().select(db.AllBarcode.bar_code).as_list()
+            if (vars['sig']==this_sig) and (ts-int(vars['timestamp'])<180) and \
+            ((vars['apiKey']).decode('unicode_escape')==(this_apiKey)):
+                #getorderid=db.trade.update_or_insert(db.trade.out_tid==edbdata['out_tid'],**edbdata)
+                if db(db.trade.out_tid==edbdata['out_tid']).select():
+                    msg.append({'is_success':'true','response_Msg':'duplicate trade'})
+                else:
+                    tcpid=db.trade.insert(**edbdata)
+                    if tcpid:
+                        msg.append({'is_success':'true','response_Msg':'import to TaoTongGroup successfully'})
+                    else:
+                        msg.append({'is_success':'false','response_Msg':'unexpected data'})
+            else:
+                msg.append({'is_success':'false','response_Msg':'wrong verification'})
+        else:
+            msg.append({'is_success':'false','response_Msg':'absence of essential field'})
+        jsonObj['item']=msg
+        return jsonObj
+    return locals()
+
+#@auth.requires_login()
+@request.restful()
+def GetEdbOrderInfo():
+    WuLiu_dict={}
+    response.view ='generic.'+request.extension
+    def GET(*args,**vars):
+        keys=vars.keys()
+        content={}
+        if ('orderId' in keys)and('status' in keys) and\
+('logisticCompany' in keys)and('trackingNo' in keys) and\
+('updateTime' in keys)and('app_key' in keys):
+            WuLiu_dict={
+'EMS':'1','HTKY':'10','ZJS':'11','STO':'12','ZDY':'13','ZDY':'14','YUNDA':'15',
+'FEDEX':'16','DBL':'17','RFD':'18','ZT':'19','STO':'2','POSTB':'20','SF':'6',
+'STO':'21','OTHER':'22','OTHER':'23','UC':'24','FAST':'25','STO':'26','SF':'7',
+'TTKDEX':'27','SF':'28','SF':'29','EMS':'3','ZTO':'30','STO':'31','YUNDA':'32',
+'SF':'33','SF':'34','YUNDA':'35','YTO':'36','TTKDEX':'37','YTO':'4','TTKDEX':'5',
+'YUNDA':'8','ZTO':'9'}
+            order_info={}
+            for k,v in vars.items():
+                if k=='app_key':
+                    continue
+                elif k=='status':
+                    order_info['order_status']=v
+                elif k=='orderId':
+                    order_info['orderId']=v.replace('TC','')
+                else:
+                    order_info[k]=v
+            db.WuLiuInfo.update_or_insert(db.WuLiuInfo.orderId==order_info['orderId'],**order_info)
+            trade_exist=db(db.trade.out_tid.like(order_info['orderId'])).select()
+            if not order_info['orderId'].startswith('TT'):
+                if trade_exist:
+                    WuLiu_info={"order_id": order_info['orderId'],
+	                "tracking_number":order_info['trackingNo']}
+                    if order_info['logisticCompany'] in WuLiu_dict.keys():
+                        WuLiu_info["tracking_company"]=str(WuLiu_dict[order_info['logisticCompany']])
+                        result=updateOTI(WuLiu_info)
+                        if result['result']=='true':
+                            content['isSuccess']=True
+                            content['errorCode']=1
+                            content['errorMsg']='处理成功'
+                        else:
+                            if result['error']=='1032':
+                                content['isSuccess']=True
+                                content['errorCode']=1
+                                content['errorMsg']='处理成功'
+                            else:
+                                content['isSuccess']=False
+                                content['errorCode']=2
+                                content['errorMsg']='订单不存在'
+                    else:
+                        content['isSuccess']=False
+                        content['errorCode']=5
+                        content['errorMsg']='物流公司不存在'
+                    trade_exist.first().update_record(oti_return=content['errorCode'])
+                else:
+                    content['isSuccess']=True
+                    content['errorCode']=1
+                    content['errorMsg']='物流信息已保存'
+            else:
+                content['isSuccess']=True
+                content['errorCode']=1
+                content['errorMsg']='物流信息已保存'
+        else:
+            content['isSuccess']=False
+            content['errorCode']=9
+            content['wrong_reason']='订单号格式错误'
+        return content
+    return locals()
+
+#@auth.requires_login()
+#@request.restful()
+def TradeGet():
+    response.view ='generic.'+request.extension  #return  json
+    def GET(*args,**vars):
+        patterns=[
+            "/products[db_map]",
+            "/productid/{db_map.id}",
+            "/product_exid/{db_map.field_order}",
+            "/product/{custom_order.user_name.startswith}",
+            "/product/{custom_order.user_name}/:field",
+            "/trades[trade]",
+            "/tradeTid/{trade.tid}",
+            "/tradeOut/{trade.out_tid}"
+        ]
+        #patterns = 'auto'
+        parser = db.parse_as_rest(patterns,args,vars)
+        if parser.status == 200:
+            return dict(content=parser.response)
+        else:
+            raise HTTP(parser.status,parser.error)
+    return locals()
+
+#@request.restful()
+def TradeUpdate():
+    response.view ='generic.'+request.extension  #return  json
+    def PUT(table_name,record_id,**vars):
+        return db(db[table_name].order_id==record_id).update(**vars)
+    return locals()
+
+#@request.restful()
+def TradeDelete():
+    response.view ='generic.'+request.extension  #return  json
+    def DELETE(table_name,record_id):
+        return db(db[table_name].order_id==record_id).delete()
+    return locals()
+
+if __name__=="__main__":
+    test_TOS()

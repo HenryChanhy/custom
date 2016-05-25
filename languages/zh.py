@@ -1,4 +1,4 @@
-# coding: utf8
+# -*- coding: utf-8 -*-
 {
 '!langcode!': 'zh-tw',
 '!langname!': '中文',
@@ -88,6 +88,7 @@
 'Editing file': '編輯檔案',
 'Editing file "%s"': '編輯檔案"%s"',
 'Email and SMS': 'Email and SMS',
+'Enter an integer between %(min)g and %(max)g': 'Enter an integer between %(min)g and %(max)g',
 'Error logs for "%(app)s"': '"%(app)s"的錯誤紀錄',
 'Errors': 'Errors',
 'export as csv file': '以逗號分隔檔(csv)格式匯出',

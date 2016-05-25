@@ -16,7 +16,7 @@ myconf = AppConfig(reload=True)
 
 if not request.env.web2py_runtime_gae:
     ## if NOT running on Google App Engine use SQLite or other DB
-    db = DAL(myconf.take('db.uri'), pool_size=myconf.take('db.pool_size', cast=int), check_reserved=['all'])
+    db = DAL(myconf.take('db.uri'), pool_size=myconf.take('db.pool_size', cast=int), check_reserved=['all'],migrate=True,fake_migrate=True)
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
     db = DAL('google:datastore+ndb')
@@ -29,7 +29,7 @@ else:
 
 ## by default give a view/generic.extension to all actions from localhost
 ## none otherwise. a pattern can be 'controller/function.extension'
-response.generic_patterns = ['*'] if request.is_local else []
+response.generic_patterns = ['*.xml','*.json'] #if request.is_local else []
 ## choose a style for forms
 response.formstyle = myconf.take('forms.formstyle')  # or 'bootstrap3_stacked' or 'bootstrap2' or other
 response.form_label_separator = myconf.take('forms.separator')
@@ -85,28 +85,6 @@ auth.settings.reset_password_requires_verification = True
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
-db.define_table('history_order',
-                Field('order_id', unique=True,length=20),
-                Field('ex_id',length=20),
-                Field('promo_id',length=20),
-                Field('barcode',length=20),
-                Field('user_name',length=40),
-                Field('mobile',length=13),
-                Field('province',length=40),
-                Field('city',length=40),
-                Field('county',length=40),
-                Field('address',length=80),
-                Field('order_date',length=13),
-                Field('product_name',length=20),
-                Field('data_date',length=20),
-                Field('channel',length=13),
-                Field('stage',length=20),
-                Field('city_class1',length=20),
-                Field('city_class2',length=20),
-                Field('memo1',length=20),
-                Field('memo2',length=20),
-                Field('address_bak',length=20)
-                )
 db.define_table('history',
                 Field('order_id', unique=True,length=20),
                 Field('ex_id',length=20),
@@ -128,6 +106,35 @@ db.define_table('history',
                 Field('memo1',length=20),
                 Field('memo2',length=20),
                 Field('address_bak',length=20)
+                )
+
+db.define_table('history_order',
+                Field('mobilPhone',length=20,unique=True),
+                Field('out_tid',length=20),
+                Field('province',length=20),
+                Field('city',length=20),
+                Field('area',length=20),
+                Field('address',length=100,notnull=True),
+                Field('shop_id',length=20),
+                Field('storage_id',length=20),
+                Field('consignee',length=20),
+                Field('postcode',length=20),
+                Field('city_level',length=20),
+                Field('product_channel',length=20),
+                Field('express',length=20),
+                Field('order_type',length=20),
+                Field('process_status',length=20),
+                Field('pay_status',length=20),
+                Field('deliver_status',length=20),
+                Field('order_date',type='datetime'),
+                Field('data_date',length=20),
+                Field('plat_type',length=20),
+                Field('barCode',length=20),
+                Field('product_title',length=20),
+                Field('standard',length=20),
+                Field('backupinfo',length=20),
+                Field('examine_status',length=20),
+                Field('addr_hash')
                 )
 #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 db.define_table('db_map',
@@ -291,12 +298,14 @@ db.define_table('trade',
                 Field('buyer_alipay',length=20),
                 Field('seller_remark',length=20),
                 Field('consignee',length=20),
-                Field('address',length=20),
+                Field('address',length=100),
+                Field('addrbkp',length=100),
                 Field('postcode',length=20),
                 Field('telephone',length=20),
                 Field('mobilPhone',length=20),
                 Field('province',length=20),
                 Field('city',length=20),
+                Field('city_class',length=10),
                 Field('area',length=20),
                 Field('actual_freight_get',length=20),
                 Field('actual_RP',length=20),
@@ -324,7 +333,7 @@ db.define_table('trade',
                 Field('out_payNo',length=20),
                 Field('out_express_method',length=20),
                 Field('out_order_status',length=20),
-                Field('order_date',length=20),
+                Field('order_date',type='datetime'),
                 Field('pay_date',length=20),
                 Field('finish_date',length=20),
                 Field('plat_type',length=20),
@@ -357,8 +366,14 @@ db.define_table('trade',
                 Field('out__tid',length=20),
                 Field('out_productId',length=20),
                 Field('out_barCode',length=20),
-                Field('product_intro',length=20)
+                Field('product_intro',length=20),
+                Field('status',length=20),
+                Field('tc_return',length=20),
+                Field('edb_return'),
+                Field('oti_return'),
+                Field('wrong_reason',length=20)
                 )
+
 db.define_table('AllBarcode',
                 Field('product_num',length=20),
                 Field('product_id',length=20),
@@ -368,6 +383,14 @@ db.define_table('AllBarcode',
                 Field('brand',length=20),
                 Field('product_classify',length=20),
                 )
+db.define_table('WuLiuInfo',
+                Field('orderId',length=20),
+                Field('order_status',length=20),
+                Field('logisticCompany',length=20),
+                Field('trackingNo',length=20),
+                Field('updateTime',type='datetime')
+                )
+
 ################### P&G ############################################
 db.define_table('original_data',
                 Field('SB_Internal_Member_ID',length=20),

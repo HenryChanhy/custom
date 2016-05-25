@@ -1,0 +1,8 @@
+{{
+try:
+    from gluon.serializers import Xml_Response
+    response.write(Xml_Response(response._vars),escape=False)
+    response.headers['Content-Type']='text/xml'
+except:
+    raise HTTP(405,'no xml')
+}}
