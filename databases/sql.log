@@ -3484,3 +3484,115 @@ faked!
 timestamp: 2016-04-28T16:23:50.508000
 ALTER TABLE trade DROP COLUMN sim_trade;
 faked!
+timestamp: 2016-05-04T13:09:28.540000
+ALTER TABLE history_order ADD consignee CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.542000
+ALTER TABLE history_order ADD shop_id CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.543000
+ALTER TABLE history_order ADD postcode CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.546000
+ALTER TABLE history_order ADD order_type CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.548000
+ALTER TABLE history_order ADD product_channel CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.549000
+ALTER TABLE history_order ADD area CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.551000
+ALTER TABLE history_order ADD storage_id CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.552000
+ALTER TABLE history_order ADD pay_status CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.556000
+ALTER TABLE history_order ADD out_tid CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.557000
+ALTER TABLE history_order ADD express CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.558000
+ALTER TABLE history_order ADD standard CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.560000
+ALTER TABLE history_order ADD deliver_status CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.562000
+ALTER TABLE history_order ADD city_level CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.565000
+ALTER TABLE history_order ADD product_title CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.567000
+ALTER TABLE history_order ADD backupinfo CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.569000
+ALTER TABLE history_order ADD addr_hash CHAR(512);
+faked!
+timestamp: 2016-05-04T13:09:28.570000
+ALTER TABLE history_order ADD examine_status CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.572000
+ALTER TABLE history_order ADD mobilphone CHAR(20) UNIQUE;
+faked!
+timestamp: 2016-05-04T13:09:28.573000
+ALTER TABLE history_order ADD process_status CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.575000
+ALTER TABLE history_order ADD plat_type CHAR(20);
+faked!
+success!
+timestamp: 2016-05-04T13:09:28.613000
+ALTER TABLE db_map ADD votes INTEGER;
+faked!
+success!
+timestamp: 2016-05-04T13:09:28.696000
+ALTER TABLE trade ADD status CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.698000
+ALTER TABLE trade ADD wrong_reason CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.721000
+ALTER TABLE trade ADD tc_return CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.724000
+ALTER TABLE trade ADD oti_return CHAR(512);
+faked!
+timestamp: 2016-05-04T13:09:28.779000
+ALTER TABLE trade ADD city_class CHAR(10);
+faked!
+timestamp: 2016-05-04T13:09:28.813000
+ALTER TABLE trade ADD edb_return CHAR(512);
+faked!
+success!
+success!
+timestamp: 2016-05-04T13:09:28.900000
+ALTER TABLE user_info ADD log_status CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.902000
+ALTER TABLE user_info ADD passwd CHAR(20);
+faked!
+timestamp: 2016-05-04T13:09:28.904000
+ALTER TABLE user_info ADD mobilphone CHAR(20);
+faked!
+success!
+success!
+success!
+success!
+success!
+timestamp: 2016-05-05T10:26:42.689000
+ALTER TABLE trade ADD wrong_reason VARCHAR(20);
+faked!
+timestamp: 2016-05-05T10:26:42.821000
+ALTER TABLE trade DROP COLUMN sim_trade;
+faked!
+timestamp: 2016-06-02T09:56:05.533000
+ALTER TABLE trade ADD addrbkp VARCHAR(100);
+faked!
+timestamp: 2016-06-02T09:56:05.683000
+ALTER TABLE trade ADD simid LONGTEXT;
+faked!
+success!

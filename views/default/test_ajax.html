@@ -3,7 +3,7 @@
 <form>
 <input name="qaq" onkeyup="ajax('echo', ['qaq'], 'target')" />
 </form>
-<div id="target" style="font-size: large;color:red;"></div>-->
+<div id="target" style="font-size: large;color:red;"></div>
 
 <div id="target"></div>
 
@@ -14,8 +14,28 @@
 
 <script>
 jQuery('#myform').submit(function() {
-ajax('{{=URL('echo')}}',
-['your_message'], 'target');
-return false;
-});
-</script>
+ajax('#=URL('echo')}}',
+#['your_message'], 'target');
+#return false;
+#});
+<input name="name" onkeyup="ajax('echo', ['name'], ':eval')" />
+#</script>-->
+<span class="flash" style="background-color: #122b40;color: #66afe9;font-weight:bold;font-size: large">{{=BEAUTIFY(response.flash) or ''}}</span>
+
+{{for i in range(1,5):}}
+<form onclick="ajax('echo', ['name{{=i}}'], ':eval');">
+  <select name="name{{=i}}">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="opel">Opel</option>
+    <option value="audi">Audi</option>
+  </select>
+</form>
+<div id="name{{=i}}">
+    trt
+</div>
+{{pass}}
+
+
+
+
