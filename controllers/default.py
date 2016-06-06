@@ -15,10 +15,20 @@ from snownlp import SnowNLP
 import time
 import hashlib
 import openpyxl
-
+import datetime
+import redis
+auth.settings.registration_requires_approval = False
+auth.settings.registration_requires_verification = True
 auth.settings.allow_basic_login = True
 auth.define_tables(username=True)
+auth.settings.login_next = URL('test_display_form/db')
 
+rds=redis.StrictRedis()
+today=datetime.date.today().strftime("%d")
+yesterday=(datetime.date.today() + datetime.timedelta(days=-1)).strftime("%d")
+auth.settings.allow_basic_login = True
+auth.define_tables(username=True)
+pat_dat=re.compile("[0-9]+")
 provinces=(u'北京',u'天津',u'河北',u'山西',u'内蒙古',u'辽宁',u'吉林',u'黑龙江',u'上海',u'江苏',
            u'浙江',u'安徽',u'福建',u'江西',u'山东',u'河南',u'湖北',u'湖南',u'广东',u'广西',
            u'海南',u'重庆',u'四川',u'贵州',u'云南',u'西藏',u'陕西',u'甘肃',u'青海',u'宁夏',
@@ -60,8 +70,6 @@ def import_csv(csvfile):
 def get_feature(s):
     return [s[i:i+1] for i in range(max(len(s)-1+1,1))]
 
-
-
 def GetTimeStamp():
     t=time.localtime()
     lst=[]
@@ -72,6 +80,7 @@ def GetTimeStamp():
         lst.append(v)
     reStr="".join(lst)
     return reStr
+
 def log_file(user,msg):
     dir=os.getcwd()
     fileName="log_access.txt"
@@ -106,12 +115,12 @@ def search_by_phone():
             log_state=0,
             can_log=1
         )
+
 def search_trade():
     mobil=request.vars.input_mobil
     current_user=request.vars.user
     search_result = db(db.trade.mobilPhone.like(mobil)).select(db.trade.out_tid,db.trade.wrong_reason,db.trade.address,db.trade.status,db.trade.shop_id)
     log_file(current_user,mobil)
-
     if search_result:
         result=search_result.first()
         shopid=result['shop_id']
@@ -136,10 +145,28 @@ def search_trade():
     else:
         return "此号码不存在"
 
+def test_table():
+    response.flash = "wang,wang,wang"
+    return 'hello,hello,hello'
+
+def EditTable():
+    return dict()
+
 def test_ajax():
     return dict()
 def echo():
-    return request.vars.your_mes
+    name_dict=dict(request.vars)
+    name_key=name_dict.keys()[0]
+    name_val=name_dict.values()[0]
+    response.flash = "wang,wang,wang"
+    #return request.vars.your_mes
+    #return request.vars.name
+    #return "jQuery('#target').html(%s);" % repr(name_val)
+    #return "jQuery('#{{=targetid}}').html(%s);" % repr(request.vars.name1)
+    #response.flash = 'please fill out the form'
+    #return
+    return "jQuery('#%s').css('color','red');"%(name_key)
+
 def main():
     return log_file("wang","18794757802")
 
@@ -168,15 +195,7 @@ def csv():
     % ('trade',request.vars.begin_line,request.vars.end_line)
     return str(db(query, ignore_common_filters=True).select(limitby=(int(request.vars.begin_line),int(request.vars.end_line))))
 #############################################################
-# ###########################################################
-# ## insert a new record
-# ###########################################################
-def insert():
-    (db, table) = get_table(request)
-    form = SQLFORM(db[table],ignore_rw=ignore_rw)
-    if form.accepts(request.vars, session):
-        response.flash = T('new record inserted')
-    return dict(form=form, table=db[table])
+
 import copy,datetime
 global_env = copy.copy(globals())
 global_env['datetime'] = datetime
@@ -192,137 +211,122 @@ def himin_distance(i1,i2):
         x &= x - 1
     return ans
 
+@auth.requires_login()
 def test_display_form():
-    import re
-    import gluon.contenttype
     db = eval_in_global_env(request.args[0])
     dbname = request.args[0]
     try:
         is_imap = db._uri.startswith("imap://")
     except (KeyError, AttributeError, TypeError):
         is_imap = False
-    totaltradenum=db(db.trade.id>0).count()
-
     step = 100
-    fields = []
     if is_imap:
         step = 3
-    locateform = FORM(TABLE(TR(
-    TD(INPUT(_name='locate', _value=request.vars.locate,_style='height:26px;width:45px;')),
-    TD(INPUT(_type='submit', _value=T('Locate'),_style='height:26px;width:60px;text-align:center;color:blue;')))),
-    _action=URL(r=request,args=request.args))
+    table = "trade"
+    if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
+        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
+    else:
+        qry = 'db.trade.id>0'
+    nrows = db((db.trade.order_date>yesterday) & (db.trade.status!='2')).count()
     start=0
     if request.vars.start:
         start = int(request.vars.start)
     elif request.vars.locate:
-        if 0< int(request.vars.locate) < totaltradenum/step:
+        if 0< int(request.vars.locate) < nrows/step:
             start = (int(request.vars.locate)-1)*step
         else:
             response.flash = T("out of range")
     else:
         start = 0
-    stop = start + step
-    table = "trade"
-    orderby = request.vars.orderby
-    if orderby:
-        orderby = dbname + '.' + orderby
-        if orderby == session.last_orderby:
-            if orderby[0] == '~':
-                orderby = orderby[1:]
-            else:
-                orderby = '~' + orderby
-    session.last_orderby = orderby
-    #session.last_query = request.vars.query
-    if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
-        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
+    if start<nrows-step:
+        stop = start + step
     else:
-        qry = 'db.trade.id>0'
-
-    nrows = 0
-    rows = []
+        stop=nrows
+    t=yesterday
+    rows=db((db.trade.order_date.day()==yesterday) & (db.trade.status!='2')& (db.trade.status!='3')).select(limitby=(start,stop),orderby=db.trade.out_tid)
     query = eval_in_global_env(qry)
     #nrows = db(query, ignore_common_filters=True).count()
     #rows = db(query, ignore_common_filters=True).select(limitby=(start,stop))
     tb=None
-    patt_feature=re.compile("[\w+|\(+|\)+|一+|二+|三+|四+|五+|六+|七+|八+|九+|十+|零+]+".decode('utf8'))
-    patt_keywd=re.compile("[号|楼|单元|路|栋|区|室|园|组|大道|村|幢|城|公司|对面|座|弄|店|期|大|巷|场|旁|公寓|省|市|医院|广场|中心|大厦|门|口|院|镇|苑|层|街|景|居|宿舍|房|部|科|都|学|厂|上|银行|方|后|家属|面|下|户|收|处|内|向|队|馆|校|斜|社|所|商|站|局|行|庭|段|团]+".decode('utf8'))
+
     simaddr=[]
-    nrows=100
-    rows=db(db.history_order.id>0).select(limitby=(2000,2100))
     for r in rows:
-        raddr=r['backupinfo'].decode('utf8')
-        rprov=r['province']
-        rcity=r['city']
-        rarea=r['area']
         sim_buf=[]
-        addr_feature=re.findall(patt_feature,raddr)
-        nwords=len(addr_feature)
-
-        if nwords==2:
-            sim_buf=db(db.history_order.backupinfo.contains(addr_feature[0].encode('utf8'))&
-                      db.history_order.backupinfo.contains(addr_feature[1].encode('utf8'))&
-                      db.history_order.province.contains(rprov)&
-                      db.history_order.city.contains(rcity)&
-                      db.history_order.area.contains(rarea)).select(db.history_order.address,db.history_order.id)
-        elif nwords==3:
-            sim_buf=db(db.history_order.backupinfo.contains(addr_feature[0].encode('utf8'))&
-                      db.history_order.backupinfo.contains(addr_feature[1].encode('utf8'))&
-                      db.history_order.backupinfo.contains(addr_feature[2].encode('utf8'))&
-                      db.history_order.province.contains(rprov)&
-                      db.history_order.city.contains(rcity)&
-                      db.history_order.area.contains(rarea)).select(db.history_order.address,db.history_order.id)
-        else:
-            bare_addr=re.sub(patt_feature,'',raddr)
-            keywd=re.split(patt_keywd,bare_addr)
-            sp='%'
-            for i in keywd:
-                if i:
-                    sp=sp+i.encode('utf8')+'%'
-            sim_buf=db(db.history_order.backupinfo.like(sp)&
-                      db.history_order.province.contains(rprov)&
-                      db.history_order.city.contains(rcity)&
-                      db.history_order.area.contains(rarea)).select(db.history_order.address,db.history_order.id)
-            if len(sim_buf)>5 :
-                sim_buf2=[]
-                if nwords!=0:
-                    for s in sim_buf:
-                        if addr_feature[0] in s['address'].decode('utf8'):
-                            sim_buf2.append(s)
-                sim_buf=sim_buf2
+        if r['simid']:
+            otids=r['simid'].split('&')
+            for i in otids:
+                ar=db(db.history_order.id==i).select(db.history_order.id,
+                    db.history_order.consignee,db.history_order.address).first()
+                sim_buf.append(ar)
         simaddr.append(sim_buf)
+        rds.sadd('every_otid',r['out_tid'])
 
-    # begin handle upload csv
-    csv_export_file=None
-    if (request.vars.begin_line) and (request.vars.end_line):
-        #import gluon.contenttype
-        #response.headers['Content-Type'] = gluon.contenttype.contenttype('.csv')
-        #import cStringIO
-        #stream=cStringIO.StringIO()
-        #db(query,ignore_common_filters=True).select(limitby=(int(request.vars.begin_line),int(request.vars.end_line))).export_to_csv_file(stream)
-        #response.headers['Content-disposition'] = 'filename=ex%s%s.csv' %(request.vars.begin_line,request.vars.end_line)
-        #response.write(stream.getvalue())
-        import cStringIO
-        import csv
-        csv_export_file = cStringIO.StringIO()
-        csv_file = csv.writer(csv_export_file)
-        rs=db(query,ignore_common_filters=True).select(limitby=(int(request.vars.begin_line),int(request.vars.end_line)))
-        for r in rs.as_list():
-            csv_file.writerow(r.values())
-        response.files.append(csv_export_file)
+    sim_index=[]
+
+    for i in range(0,stop-start):
+        if simaddr[i]:
+            sim_index.append(i)
+
+    locateform = FORM(TABLE(TR(
+    TD(INPUT(_name='locate', _value=request.vars.locate,_style='width:45px;')),
+    TD(INPUT(_type='submit', _value=T('Locate'),_style='width:60px;text-align:center;color:blue;')))),
+    _action=URL(r=request,args=request.args),_style="padding:0;margin:0;" )
 
     return dict(
-        csv_fi=response.files,
         locateform=locateform,
         table=table,
         start=start,
-        stop=stop,
         step=step,
         nrows=nrows,
         rows=rows,
         simaddr=simaddr,
+        sim_index=sim_index,
         query=request.vars.query,
+        current_user='%(first_name)s' %(auth.user),
         tb=tb
     )
+
+def update_state():
+    name_dict=dict(request.vars)
+    name_key=name_dict.keys()[0]
+    name_val=name_dict.values()[0]
+    if rds.sismember('every_otid',name_key):
+        rds.srem('every_otid',name_key)
+    if name_val=='TG':
+        r=db(db.trade.out_tid==name_key).update(status='3')
+        if r:
+            response.flash = "trade has been updated"
+        else:
+            response.flash = "failed to update the trade"
+        return "jQuery('#%s').css('color','#00ff00');"%(name_key)
+    else:
+        r=db(db.trade.out_tid==name_key).update(**dict(status='2',wrong_reason=name_val))
+        if r:
+            response.flash = "trade has been updated"
+        else:
+            response.flash = "failed to update the trade"
+        response.flash = "trade has been updated"
+        return "jQuery('#%s').css('color','#ff00ff');"%(name_key)
+
+def update_all_rest():
+    t=len(rds.smembers('every_otid'))
+    if t==97:
+        response.flash = "All of updated"
+    else:
+        response.flash = str(t)
+    return ''
+
+def EditTableAjax():
+    name_dict=dict(request.vars)
+    namekey=name_dict.keys()[0]
+    name_key=pat_dat.findall(namekey)[0]
+    name_val=name_dict.values()[0]
+    r=db(db.trade.out_tid==name_key).update(address=name_val)
+    if r:
+        response.flash = "address have been updated"
+    else:
+        response.flash = "no updated"
+    return ''
 
 def echo_rownum():
     trade_items=db(db.trade.mobilPhone.like(request.vars.id)).select().as_list()[0]
@@ -344,7 +348,6 @@ def month_selector():
     _onmouseover="this.style.backgroundColor='yellow'",
     _onmouseout="this.style.backgroundColor='white'"
     ) for k in selected])
-
 
 def add_db():
     rows=db(db.history_order.id>0).select()
@@ -1280,7 +1283,7 @@ def TradeDelete():
     response.view ='generic.'+request.extension  #return  json
     def DELETE(table_name,record_id):
         return db(db[table_name].order_id==record_id).delete()
-    return local
+    return locals()
 
 if __name__=='__main__':
     main()

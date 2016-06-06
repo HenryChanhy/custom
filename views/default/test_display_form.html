@@ -1,3 +1,4 @@
+{{include 'web2py_ajax.html'}}
 
   {{if tb:}}
   <h3>{{=T('Traceback')}}</h3>
@@ -5,111 +6,140 @@
     {{=tb}}
   </pre>
   {{pass}}
-
-  <table border="1" style="height:28px">
-   <tr style="height:27px;">
-    <td>{{=T("%s selected", nrows)}}</td>
-    <td>&#8195;</td>
+<form><input type="hidden" name="update_rest"  /></form>
+  <table border="1" rules="cols" cellspacing="0" style="border-width:thin;width: 100%">
+   <tr style="background-color: #122b40;">
+    <td style="color: #66afe9;">{{=T("%s selected", nrows)}}</td>
     <td>
-    {{=A('\xe9\xa6\x96\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=0)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    {{=A('\xe9\xa6\x96\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=0)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
     </td>
     <td>
-    {{if start>0:}}
-    {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=start-step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    {{if start>=step:}}
+    {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=start-step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
     {{else:}}
-    {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href="#0",_style='height:25px;width:95px;text-decoration:none;color:888888;')}}
+    {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href="#0",_style='height:25px;width:95px;text-decoration:none;color: #66afe9;')}}
     {{pass}}
     </td>
     <td>
-    {{if stop<nrows:}}
-    {{=A('\xe4\xb8\x8b\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=start+step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    {{if start<=nrows-step:}}
+    {{=A('\xe4\xb8\x8b\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=start+step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
     {{else:}}
     {{=A('\xe4\xb8\x8b\xe9\xa1\xb5',_href="#0",_style='height:25px;width:95px;text-decoration:none;color:888888;')}}
     {{pass}}
     </td>
     <td>
-    {{=A('\xe5\xb0\xbe\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=nrows-(nrows%step))),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    {{=A('\xe5\xb0\xbe\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=nrows-(nrows%step))),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
     </td>
+    <td> <button style="border: none;background: none;color: #66afe9;" onclick="HiddenToolbar(this);">Show tool</button></td>
+    <td> <button style="border: none;background: none;color: #66afe9;" onclick="HiddenDetail(this);">Show detail</button></td>
     <td>
-    {{=A(str(T('New Record')),_href=URL('insert',args=[request.args[0],table]),_class="btn btn-default",_style='height:25px;width:70px;color:blue;')}}
+        <button  onclick="ajax('{{=URL('update_all_rest')}}', ['update_rest'], ':eval')" style="border: none;background: none;color: #66afe9;">
+        {{="\xe5\x89\xa9\xe4\xbd\x99\xe5\x85\xa8\xe9\x80\x9a\xe8\xbf\x87"}}
+        </button>
     </td>
-    <td> <button onclick="HiddenToolbar(this);">{{='\xe6\x98\xbe\xe7\xa4\xba\xe5\xb7\xa5\xe5\x85\xb7\xe6\xa0\x8f'}}</button></td>
-    <td> <button onclick="HiddenDetail(this);">{{='\xe6\x98\xbe\xe7\xa4\xba\xe5\xb7\xa5\xe5\x85\xb7\xe6\xa0\x8f'}}</button></td>
+    <td style="font-family:Book Antiqua;color: #66afe9;">hello! {{=current_user}}</td>
+     <td>
+    {{=A('\xe9\x80\x80\xe5\x87\xba',_href=URL('user',args='logout',vars=dict(_next='login')),_style='color: #66afe9;')}}
+  </td>
    </tr>
   </table>
 
-
      {{if rows:}}
-      <table id="table1" border="1" rules="cols">
+      <table id="table1" cellpadding="0" cellspacing="0" class="scroll" border="1" rules="cols" >
         <thead id="thead1" style="display:block;">
           <tr id="trade_head">
             <th id="consignee" align="left">{{='\xe6\x94\xb6\xe8\xb4\xa7\xe4\xba\xba'}}</th>
             <th id="mobilPhone" align="left">{{='\xe6\x89\x8b\xe6\x9c\xba\xe5\x8f\xb7'}}</th>
             <th id="order_date" align="left">{{='\xe8\xae\xa2\xe5\x8d\x95\xe6\x97\xa5\xe6\x9c\x9f'}}</th>
-            <th id="out_tid" align="left">{{='\xe5\x8d\x95\xe5\x8f\xb7'}}</th>
+            <th id="shop_id" align="left">{{='\xe6\xb8\xa0\xe9\x81\x93'}}</th>
             <th id="status" align="left" >{{='\xe7\x8a\xb6\xe6\x80\x81'}}</th>
             <th id="product_title" align="left">{{='\xe4\xba\xa7\xe5\x93\x81\xe5\x90\x8d'}}</th>
+            <th id="out_tid" align="left">{{='\xe5\x8d\x95\xe5\x8f\xb7'}}</th>
             <th id="address" align="left">{{='\xe5\x9c\xb0\xe5\x9d\x80'}}</th>
+            <th id="update" align="left">{{='\xe6\x9b\xb4\xe6\x96\xb0'}}</th>
           </tr>
         </thead>
         <tbody id="tbody1">
           {{for i,row in enumerate(rows.as_list()):}}
-            <tr onclick="SetPointedColor(this);">
-              <td class="consignee"><div>{{=row['consignee']}}</div></td>
-              <td class="mobilPhone"><div>{{=row['mobilPhone']}} &#8194;</div></td>
-              <td class="order_date"><div>{{=row['order_date']}} &#8194;</div></td>
-              <td class="out_tid"><div>{{=row['out_tid']}} &#8194;</div></td>
+            <tr id="tbr{{=i}}" {{if row['status']=='7':}}style="color:#ff2121" {{elif row['status']=='4':}}style="color: #0000ff;" {{elif row['status']=='9':}} style="color:#801DAE" {{elif row['status']=='8':}} style="color:#00BC12"{{else:pass}}
+                onclick="SetPointedColor(this);">
 
-              <td class="product_title"><div>{{=row['product_title'][row['product_title'].find('\xe6\x9f\x94')+3:]}} &#8194;</div></td>
-              <td class="address"><div>{{=row['address']}}</div></td>
+              <td class="consignee">{{=row['consignee']}}&#8194;</td>
+              <td class="mobilPhone">{{=row['mobilPhone']}} &#8194;</td>
+              <td class="order_date">{{=row['order_date']}} &#8194;</td>
+              <td class="shop_id">{{=row['shop_id']}} &#8194;</td>
+              <td class="status">{{=row['status']}} &#8194;</td>
+              <td class="product_title">{{=row['product_title'].decode('utf8')[len(row['product_title'].decode('utf8'))-10:].encode('utf8')}}</td>
+              <td id="{{=row['out_tid']}}" class="out_tid">{{=row['out_tid']}}&#8194;</td> <!--td的id用于接收回调函数的Jquery-->
+              <td class="address">{{=row['address']}}</td>
+              <td class="update">
+                <form onclick="ajax('{{=URL('update_state')}}', ['{{=row["out_tid"].decode('utf8')}}'], ':eval');" style="padding:0;margin:0;">
+                  <select name='{{=row["out_tid"]}}' style="width:100px;">
+                    <option value="TG">{{='\xe9\x80\x9a\xe8\xbf\x87'}}-TG</option>
+                    <option value="BTG">{{='\xe4\xb8\x8d\xe9\x80\x9a\xe8\xbf\x87'}}-BTG</option>
+                    <option value="SJ">{{='\xe9\x87\x8d\xe5\xa4\x8d'}}-SJ</option>
+                    <option value="DF">{{='\xe5\xbd\x93\xe4\xbb\xbd\xe9\x87\x8d\xe5\xa4\x8d'}}-DF</option>
+                    <option value="LS">{{='\xe5\x8e\x86\xe5\x8f\xb2\xe9\x87\x8d\xe5\xa4\x8d'}}-LS</option>
+                    <option value="DZ">{{='\xe5\x8e\x86\xe5\x8f\xb2\xe5\x9c\xb0\xe5\x9d\x80\xe9\x87\x8d\xe5\xa4\x8d'}}-DZ</option>
+                    <option value="HDF">{{='\xe9\xbb\x91\xe5\x90\x8d\xe5\x8d\x95'}}-HDF</option>
+                    <option value="HLS">{{='\xe5\x8e\x86\xe5\x8f\xb2\xe9\xbb\x91\xe5\x90\x8d\xe5\x8d\x95'}}-HLS</option>
+                    <option value="HDZ">{{='\xe9\xbb\x91\xe5\x90\x8d\xe5\x8d\x95&\xe5\x9c\xb0\xe5\x9d\x80\xe8\xa7\x84\xe9\x81\xbf'}}-HDZ</option>
+                    <option value="HEY">{{='\xe9\xbb\x91\xe5\x90\x8d\xe5\x8d\x95&\xe6\x81\xb6\xe6\x84\x8f\xe7\x94\xb3\xe9\xa2\x86'}}-HEY</option>
+                    <option value="TDL">{{='\xe5\x90\x8c\xe6\xa0\x8b\xe6\xa5\xbc\xe4\xb8\x8d\xe9\x80\x9a\xe8\xbf\x87'}}-TDL</option>
+                    <option value="DQ1">{{='\xe4\xb8\x80\xe4\xb8\xaa\xe6\x9c\x88\xe4\xb8\x8d\xe8\xb6\x85\xe8\xbf\x871\xe6\xac\xa1'}}-DQ1</option>
+                    <option value="DQ3">{{='\xe4\xb8\x80\xe4\xb8\xaa\xe6\x9c\x88\xe4\xb8\x8d\xe8\xb6\x85\xe8\xbf\x873\xe6\xac\xa1'}}-DQ3</option>
+                    <option value="DQ5">{{='\xe4\xb8\x80\xe4\xb8\xaa\xe6\x9c\x88\xe4\xb8\x8d\xe8\xb6\x85\xe8\xbf\x875\xe6\xac\xa1'}}-DQ5</option>
+                    <option value="DD">{{='\xe8\xae\xa2\xe5\x8d\x95\xe9\x87\x8d\xe5\xa4\x8d'}}-DD</option>
+                    <option value="KQD">{{='\xe8\xb7\xa8\xe6\xb8\xa0\xe9\x81\x93\xe6\x89\x8b\xe6\x9c\xba\xe9\x87\x8d\xe5\xa4\x8d'}}-KQD</option>
+                  </select>
+                </form>
+                &#8195;&#8195;&#8195;&#8195;&#8195;&#8195;&#8195;
+              </td>
             </tr>
-            {{pass}}
+          {{pass}}
           </tbody>
         </table>
     {{pass}}
 
-  <table id="table2" style="display: none">
-   <tr>
-    <th>{{=T("trade details")}}</th>
-    <td>&#8195;</td>
+<table id="table2" border="1" frame="void" style="border-width:thin;display: none" cellspacing="0">
+  <tr>
     <td>
-      <form enctype="multipart/form-data" action="{{=URL(r=request, args=request.args)}}" method="post">
-        <select name="updatefield" style="height:26px;width:60px;">
-          <option value="status" selected>status</option>
-          <option value="pay_status">pay_status</option>
-          <option value="process_status">process_status</option>
-          <option value="deliver_status">deliver_status</option>
-        </select>
-        =
-        <input name="newvalue" value="0" style="height:26px;width:20px;"/>
-        <input type="submit" value="Update" style="height:26px;width:52px;text-align:left;color:#0000ff"/>
-      </form>
-    </td>
-    <td>&#8195;</td>
-    <td>{{=locateform}}  </td>
-    <td>&#8195;</td>
-    <td style="height: 26px;background-color: #006666">
-      <form enctype="multipart/form-data" action="{{=URL(r=request, args=request.args)}}" method="post">
-        <select name="qryfield" style="height:26px;width:60px;">
+      <form enctype="multipart/form-data" style="padding:0;margin:0;" action="{{=URL(r=request, args=request.args)}}" method="post">
+        <select name="qryfield" style="width:65px;">
           <option value="db.trade.out_tid" selected>out_tid</option>
           <option value="db.trade.id" >id</option>
           <option value="db.trade.mobilPhone">mobilPhone</option>
           <option value="db.trade.consignee">consignee</option>
         </select>
-        <select name="qryoperater" style="height:26px;width:45px;">
+        <select name="qryoperater" style="width:45px;">
           <option value="==">=</option>
           <option value="&#60">&#60</option>
           <option value="&#62">&#62</option>
           <option value="&#60=">&#8804</option>
           <option value="&#62=">&#8805</option>
         </select>
-        <input name="qryvalue" style="height:26px;width:50px;" value="0"/>
-        <input type="submit" value="Query" style="height:26px;width:53px;text-align:center;color:#0000ff;"/>
+        <input name="qryvalue" style="width:50px;" value="0"/>
+        <input type="submit" value="Query" style="width:53px;text-align:center;color:#0000ff;"/>
       </form>
     </td>
+    <td>
+      <form enctype="multipart/form-data" style="padding:0;margin:0;" action="{{=URL(r=request, args=request.args)}}" method="post">
+        <select name="updatefield" style="width:60px;">
+          <option value="status" selected>status</option>
+          <option value="pay_status">pay_status</option>
+          <option value="process_status">process_status</option>
+          <option value="deliver_status">deliver_status</option>
+        </select>
+        =
+        <input name="newvalue" value="0" style="width:20px;"/>
+        <input type="submit" value="Update" style="width:52px;text-align:left;color:#0000ff"/>
+      </form>
+    </td>
+    <td>{{=locateform}} </td>
+  </tr>
+</table>
 
-    </tr>
-  </table>
+<div id="target" class="flash" style="color:#ff0000;">{{=response.flash or ''}}</div>
 
 <div id="detailTable" style="display:none">
     {{for num,row in enumerate(rows.as_list()):}}
@@ -128,13 +158,16 @@
     {{for row in simaddr:}}
       <div class="simcontent" style="display: none">
       {{for r in row:}}
-        <span class="sitems">{{=r['address']}},</span>
-        <span class="sitem">{{=r['id']}}；</span>
+        <li type="1">
+          <span class="sitem">{{=r['consignee']}},</span>
+          <span class="sitems">{{=r['address']}},</span>
+          <span class="sitem">{{=r['id']}};</span>
+        </li>
       {{pass}}
       </div>
     {{pass}}
 </div>
-
+<!--
 <table><tr>
      <td><form>
         <input name="begin_line" value="0" style="height:26px;width:25px;"/>
@@ -143,6 +176,8 @@
         <input type="submit" value="Export CSV" style="height:26px;width:100px;text-align:center;color:#0000ff"/>
      </form></td>
  </tr></table>
+-->
+
 
 <script>
     var pointed_node0;
@@ -152,23 +187,25 @@
     var sim_node1;
     window.onload=function(){
         pointed_node0 = document.getElementById("tbody1").firstElementChild;
-        pointed_node0.style.backgroundColor='00ff00';
+        pointed_node0.style.backgroundColor='00ffff';
         detail_node0=document.getElementsByClassName("detailcontent")[0];
         detail_node0.style.display='inline';
         sim_node0=document.getElementsByClassName("simcontent")[0];
         sim_node0.style.display='inline';
-        document.getElementById('consignee').style.width = document.getElementsByClassName('consignee')[0].offsetWidth-2;
-        document.getElementById('mobilPhone').style.width = document.getElementsByClassName('mobilPhone')[0].offsetWidth-2;
-        document.getElementById('order_date').style.width = document.getElementsByClassName('order_date')[0].offsetWidth-3;
-        document.getElementById('out_tid').style.width = document.getElementsByClassName('out_tid')[0].offsetWidth-2;
-        document.getElementById('product_title').style.width = document.getElementsByClassName('product_title')[0].offsetWidth-3;
-        document.getElementById('status').style.width = document.getElementsByClassName('status')[0].offsetWidth-2;
-        document.getElementById('address').style.width = document.getElementsByClassName('address')[0].offsetWidth-2;
-        document.getElementById('tbody1').style.width=document.getElementById('thead1').offsetWidth;
+        document.getElementById('consignee').style.width = document.getElementsByClassName('consignee')[0].offsetWidth;
+        document.getElementById('mobilPhone').style.width = document.getElementsByClassName('mobilPhone')[0].offsetWidth;
+        document.getElementById('order_date').style.width = document.getElementsByClassName('order_date')[0].offsetWidth;
+        document.getElementById('shop_id').style.width = document.getElementsByClassName('shop_id')[0].offsetWidth;
+        document.getElementById('status').style.width = document.getElementsByClassName('status')[0].offsetWidth;
+        document.getElementById('product_title').style.width = document.getElementsByClassName('product_title')[0].offsetWidth;
+        document.getElementById('out_tid').style.width = document.getElementsByClassName('out_tid')[0].offsetWidth;
+        document.getElementById('address').style.width = document.getElementsByClassName('address')[0].offsetWidth;
+        document.getElementById('update').style.width = document.getElementsByClassName('update')[0].offsetWidth;
+        document.getElementById('tbody1').style.width=document.getElementById('thead1').offsetWidth+3;
     };
     function SetPointedColor(p_id){
         pointed_node0.style.backgroundColor='transparent';
-        p_id.style.backgroundColor='00ff00';
+        p_id.style.backgroundColor='00ffff';
         pointed_node0=p_id;
         detail_node0.style.display='none';
         detail_node1=document.getElementsByClassName("detailcontent")[p_id.rowIndex-1];
@@ -185,11 +222,11 @@
         objtb=document.getElementById('table2');
         if( objtb.style.display=='none'){
             objtb.style.display='inline';
-            btn_hid.innerHTML='hide';
+            btn_hid.innerHTML='hide tool';
         }
         else{
             objtb.style.display='none';
-            btn_hid.innerHTML='show';
+            btn_hid.innerHTML='show tool';
         }
     }
 
@@ -198,36 +235,79 @@
         objtb=document.getElementById('detailTable');
         if( objtb.style.display=='none'){
             objtb.style.display='block';
-            btn_hid.innerHTML='hD';
+            btn_hid.innerHTML='hide detail';
         }
         else{
             objtb.style.display='none';
-            btn_hid.innerHTML='sD';
+            btn_hid.innerHTML='show detail';
         }
     }
 </script>
+<script>
+    //dom创建文本框
+    var input = document.createElement("input");
+    input.type="text";
 
+    //得到当前的单元格
+    var currentCell;
+    function editCell(event){
+        if(event==null){
+            currentCell=window.event.srcElement;
+        }
+        else {
+            currentCell=event.target;
+        }
+        input.name=currentCell.previousElementSibling.innerHTML;//"newvar";
+        var x=currentCell.previousElementSibling.innerHTML;
+        if(currentCell.className=="address"){
+        input.value=currentCell.innerHTML;//用单元格的值来填充文本框的值
+        input.style.width=currentCell.offsetWidth;
+        //input.onblur=last;//当文本框丢失焦点时调用last
+        //input.ondblclick=last;
+        input.onkeypress=function (event){
+            if(event.keyCode=="13"){
+            ajax('{{=URL("EditTableAjax")}}',[x],'target');
+            last();
+            }
+        };
+        currentCell.innerHTML="";
+        //把文本框加到当前单元格上.
+        currentCell.appendChild(input);
+        input.focus();
+        }
+    }
+    function last(){
+        //充文本框的值给当前单元格
+        currentCell.innerHTML = input.value;
+    }
+    //最后为表格绑定处理方法.
+    document.getElementById("table1").ondblclick=editCell;
+</script>
 
 <style>
-td.consignee{white-space:nowrap;color:#0000ff;line-height: 23px;}
+td.consignee{white-space:nowrap;line-height: 23px;}
 td.mobilPhone{white-space:nowrap;}
-td.order_date{white-space:nowrap;color:blue;}
+td.order_date{white-space:nowrap;}
 td.out_tid{white-space:nowrap;}
-td.status{white-space:nowrap;color:blue}
+td.shop_id{white-space:nowrap;}
+td.status{white-space:nowrap;}
 td.product_title{white-space:nowrap;overflow: hidden;}
-td.address{white-space:nowrap;overflow: hidden;color:blue;}
+td.address{overflow: hidden;}
 
-#table1{border-spacing:0 0;border-collapse:collapse;}
+#table1{border-spacing:0;border-collapse:collapse;}
+
 #tbody1{display:block;
-        height: 320px;
-        overflow: auto;
+        height: 360px;
+        overflow-y: auto;
+        overflow-x:hidden;
         }
 #trade_head th{color:#ffffff;background-color:#ff00ff;border:none;white-space:nowrap;}
-
 #detailTable>{display: none}
 #detailTable{border:1px solid #006600;}
-
-
 #simTable{border:1px solid #006600;}
 .items{color:blue;}
+
+{{for i in sim_index:}}
+    #tbr{{=i}}{color:#ff0000}
+{{pass}}
 </style>
