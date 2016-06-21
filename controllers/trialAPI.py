@@ -62,13 +62,26 @@ def log_file(msg):
 def TrialAPI(**arg):
     def _TrialAPI(func):
         def __TrialAPI(data):
+#<<<<<<< HEAD
+#=======
+#            #url="http://vip802.6x86.com/edb2/rest/index.aspx"
+#>>>>>>> 0ce661092826c656b9e7db3a5659a6ab6e6a6caf
             SysData={"apiKey":"57Hyjts8HHty",}
             ExData={"apiSecret":"iO7hbmH8-rbt6Hg_Yg6",}
             param=func(data)
             param.update(SysData)
             param.update(data)
+#<<<<<<< HEAD
             url="http://122.193.31.8:8080/TrialCenter/order/Pampers/ST/"+arg["method"]
             param["timestamp"]=str(int(time.time()))
+#=======
+#            #url="http://IP+PORT/TrialCenter/order/Pampers/ST/"+arg["method"]
+#            #url="http://nwct.biz:18910/TrialCenter/order/Pampers/ST/"+arg["method"]
+#            url="http://122.193.31.5:8080/TrialCenter/order/Pampers/ST/"+arg["method"]
+#            #param["method"]=arg["method"]
+#            param["timestamp"]=GetTimeStamp()
+#            #param["timestamp"]="201512161115"
+#>>>>>>> 0ce661092826c656b9e7db3a5659a6ab6e6a6caf
             paraList=[]
             for k,v in param.items():
                 if isinstance(v,str):
@@ -80,7 +93,11 @@ def TrialAPI(**arg):
             log_file("%s %s"%(md5Str,param["sig"]))
             jsparam=json.dumps(param)
             req=requests.post(url,jsparam,verify=False)
+#<<<<<<< HEAD
             return json.loads(req.content)       
+#=======
+#            return json.loads(req.content)
+#>>>>>>> 0ce661092826c656b9e7db3a5659a6ab6e6a6caf
         return __TrialAPI
     return _TrialAPI
 
@@ -106,14 +123,21 @@ def test_OTI():
 'SF':'33','SF':'34','YUNDA':'35','YTO':'36','TTKDEX':'37','YTO':'4','TTKDEX':'5',
 'YUNDA':8,'ZTO':9}
     orderinfo={
+#<<<<<<< HEAD
 	"order_id": "8444",
 	"tracking_number": "3100901633843",
 	"tracking_company": str(WuLiu_dict['YUNDA'])
+#=======
+#	"order_id": "4",
+#	"tracking_number": "13",
+#	"tracking_company": "ZTO"
+#>>>>>>> 0ce661092826c656b9e7db3a5659a6ab6e6a6caf
     }
     result=updateOTI(orderinfo)
     log_file("%s %s"%(orderinfo,result))
 
 def test_TOS():
+#<<<<<<< HEAD
     wb=openpyxl.load_workbook(r'/home/trade20160125h_36（100条测试71条合格）.xlsx')
     wst= wb.get_sheet_by_name(name = 'true71')
     wsw= wb.get_sheet_by_name(name = 'wrong29')
@@ -133,6 +157,16 @@ def test_TOS():
         log_file("%s %s"%(data,result))
         db(db.trade.out_tid==outtid).select().first().update_record(status=2)
     
+#=======
+#    data={
+#    "order_id": "1",
+#	"status": "1",
+#    "message":"订单重复"
+#    }
+#    jsonobj= updateTOS(data)
+#    return jsonobj
+#
+#>>>>>>> 0ce661092826c656b9e7db3a5659a6ab6e6a6caf
 def test_addTrade():
     data0={"product_totalMoney":"0","storage_id":"11",
        "deliver_status":"\u672a\u53d1\u8d27","consignee":"\u6d4b\u8bd51",

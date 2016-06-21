@@ -1,0 +1,67 @@
+{{include 'web2py_ajax.html'}}
+<html>
+<head>
+<title></title>
+
+</head>
+{{rows=[{'a':'a1','b':'b1','c':'c1'},
+        {'a':'a2','b':'b2','c':'c2'},
+        {'a':'a3','b':'b3','c':'c3'},
+        {'a':'a4','b':'b4','c':'c4'}]}}
+<body>
+    <table id="editTable"  border="1">
+        {{for i,row in enumerate(rows):}}
+        <tr>
+            <td>{{=row['a']}}</td>
+            <td>{{=row['b']}}</td>
+            <td class="addr">{{=row['c']}}</td>
+        </tr>
+        {{pass}}
+    </table>
+</body>
+</html>
+<div id="target"></div>
+
+<script>
+    //dom创建文本框
+    var input = document.createElement("input");
+    input.type="text";
+
+    //得到当前的单元格
+    var currentCell;
+    function editCell(event){
+        if(event==null){
+            currentCell=window.event.srcElement;
+        }
+        else {
+            currentCell=event.target;
+        }
+        input.name=currentCell.previousElementSibling.innerHTML;//"newvar";
+        var x=currentCell.previousElementSibling.innerHTML;
+
+        if(currentCell.className=="addr"){
+        input.value=currentCell.innerHTML;//用单元格的值来填充文本框的值
+        input.style.width=currentCell.offsetWidth;
+        //input.onblur=last;//当文本框丢失焦点时调用last
+        //input.ondblclick=last;
+        input.onkeypress=function (event){
+            if(event.keyCode=="13"){
+            ajax('EditTableAjax',[x],'target');
+            last();
+            }
+        };
+        currentCell.innerHTML="";
+        //把文本框加到当前单元格上.
+        currentCell.appendChild(input);
+        input.focus();
+        }
+    }
+    function last(){
+        //充文本框的值给当前单元格
+        currentCell.innerHTML = input.value;
+    }
+    //最后为表格绑定处理方法.
+    document.getElementById("editTable").ondblclick=editCell;
+</script>
+
+ ajax('EditTableAjax',[input.name],'target');

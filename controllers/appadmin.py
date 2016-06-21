@@ -38,6 +38,7 @@ elif (remote_addr not in hosts) and (remote_addr != "127.0.0.1") and \
     (request.function != 'manage'):
     raise HTTP(200, T('appadmin is disabled because insecure channel'))
 
+
 if request.function == 'manage':
     if not 'auth' in globals() or not request.args:
         redirect(URL(request.controller, 'index'))
@@ -53,12 +54,14 @@ if request.function == 'manage':
         raise HTTP(403, "Not authorized")
     menu = False
 elif (request.application == 'admin' and not session.authorized) or \
-        (request.application != 'admin' and not gluon.fileutils.check_credentials(request)):
+    (request.application != 'admin' and not gluon.fileutils.check_credentials(request)):
     redirect(URL('admin', 'default', 'index',
                  vars=dict(send=URL(args=request.args, vars=request.vars))))
 else:
     response.subtitle = T('Database Administration (appadmin)')
     menu = True
+
+
 
 ignore_rw = True
 response.view = 'appadmin.html'
@@ -95,7 +98,6 @@ def eval_in_global_env(text):
     exec ('_ret=%s' % text, {}, global_env)
     return global_env['_ret']
 
-
 def get_database(request):
     if request.args and request.args[0] in databases:
         return eval_in_global_env(request.args[0])
@@ -111,13 +113,11 @@ def get_table(request):
         session.flash = T('invalid request')
         redirect(URL('index'))
 
-
 def get_query(request):
     try:
         return eval_in_global_env(request.vars.query)
     except Exception:
         return None
-
 
 def query_by_table_type(tablename, db, request=request):
     keyed = hasattr(db[tablename], '_primarykey')
@@ -132,19 +132,15 @@ def query_by_table_type(tablename, db, request=request):
         qry = '%s.%s.id>0' % tuple(request.args[:2])
     return qry
 
-
 # ##########################################################
 # ## list all databases and tables
 # ###########################################################
 def index():
     return dict(databases=databases)
 
-
-# ##########################################################
+# ###########################################################
 # ## insert a new record
 # ###########################################################
-
-
 def insert():
     (db, table) = get_table(request)
     form = SQLFORM(db[table], ignore_rw=ignore_rw)
@@ -152,17 +148,13 @@ def insert():
         response.flash = T('new record inserted')
     return dict(form=form, table=db[table])
 
-
 # ##########################################################
 # ## list all records in table and insert new record
-# ###########################################################
-
-
+# ##########################################################
 def download():
     import os
     db = get_database(request)
     return response.download(request, db)
-
 
 def csv():
     import gluon.contenttype
@@ -173,13 +165,11 @@ def csv():
     if not query:
         return None
     response.headers['Content-disposition'] = 'attachment; filename=%s_%s.csv'\
-        % tuple(request.vars.query.split('.')[:2])
+    % tuple(request.vars.query.split('.')[:2])
     return str(db(query, ignore_common_filters=True).select())
-
 
 def import_csv(table, file):
     table.import_from_csv_file(file)
-
 
 def select():
     import re
@@ -195,26 +185,22 @@ def select():
     if request.vars.query:
         match = regex.match(request.vars.query)
         if match:
-            request.vars.query = '%s.%s.%s==%s' % (request.args[0],
-                                                   match.group('table'), match.group('field'),
-                                                   match.group('value'))
+            request.vars.query = '%s.%s.%s==%s'\
+            %(request.args[0],match.group('table'), match.group('field'),match.group('value'))
     else:
         request.vars.query = session.last_query
     query = get_query(request)
+
     if request.vars.start:
         start = int(request.vars.start)
     else:
         start = 0
     nrows = 0
-
     step = 100
     fields = []
-
     if is_imap:
         step = 3
- 
     stop = start + step
-
     table = None
     rows = []
     orderby = request.vars.orderby
@@ -227,20 +213,19 @@ def select():
                 orderby = '~' + orderby
     session.last_orderby = orderby
     session.last_query = request.vars.query
-    form = FORM(TABLE(TR(T('Query:'), '', INPUT(_style='width:400px',
-                _name='query', _value=request.vars.query or '',
-                requires=IS_NOT_EMPTY(
-                    error_message=T("Cannot be empty")))), TR(T('Update:'),
-                INPUT(_name='update_check', _type='checkbox',
-                value=False), INPUT(_style='width:400px',
-                _name='update_fields', _value=request.vars.update_fields
-                                    or '')), TR(T('Delete:'), INPUT(_name='delete_check',
-                _class='delete', _type='checkbox', value=False), ''),
-                TR('', '', INPUT(_type='submit', _value=T('submit')))),
+    form = FORM(TABLE(
+        TR( T('Query:'), '',
+            INPUT(_style='width:400px',_name='query', _value=request.vars.query or '',
+              requires=IS_NOT_EMPTY(error_message=T("Cannot be empty")))),
+        TR( T('Update:'),
+            INPUT(_name='update_check', _type='checkbox',value=False),
+            INPUT(_style='width:400px',_name='update_fields', _value=request.vars.update_fields or '')),
+        TR(T('Delete:'), INPUT(_name='delete_check',
+            _class='delete', _type='checkbox', value=False), ''),
+        TR('', '', INPUT(_type='submit', _value=T('submit'))) ),
                 _action=URL(r=request, args=request.args))
-
     tb = None
-    if form.accepts(request.vars, formname=None):
+    if form.accepts(request.vars,formname=None):
         regex = re.compile(request.args[0] + '\.(?P<table>\w+)\..+')
         match = regex.match(form.vars.query.strip())
         if match:
@@ -252,7 +237,7 @@ def select():
                     **eval_in_global_env('dict(%s)' % form.vars.update_fields))
                 response.flash = T('%s %%{row} updated', nrows)
             elif form.vars.delete_check:
-                db(query, ignore_common_filters=True).delete()
+                db(query,ignore_common_filters=True).delete()
                 response.flash = T('%s %%{row} deleted', nrows)
             nrows = db(query, ignore_common_filters=True).count()
 
@@ -262,16 +247,16 @@ def select():
                      "sender", "subject")]
             if orderby:
                 rows = db(query, ignore_common_filters=True).select(
-                              *fields, limitby=(start, stop),
-                              orderby=eval_in_global_env(orderby))
+                *fields, limitby=(start, stop),orderby=eval_in_global_env(orderby))
             else:
                 rows = db(query, ignore_common_filters=True).select(
-                    *fields, limitby=(start, stop))
+                *fields, limitby=(start, stop))
         except Exception, e:
             import traceback
             tb = traceback.format_exc()
             (rows, nrows) = ([], 0)
             response.flash = DIV(T('Invalid Query'), PRE(str(e)))
+
     # begin handle upload csv
     csv_table = table or request.vars.table
     if csv_table:
@@ -283,13 +268,11 @@ def select():
         formcsv = None
     if formcsv and formcsv.process().accepted:
         try:
-            import_csv(db[request.vars.table],
-                       request.vars.csvfile.file)
+            import_csv(db[request.vars.table],request.vars.csvfile.file)
             response.flash = T('data uploaded')
         except Exception, e:
             response.flash = DIV(T('unable to parse csv file'), PRE(str(e)))
     # end handle upload csv
-
     return dict(
         form=form,
         table=table,
@@ -303,12 +286,9 @@ def select():
         tb=tb
     )
 
-
 # ##########################################################
 # ## edit delete one record
 # ###########################################################
-
-
 def update():
     (db, table) = get_table(request)
     keyed = hasattr(db[table], '_primarykey')
@@ -317,17 +297,14 @@ def update():
     if keyed:
         key = [f for f in request.vars if f in db[table]._primarykey]
         if key:
-            record = db(db[table][key[0]] == request.vars[key[
-                        0]]).select().first()
+            record = db(db[table][key[0]] == request.vars[key[0]]).select().first()
     else:
-        record = db(db[table].id == request.args(
-            2)).select().first()
+        record = db(db[table].id == request.args(2)).select().first()
 
     if not record:
         qry = query_by_table_type(table, db)
         session.flash = T('record does not exist')
-        redirect(URL('select', args=request.args[:1],
-                     vars=dict(query=qry)))
+        redirect(URL('select', args=request.args[:1],vars=dict(query=qry)))
 
     if keyed:
         for k in db[table]._primarykey:
@@ -336,26 +313,21 @@ def update():
     form = SQLFORM(
         db[table], record, deletable=True, delete_label=T('Check to delete'),
         ignore_rw=ignore_rw and not keyed,
-        linkto=URL('select',
-                   args=request.args[:1]), upload=URL(r=request,
-                                                      f='download', args=request.args[:1]))
+        linkto=URL('select',args=request.args[:1]), upload=URL(r=request,
+            f='download', args=request.args[:1]))
 
     if form.accepts(request.vars, session):
         session.flash = T('done!')
         qry = query_by_table_type(table, db)
-        redirect(URL('select', args=request.args[:1],
-                 vars=dict(query=qry)))
+        redirect(URL('select', args=request.args[:1],vars=dict(query=qry)))
     return dict(form=form, table=db[table])
 
 
 # ##########################################################
 # ## get global variables
 # ###########################################################
-
-
 def state():
     return dict()
-
 
 def ccache():
     if is_gae:

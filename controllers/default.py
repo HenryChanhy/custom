@@ -8,15 +8,27 @@
 ## - download is for downloading files uploaded in the db (does streaming)
 ####rowcontent['mobile'] in db().select(db.history_order.mobile)#########
 # #######################################################################
+import os
 import re
 from simhash import Simhash,SimhashIndex
+from snownlp import SnowNLP
 import time
 import hashlib
 import openpyxl
-
+import datetime
+import redis
+auth.settings.registration_requires_approval = False
+auth.settings.registration_requires_verification = True
 auth.settings.allow_basic_login = True
 auth.define_tables(username=True)
+auth.settings.login_next = URL('test_display_form/db')
 
+rds=redis.StrictRedis()
+today=datetime.date.today().strftime("%d")
+yesterday=(datetime.date.today() + datetime.timedelta(days=-1)).strftime("%d")
+auth.settings.allow_basic_login = True
+auth.define_tables(username=True)
+pat_dat=re.compile("[0-9]+")
 provinces=(u'北京',u'天津',u'河北',u'山西',u'内蒙古',u'辽宁',u'吉林',u'黑龙江',u'上海',u'江苏',
            u'浙江',u'安徽',u'福建',u'江西',u'山东',u'河南',u'湖北',u'湖南',u'广东',u'广西',
            u'海南',u'重庆',u'四川',u'贵州',u'云南',u'西藏',u'陕西',u'甘肃',u'青海',u'宁夏',
@@ -58,6 +70,106 @@ def import_csv(csvfile):
 def get_feature(s):
     return [s[i:i+1] for i in range(max(len(s)-1+1,1))]
 
+def GetTimeStamp():
+    t=time.localtime()
+    lst=[]
+    for i in xrange(len(t)):
+        if i>=5:
+            break
+        v=str(t[i]).zfill(2)
+        lst.append(v)
+    reStr="".join(lst)
+    return reStr
+
+def log_file(user,msg):
+    dir=os.getcwd()
+    fileName="log_access.txt"
+    finalPath=os.path.join(dir,fileName)
+    with open(finalPath,"ab") as f:
+        f.write("[%s:%s],%s\r\n"%(GetTimeStamp(),user,msg))
+    return finalPath
+
+def user():
+    """
+    exposes:
+    http://..../[app]/default/user/login
+    http://..../[app]/default/user/logout
+    http://..../[app]/default/user/register
+    http://..../[app]/default/user/profile
+    http://..../[app]/default/user/retrieve_password
+    http://..../[app]/default/user/change_password
+    http://..../[app]/default/user/manage_users (requires membership in
+    http://..../[app]/default/user/bulk_register
+    use @auth.requires_login()
+        @auth.requires_membership('group name')
+        @auth.requires_permission('read','table name',record_id)
+    to decorate functions that need access control
+    """
+    form=auth()
+    return dict(form=form)
+
+@auth.requires_login()
+def search_by_phone():
+        return dict(
+            current_user='%(first_name)s' %(auth.user),
+            log_state=0,
+            can_log=1
+        )
+
+def search_trade():
+    mobil=request.vars.input_mobil
+    current_user=request.vars.user
+    search_result = db(db.trade.mobilPhone.like(mobil)).select(db.trade.out_tid,db.trade.wrong_reason,db.trade.address,db.trade.status,db.trade.shop_id)
+    log_file(current_user,mobil)
+    if search_result:
+        result=search_result.first()
+        shopid=result['shop_id']
+        recv_addr=result['address']
+        if result['status']=='2':
+            reason=result['wrong_reason']
+            return DIV(DIV("shop_id:",shopid),BR(),
+                       DIV("wrong_reason:",reason),BR(),
+                       DIV("address:",recv_addr),
+                       _align="left",_style="padding-left: 5cm")
+        elif result['status']=='3':
+            trackingno=db(db.WuLiuInfo.orderId.like(result['out_tid'])).select(db.WuLiuInfo.trackingNo)
+            return DIV(DIV("shop_id:",shopid),BR(),
+                       DIV("WuLiu:",trackingno.first()['trackingNo']),BR(),
+                       DIV("address:",recv_addr),
+                       _align="left",_style="padding-left: 5cm")
+        else:
+            return DIV(DIV("shop_id:",shopid),BR(),
+                       DIV("订单未审核"),BR(),
+                       DIV("address:",recv_addr),
+                       _align="left",_style="padding-left: 5cm")
+    else:
+        return "此号码不存在"
+
+def test_table():
+    response.flash = "wang,wang,wang"
+    return 'hello,hello,hello'
+
+def EditTable():
+    return dict()
+
+def test_ajax():
+    return dict()
+def echo():
+    name_dict=dict(request.vars)
+    name_key=name_dict.keys()[0]
+    name_val=name_dict.values()[0]
+    response.flash = "wang,wang,wang"
+    #return request.vars.your_mes
+    #return request.vars.name
+    #return "jQuery('#target').html(%s);" % repr(name_val)
+    #return "jQuery('#{{=targetid}}').html(%s);" % repr(request.vars.name1)
+    #response.flash = 'please fill out the form'
+    #return
+    return "jQuery('#%s').css('color','red');"%(name_key)
+
+def main():
+    return log_file("wang","18794757802")
+
 #@auth.requires_login()
 def display_form():
     grid = SQLFORM.grid(db.wrong_order,fields=\
@@ -68,6 +180,192 @@ def display_form():
         db.wrong_order.dup_phone])
     return locals()
 
+def csv():
+    import gluon.contenttype
+    response.headers['Content-Type'] = \
+        gluon.contenttype.contenttype('.csv')
+    db = eval_in_global_env(request.args[0])
+
+    if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
+        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
+    else:
+        qry = 'db.trade.id>0'
+    query = eval_in_global_env(qry)
+    response.headers['Content-disposition'] = 'attachment; filename=%s_%s_%s.csv'\
+    % ('trade',request.vars.begin_line,request.vars.end_line)
+    return str(db(query, ignore_common_filters=True).select(limitby=(int(request.vars.begin_line),int(request.vars.end_line))))
+#############################################################
+
+import copy,datetime
+global_env = copy.copy(globals())
+global_env['datetime'] = datetime
+def eval_in_global_env(text):
+    exec ('_ret=%s' % text, {}, global_env)
+    return global_env['_ret']
+def himin_distance(i1,i2):
+    f=64
+    x = (i1 ^ i2) & ((1 << 64) - 1)
+    ans = 0
+    while x:
+        ans += 1
+        x &= x - 1
+    return ans
+
+@auth.requires_login()
+def test_display_form():
+    db = eval_in_global_env(request.args[0])
+    dbname = request.args[0]
+    try:
+        is_imap = db._uri.startswith("imap://")
+    except (KeyError, AttributeError, TypeError):
+        is_imap = False
+    step = 100
+    if is_imap:
+        step = 3
+    table = "trade"
+    if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
+        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
+    else:
+        qry = 'db.trade.id>0'
+    nrows = db((db.trade.order_date>yesterday) & (db.trade.status!='2')).count()
+    start=0
+    if request.vars.start:
+        start = int(request.vars.start)
+    elif request.vars.locate:
+        if 0< int(request.vars.locate) < nrows/step:
+            start = (int(request.vars.locate)-1)*step
+        else:
+            response.flash = T("out of range")
+    else:
+        start = 0
+    if start<nrows-step:
+        stop = start + step
+    else:
+        stop=nrows
+    t=yesterday
+    rows=db((db.trade.order_date.day()==yesterday) & (db.trade.status!='2')& (db.trade.status!='3')).select(limitby=(start,stop),orderby=db.trade.out_tid)
+    query = eval_in_global_env(qry)
+    #nrows = db(query, ignore_common_filters=True).count()
+    #rows = db(query, ignore_common_filters=True).select(limitby=(start,stop))
+    tb=None
+
+    simaddr=[]
+    for r in rows:
+        sim_buf=[]
+        if r['simid']:
+            otids=r['simid'].split('&')
+            for i in otids:
+                ar=db(db.history_order.id==i).select(db.history_order.id,
+                    db.history_order.consignee,db.history_order.address).first()
+                sim_buf.append(ar)
+        simaddr.append(sim_buf)
+        rds.sadd('every_otid',r['out_tid'])
+
+    sim_index=[]
+
+    for i in range(0,stop-start):
+        if simaddr[i]:
+            sim_index.append(i)
+
+    locateform = FORM(TABLE(TR(
+    TD(INPUT(_name='locate', _value=request.vars.locate,_style='width:45px;')),
+    TD(INPUT(_type='submit', _value=T('Locate'),_style='width:60px;text-align:center;color:blue;')))),
+    _action=URL(r=request,args=request.args),_style="padding:0;margin:0;" )
+
+    return dict(
+        locateform=locateform,
+        table=table,
+        start=start,
+        step=step,
+        nrows=nrows,
+        rows=rows,
+        simaddr=simaddr,
+        sim_index=sim_index,
+        query=request.vars.query,
+        current_user='%(first_name)s' %(auth.user),
+        tb=tb
+    )
+
+def update_state():
+    name_dict=dict(request.vars)
+    name_key=name_dict.keys()[0]
+    name_val=name_dict.values()[0]
+    if rds.sismember('every_otid',name_key):
+        rds.srem('every_otid',name_key)
+    if name_val=='TG':
+        r=db(db.trade.out_tid==name_key).update(status='3')
+        if r:
+            response.flash = "trade has been updated"
+        else:
+            response.flash = "failed to update the trade"
+        return "jQuery('#%s').css('color','#00ff00');"%(name_key)
+    else:
+        r=db(db.trade.out_tid==name_key).update(**dict(status='2',wrong_reason=name_val))
+        if r:
+            response.flash = "trade has been updated"
+        else:
+            response.flash = "failed to update the trade"
+        response.flash = "trade has been updated"
+        return "jQuery('#%s').css('color','#ff00ff');"%(name_key)
+
+def update_all_rest():
+    t=len(rds.smembers('every_otid'))
+    if t==97:
+        response.flash = "All of updated"
+    else:
+        response.flash = str(t)
+    return ''
+
+def EditTableAjax():
+    name_dict=dict(request.vars)
+    namekey=name_dict.keys()[0]
+    name_key=pat_dat.findall(namekey)[0]
+    name_val=name_dict.values()[0]
+    r=db(db.trade.out_tid==name_key).update(address=name_val)
+    if r:
+        response.flash = "address have been updated"
+    else:
+        response.flash = "no updated"
+    return ''
+
+def echo_rownum():
+    trade_items=db(db.trade.mobilPhone.like(request.vars.id)).select().as_list()[0]
+    return ''.join([DIV(SPAN(k,_class='items'),SPAN(v,_class='item')).xml() for k,v in trade_items if k])
+
+def month_input():
+    return dict()
+
+def month_selector():
+    if not request.vars.month:
+        return ''
+    months = ['January', 'February', 'March', 'April', 'May',
+    'June', 'July', 'August', 'September' ,'October',
+    'November', 'December']
+    month_start = request.vars.month.capitalize()
+    selected = [m for m in months if m.startswith(month_start)]
+    return DIV(*[DIV(k,
+    _onclick="jQuery('#month').val('%s')" % k,
+    _onmouseover="this.style.backgroundColor='yellow'",
+    _onmouseout="this.style.backgroundColor='white'"
+    ) for k in selected])
+
+def add_db():
+    rows=db(db.history_order.id>0).select()
+    r0=rows.first()
+    #r0.out_tid=r0.tid
+    r0.update_record(out_tid=r0.tid)
+    return locals()
+
+def list_items():
+    items = db().select(db.db_map.ALL)
+    return dict(items=items)
+
+def vote():
+    item = db.trade[request.vars.id]
+    new_votes = item.votes + 1
+    item.update_record(votes=new_votes)
+    return str(new_votes)
+
 def display_pampers_result():
     grid = SQLFORM.grid(db.pampers_result)
     return locals()
@@ -76,8 +374,28 @@ def display_pampers_order():
     grid = SQLFORM.grid(db.pampers_order)
     return locals()
 
+def display_trade_order():
+    grid = SQLFORM.grid(db.trade)
+    return locals()
+
 def check_order():
-    orderList=db(db.wrong_order).select().as_list()
+    orderList=db(db.WuLiuInfo).select().as_list()
+    return locals()
+
+def trade_proc():
+    essential_field=['consignee','address','province','city','area','mobilPhone','out_tid','shop_id','order_date','barCode','product_title','standard','out__tid']
+    trade_list=db(db.trade).select().as_list()
+    trade_draw=[]
+    for each_trade in trade_list[0:30]:
+        content={}
+        for field in essential_field:
+            content[field]=each_trade[field]
+        trade_draw.append(content)
+    WuLiu_list=db(db.WuLiuInfo).select().as_list()
+    WuLiu_draw=[]
+    for i in range(0,len(WuLiu_list)/10):
+        WuLiu_draw.append(WuLiu_list[i*10:(i+1)*10])
+    WuLiu_draw.append(WuLiu_list[(len(WuLiu_list)/10)*10:len(WuLiu_list)])
     return locals()
 
 def process_order():
@@ -678,14 +996,7 @@ def statistics(list1):
         dict1[list1[i]]=li
     return dict1
 
-def himin_distance(i1,i2):
-    f=64
-    x = (i1 ^ i2) & ((1 << 64) - 1)
-    ans = 0
-    while x:
-        ans += 1
-        x &= x - 1
-    return ans
+
     
 def add_BBS_20151222(ws4):
     field_list=['order_id','ex_id','shop_name','telephone','cellphone','user_name','address',
@@ -853,24 +1164,6 @@ def index():
         pampers_census()
     return dict()
 
-def user():
-    """
-    exposes:
-    http://..../[app]/default/user/login
-    http://..../[app]/default/user/logout
-    http://..../[app]/default/user/register
-    http://..../[app]/default/user/profile
-    http://..../[app]/default/user/retrieve_password
-    http://..../[app]/default/user/change_password
-    http://..../[app]/default/user/manage_users (requires membership in
-    http://..../[app]/default/user/bulk_register
-    use @auth.requires_login()
-        @auth.requires_membership('group name')
-        @auth.requires_permission('read','table name',record_id)
-    to decorate functions that need access control
-    """
-    return dict(form=auth())
-
 @cache.action()
 def download():
     """
@@ -992,5 +1285,5 @@ def TradeDelete():
         return db(db[table_name].order_id==record_id).delete()
     return locals()
 
-
-
+if __name__=='__main__':
+    main()

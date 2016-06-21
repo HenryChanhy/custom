@@ -1,0 +1,174 @@
+{{extend "layout.html"}}
+<head>
+    <script src="{{=URL('static','js/jquery.js')}}"></script>
+    <script src="{{=URL('static','js/jquery.form.js')}}"></script>
+    <script>
+        function submitForm(formid,centerid){
+        var center=document.getElementById(centerid);
+        $("#"+formid).ajaxSubmit(function(message){
+            center.style.display="none"
+        });
+        return false
+        }
+    </script>
+    <script>
+        /*
+        * js分页类
+        * @param iAbsolute 每页显示记录数
+        * @param sTableId 分页表格属性ID值，为String
+        * @param sTBodyId 分页表格TBODY的属性ID值,为String,此项为要分页的主体内容
+        * var __variable__; private
+        * function __method__(){};private
+        */
+        function Page(iAbsolute,sTableId,sTBodyId){
+            this.absolute = iAbsolute; //每页最大记录数
+            this.tableId = sTableId;
+            this.tBodyId = sTBodyId;
+            this.rowCount = 0;//记录数
+            this.pageCount = 0;//页数
+            this.pageIndex = 0;//页索引
+            this.__oTable__ = null;//表格引用
+            this.__oTBody__ = null;//要分页内容
+            this.__dataRows__ = 0;//记录行引用
+            this.__oldTBody__ = null;
+            this.__init__(); //初始化;
+        }
+        Page.prototype.__init__ = function(){
+            this.__oTable__ = document.getElementById(this.tableId);//获取table引用
+            this.__oTBody__ = this.__oTable__.tBodies[this.tBodyId];//获取tBody引用
+            this.__dataRows__ = this.__oTBody__.rows;
+            this.rowCount = this.__dataRows__.length;
+            try{
+                this.absolute = (this.absolute <= 0) || (this.absolute>this.rowCount) ? this.rowCount : this.absolute;
+                this.pageCount = parseInt(this.rowCount%this.absolute == 0 ? this.rowCount/this.absolute : this.rowCount/this.absolute+1);
+            }
+            catch(exception){}
+            this.__updateTableRows__();
+        };
+        Page.prototype.nextPage = function(){
+        if(this.pageIndex + 1 < this.pageCount){
+            this.pageIndex += 1;
+            this.__updateTableRows__();
+        }};
+        Page.prototype.prePage = function(){
+        if(this.pageIndex >= 1){
+            this.pageIndex -= 1;
+            this.__updateTableRows__();
+        }};
+        Page.prototype.firstPage = function(){
+        if(this.pageIndex != 0){
+            this.pageIndex = 0;
+            this.__updateTableRows__();
+        }};
+        Page.prototype.lastPage = function(){
+        if(this.pageIndex+1 != this.pageCount){
+        this.pageIndex = this.pageCount - 1;
+        this.__updateTableRows__();
+        }};
+        Page.prototype.aimPage = function(iPageIndex){
+            if(iPageIndex > this.pageCount-1){
+                this.pageIndex = this.pageCount - 1;
+            }else if(iPageIndex < 0){
+                this.pageIndex = 0;
+            }else{
+                this.pageIndex = iPageIndex;
+            }
+            this.__updateTableRows__();
+        };
+        Page.prototype.__updateTableRows__ = function(){
+            var iCurrentRowCount = this.absolute * this.pageIndex;
+            var iMoreRow = this.absolute+iCurrentRowCount > this.rowCount ? this.absolute+iCurrentRowCount - this.rowCount : 0;
+            var tempRows = this.__cloneRows__();
+            var removedTBody = this.__oTable__.removeChild(this.__oTBody__);
+            var newTBody = document.createElement("TBODY");
+            newTBody.setAttribute("id", this.tBodyId);
+            for(var i=iCurrentRowCount;i < this.absolute+iCurrentRowCount-iMoreRow; i++){
+                newTBody.appendChild(tempRows[i]);
+            }
+            this.__oTable__.appendChild(newTBody);
+            /*
+            this.dataRows为this.oTBody的一个引用，
+            移除this.oTBody那么this.dataRows引用将销失,
+            code:this.dataRows = tempRows;恢复原始操作行集合.
+            */
+            this.__dataRows__ = tempRows;
+            this.__oTBody__ = newTBody;
+        };
+        /**克隆原始操作行集合*/
+        Page.prototype.__cloneRows__ = function(){
+            var tempRows = [];
+            for(var i=0; i<this.__dataRows__.length; i++){
+                /**
+                code:this.dataRows[i].cloneNode(param),
+                param = 1 or true:复制以指定节点发展出去的所有节点,
+                param = 0 or false:只有指定的节点和它的属性被复制.
+                */
+                tempRows[i] = this.__dataRows__[i].cloneNode(1);
+            }
+            return tempRows;
+        };
+    </script>
+    <script type="text/javascript" language="javascript">
+        window.onload = function(){
+        page = new Page(10,'table1','group_one'); };
+        function SearchPage() {
+            var pagenum = document.getElementById("mySearch").value;
+            page.prototype.aimPage(pagenum);
+        }
+    </script>
+</head>
+{{
+field_list=['tid','out_tid','shop_id','storage_id','buyer_id','buyer_msg','buyer_email','buyer_alipay','seller_remark','consignee','address','postcode','telephone','mobilPhone','province','city','area','actual_freight_get','actual_RP','ship_method','express','is_invoiceOpened','invoice_type','invoice_money','invoice_title','invoice_msg','order_type','process_status','pay_status','deliver_status','is_COD','serverCost_COD','order_totalMoney','product_totalMoney','pay_method','pay_commission','pay_score','return_score','favorable_money','alipay_transaction_no','out_payNo','out_express_method','out_order_status','order_date','pay_date','finish_date','plat_type','distributor_no','WuLiu','WuLiu_no','in_memo','other_remark','actual_freight_pay','ship_date_plan','deliver_date_plan','is_scorePay','is_needInvoice','barCode','product_title','standard','out_price','favorite_money','orderGoods_Num','gift_Num','cost_Price','t_id','product_stockout','is_Book','is_presell','is_Gift','avg_price','product_freight','shop__id','out__tid','out_productId','out_barCode','product_intro']
+essential_field=['consignee','address','province','city','area','mobilPhone','out_tid','shop_id','order_date','barCode','product_title','standard','out__tid']
+WuLiu_field=['orderId','order_status','logisticCompany','trackingNo','updateTime']
+current_page=0
+}}
+
+<div class="divContent">
+    <table width="85%" border="1" id="table1">
+        <thead>
+        <tr id="trade_head">
+            {{for field in WuLiu_field:}}
+            <th>{{=field}}</th>
+            {{pass}}
+        </tr>
+        </thead>
+        <tbody id="group_one">
+        {{for row in WuLiu_list:}}
+        <tr class="trContent">
+            {{for field in WuLiu_field:}}
+            <td>{{=row[field]}}</td>
+            {{pass}}
+        </tr>
+        {{pass}}
+        </tbody>
+        </table>
+        <table>
+            <tr>
+                <td><button onclick="page.firstPage();">firstPage</button></td>
+                <td><button onclick="page.prePage();">prePage</button></td>
+                <td><button onclick="page.nextPage();">nextPage</button></td>
+                <td><button onclick="page.lastPage();">lastPage</button></td>
+                <td><span id="page_index"></span></td>
+            </tr>
+        </table>
+        <form id="mySearch">
+           <input type="text">
+           <button type="button" onclick="SearchPage()">search</button>
+        </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

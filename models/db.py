@@ -19,7 +19,7 @@ if not request.env.web2py_runtime_gae:
     db = DAL(myconf.take('db.uri'), pool_size=myconf.take('db.pool_size', cast=int), check_reserved=['all'],migrate=True,fake_migrate=True)
 else:
     ## connect to Google BigTable (optional 'google:datastore://namespace')
-    db = DAL('google:datastore+ndb')
+    db = DAL('google:datastore+ndb',migrate=True)
     ## store sessions and tickets there
     session.connect(request, response, db=db)
     ## or store session in Memcache, Redis, etc.
@@ -63,10 +63,10 @@ mail = auth.settings.mailer
 mail.settings.server = 'logging' if request.is_local else myconf.take('smtp.server')
 mail.settings.sender = myconf.take('smtp.sender')
 mail.settings.login = myconf.take('smtp.login')
-
 ## configure auth policy
+
 auth.settings.registration_requires_verification = False
-auth.settings.registration_requires_approval = False
+auth.settings.registration_requires_approval = True
 auth.settings.reset_password_requires_verification = True
 
 #########################################################################
@@ -99,13 +99,12 @@ db.define_table('history',
                 Field('order_date',length=13),
                 Field('product_name',length=20),
                 Field('data_date',length=20),
-                Field('channel',length=13),
-                Field('stage',length=20),
-                Field('city_class1',length=20),
-                Field('city_class2',length=20),
-                Field('memo1',length=20),
-                Field('memo2',length=20),
-                Field('address_bak',length=20)
+                Field('plat_type',length=20),
+                Field('product_title',length=20),
+                Field('standard',length=20),
+                Field('backupinfo',length=20),
+                Field('examine_status',length=20),
+                Field('addr_hash')
                 )
 
 db.define_table('history_order',
@@ -136,13 +135,13 @@ db.define_table('history_order',
                 Field('examine_status',length=20),
                 Field('addr_hash')
                 )
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 db.define_table('db_map',
                 Field('table_type',length=20),
                 Field('table_name',length=40),
                 Field('field_name',length=40),
                 Field('field_id',length=40),
-                Field('field_order',type='integer'))
+                Field('field_order',type='integer'),
+                Field('votes','integer',default=0))
 
 db.define_table('custom_order',
                 Field('order_id', unique=True,length=20),
@@ -212,7 +211,6 @@ db.define_table('wrong_order',
                 Field('dup_phone',length=80)
                 )
 
-#<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 db.define_table('pampers_order',
                 Field('order_id', unique=True,length=20),
                 Field('ex_id',length=20),
@@ -433,16 +431,12 @@ db.define_table('product_info',
 
 db.define_table('user_info',
                 Field('user_id',length=20),
-                Field('SB_Internal_Member_ID',length=20),
-                Field('Member_Account_ID',length=20),
                 Field('user_name',length=20),
                 Field('address',length=20),
-                Field('phone_num',length=20),
-                Field('city',length=20),
-                Field('province',length=20),
-                Field('zip_code',length=20),
-                Field('Country',length=20),
-                Field('reserve_field',length=20))
+                Field('mobilPhone',length=20),
+                Field('passwd',length=20),
+                Field('log_status',length=20)
+                )
 
 db.define_table('user2product',
                 Field('product_id',length=20),

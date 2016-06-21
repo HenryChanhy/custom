@@ -724,6 +724,8 @@ def AddTradeToEdb():
                         SigStr=SigStr[0:len(SigStr)-1]
                         SigStr=SigStr+u"}"
                     SigStr=SigStr+u"]"+u"&"
+                elif field =="apiKey" or field =="timeStamp":
+                    SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
                 else:
                     SigStr=SigStr+unicode(field)+u"="+unicode(vars[field])+u"&"
                     if (field != 'apiKey') and (field !='timestamp'):
@@ -769,7 +771,6 @@ def AddTradeToEdb():
         return jsonObj
     return locals()
 
-#@auth.requires_login()
 @request.restful()
 def GetEdbOrderInfo():
     WuLiu_dict={}

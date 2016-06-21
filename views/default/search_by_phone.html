@@ -1,0 +1,76 @@
+
+{{include 'web2py_ajax.html'}}
+<body>
+  <script src="{{=URL('static','js/jquery-1.11.0.min.js')}}"></script>
+  <script src="{{=URL('static','js/jquery.js')}}"></script>
+  <script src="{{=URL('static','js/jquery.form.js')}}"></script>
+   <!--
+  <div id="bkgd"></div>
+  <h1>订单查询系统</h1>
+  <div id="login_id">
+    <h3>登陆之后即可使用</h3>
+    <form id="login_form">
+        <input name="loginname" type="text" class="loginuser" style="height: 35px"   placeholder="用户名"   /></br></br>
+        <input name="password" type="password" class="loginpwd"  style="height: 35px" placeholder="密码"  /></br></br>
+        <input id="login" type="submit" style="height: 35px;background-color: #2aabd2;color:#ffffff;" class="loginbtn" value="登录" />
+    </form>
+  </div>
+  <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+    登陆
+    </button>
+-->
+{{#if can_log==1:}}
+
+  <div align="right">
+    {{=A('\xe9\x80\x80\xe5\x87\xba',_href=URL('user',args='logout',vars=dict(_next='login')),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+  </div>
+  <div align="center" style="font-family:Book Antiqua;color:#ff00ff;">hello,hello,hello! {{=current_user}}</div>
+  <div align="center">
+    <form id="search_form">
+      <h2 style="color:blue">订单查询系统</h2>
+      <input  type="hidden" name="user" value='{{=current_user}}' />
+      <input name="input_mobil" style="height:32px;" placeholder="mobilephone"/><input type="submit" value="查询" style="height:32px;font-size:100%;font-weight:bold;width:60px;color:#ffffff;background-color: #2aabd2;"/>
+    </form>
+    <div id="search_result"  ></div>
+  </div>
+
+
+  <script>
+    jQuery('#search_form').submit(
+    function() {
+       ajax('{{=URL("search_trade")}}',['input_mobil','user'], 'search_result');return false;
+    });
+  </script>
+</body>
+
+
+<style>
+body {
+    text-align: center;
+    margin: 0;
+}
+#myModal{
+    background-color: #afd9ee;
+    width:100% ;height:100%;
+    position: absolute;
+    top:0;
+    left:0;
+    right:100;
+    bottom:500;
+}
+</style>
+
+<!--
+<form id="myform">
+<input name="your_message" id="your_message" />
+<input type="submit" />
+</form>
+
+<script>
+jQuery('#myform').submit(function() {
+ajax('',
+['your_message'], 'target');
+return false;
+});
+</script>
+-->
