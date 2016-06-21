@@ -10,6 +10,7 @@ databases/*
 controllers/err.txt
 *.table
 *.log
+*.tgz
 # Compiled source #
 ###################
 *.com
