@@ -1,5 +1,5 @@
+# -*- coding: utf-8 -*-
 __author__ = 'Administrator'
-
 import xml.etree.ElementTree as XML_ET
 import os
 import sys
@@ -18,8 +18,7 @@ rds=redis.StrictRedis()
 p=re.compile("[\.\!\|\,\\\$%^*+=\"\']+|[+！，。？、~@￥%……&*＠]+".decode("utf8"))
 pspace=re.compile("\s+".decode("utf8"))
 paddress=re.compile("-".decode("utf8"))
-patt_feature=re.compile("[\w+|\(+|\)+|一+|二+|三+|四+|五+|六+|七+|八+|九+|十+|零+]+".decode('utf8'))
-patt_keywd=re.compile("[号|楼|元|路|栋|区|室|园|组|道|村|幢|城|司|座|弄|店|期|大|巷|场|旁|寓|省|市|县|院|心|厦|门|口|集|镇|苑|层|街|景|居|舍|房|部|科|都|学|厂|上|行|方|后|属|面|下|户|收|处|内|向|队|馆|校|斜|社|所|商|站|局|行|庭|段|团]+".decode('utf8'))
+patt_keywd=re.compile("[号|楼|元|路|栋|区|室|园|组|道|村|幢|城|司|座|弄|店|期|巷|场|旁|寓|省|市|县|院|心|厦|门|口|集|镇|苑|层|街|景|居|舍|房|部|科|都|学|厂|方|后|属|面|下|户|收|处|内|向|队|馆|校|斜|社|所|商|站|局|行|庭|段|团]+".decode('utf8'))
 zhixia=(u'北京',u'天津',u'上海',u'重庆')
 zhixiashi=(u'北京市',u'天津市',u'上海市',u'重庆市')
 zizhi=(u'内蒙古',u'西藏')
@@ -194,6 +193,20 @@ def filterotherarea(straddr):
             return straddr.replace(fixword,fixaddress[fixword])
     return straddr
 
+bknm=rds.smembers('blackname')
+def isbknm(straddr):
+    for i in bknm:
+        if i.decode('utf8') in straddr:
+            return True
+    return False
+
+may_bknm=rds.smembers('may_blackname')
+def is_may_blackname(straddr):
+    for i in may_bknm:
+        if i.decode('utf8') in straddr:
+            return True
+    return False
+
 #是否模糊字结尾
 def isfuzzyend(straddr):
     for i in fuzzywords:
@@ -237,7 +250,7 @@ def procaddress(**content):
     content["address"]=Detailaddress
     if content["province"]!='':
         addr=getprovince(content["province"])
-        if addr!="":
+        if addr:
             content["province"]=addr
         #else:
             #content["province"]=u""
@@ -357,9 +370,14 @@ def procaddress(**content):
         content["area"]=area
         content["address"]=dynareduce(filterotherarea(content["address"]))
     content["address"]=setdetail(content["province"],content["city"],content["area"],content["address"])
-    if isfuzzyend(content["address"]):
+    if isfuzzyend(content["address"]) or u'测试' in content["address"]:
         content["status"]="2"
         content["wrong_reason"]=u"不通过"
+    elif isbknm(content["address"]):
+        content["status"]="2"
+        content["wrong_reason"]=u"黑名单"
+    elif is_may_blackname(content["address"]):
+        content["status"] +="9"
     elif isfuzzyend1(content["address"]):
         content["status"] += "4" #待查看
     street=findstreetincity(content["city"],content["address"])
@@ -367,6 +385,8 @@ def procaddress(**content):
         content["other_remark"]=street
         content["address"]=content["address"].replace(street,u"")
     content['city_class']=getcityclass(content["city"],content["area"])
+    if not content["status"]:
+        content["status"]="55"
     return content
 
 def cmp(x,y):
@@ -731,7 +751,7 @@ def AddTradeToEdb():
             ((vars['apiKey']).decode('unicode_escape')==(this_apiKey)):
                 #getorderid=db.trade.update_or_insert(db.trade.out_tid==edbdata['out_tid'],**edbdata)
                 t=db(db.trade.out_tid==edbdata['out_tid']).select()
-                #edbdata=procaddress(**edbdata)
+                edbdata=procaddress(**edbdata)
                 if t:
                     msg.append({'is_success':'true','response_Msg':'duplicate trade'})
                     t.first().update_record(**edbdata)

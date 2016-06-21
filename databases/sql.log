@@ -23915,3 +23915,7 @@ timestamp: 2016-05-25T09:45:33.505631
 ALTER TABLE trade ADD addrbkp VARCHAR(100);
 faked!
 success!
+timestamp: 2016-06-01T16:47:18.389454
+ALTER TABLE trade ADD simid LONGTEXT;
+faked!
+success!
