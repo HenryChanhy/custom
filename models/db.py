@@ -84,6 +84,13 @@ auth.settings.reset_password_requires_verification = True
 ## >>> db.mytable.insert(myfield='value')
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
+#######################################################################
+db.define_table('census_result',
+                Field('shop_id',length=20),
+                Field('product_size',length=20),
+                Field('census_count',length=20),
+                Field('tstat',length=4),
+                Field('census_date',type='date'))#,unique=True
 #########################################################################
 db.define_table('history_order',
                 Field('mobilPhone',length=20,unique=True),

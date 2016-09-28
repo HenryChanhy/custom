@@ -20,22 +20,36 @@ ajax('#=URL('echo')}}',
 #});
 <input name="name" onkeyup="ajax('echo', ['name'], ':eval')" />
 #</script>-->
-<span class="flash" style="background-color: #122b40;color: #66afe9;font-weight:bold;font-size: large">{{=BEAUTIFY(response.flash) or ''}}</span>
+<span class="flash" style="background-color: #122b40;color: #66afe9;font-weight:bold;font-size: large">
+{{=BEAUTIFY(response.flash) or ''}}</span>
 
 {{for i in range(1,5):}}
 <form onclick="ajax('echo', ['name{{=i}}'], ':eval');">
-  <select name="name{{=i}}">
+  <select name="name{{=i}}"  onmouseover="this.size='5';"
+            onmouseout="this.size='1';">
     <option value="volvo">Volvo</option>
     <option value="saab">Saab</option>
     <option value="opel">Opel</option>
     <option value="audi">Audi</option>
   </select>
 </form>
+<br/>
+<br/>
+<br/>
 <div id="name{{=i}}">
     trt
 </div>
 {{pass}}
 
+<div>
+  <form>
+    <input type="checkbox" name="provice" value="上海" disabled="disabled"/>{{='\xe4\xb8\x8a\xe6\xb5\xb7'}}
+    <input type="checkbox" name="provice" value="天津" disabled="disabled" />{{='\xe5\xa4\xa9\xe6\xb4\xa5'}}
+    <input type="checkbox" name="provice" value="重庆" />{{='\xe9\x87\x8d\xe5\xba\x86'}}<br />
+    <input type="checkbox" name="provice" value="河北" />{{='\xe6\xb2\xb3\xe5\x8c\x97'}}
+    <input type="checkbox" name="provice" value="山西" />{{='\xe5\xb1\xb1\xe8\xa5\xbf'}}
 
 
-
+    <input type="submit" value="Submit"/>
+  </form>
+</div>

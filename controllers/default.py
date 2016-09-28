@@ -11,17 +11,21 @@
 import os
 import re
 from simhash import Simhash,SimhashIndex
-from snownlp import SnowNLP
+#from snownlp import SnowNLP
 import time
 import hashlib
 import openpyxl
 import datetime
 import redis
+import xml.etree.ElementTree as XML_ET
+import json
+import requests
+
 auth.settings.registration_requires_approval = False
 auth.settings.registration_requires_verification = True
 auth.settings.allow_basic_login = True
 auth.define_tables(username=True)
-auth.settings.login_next = URL('test_display_form/db')
+auth.settings.login_next = URL('select_province')
 
 rds=redis.StrictRedis()
 today=datetime.date.today().strftime("%d")
@@ -63,6 +67,13 @@ def init_db():
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'产品名称',field_id='product_name',field_order=15)
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'订货数量',field_id='order_num',field_order=16)
     db.db_map.insert(table_type='excel',table_name='custom_order',field_name=u'网店规格',field_id='ex_spec',field_order=17)
+
+def d3tree():
+    return dict()
+def circle():
+    return dict()
+def force():
+    return dict()
 
 def import_csv(csvfile):
     db.custom_order.import_from_csv_file(csvfile)
@@ -106,16 +117,94 @@ def user():
     to decorate functions that need access control
     """
     form=auth()
+    #form.insert(-1,TR(INPUT(_type="checkbox",_name="vehicle",_value="Bike"),"I have a bike",
+    #INPUT(_type="checkbox",_name="vehicle",_value="Car"),"I have a car",BR()))
     return dict(form=form)
+
+shop_ids=['108','109' ,'110','111','112','114','120','122',
+         '23','29','36','38','61','63','64','93','94','95']
+product_size=['NB12','S12','NB8','S8']
+def census_form():
+    cnt5={}
+    s5=[]
+    cnt6={}
+    s6=[]
+    for j in product_size:
+        s=0
+        for i in shop_ids:
+            buf1=db((db.census_result.tstat=='5')&\
+               (db.census_result.product_size==j)&\
+               (db.census_result.shop_id==i)).select(
+                db.census_result.census_count)
+            cnt5[j+'_'+i]=buf1[0]['census_count']
+            s=s+int(cnt5[j+'_'+i])
+        s5.append(s)
+        s=0
+        for i in shop_ids:
+            buf2=db((db.census_result.tstat=='6')&\
+               (db.census_result.product_size==j)&\
+               (db.census_result.shop_id==i)).select(
+                db.census_result.census_count)
+            cnt6[j+'_'+i]=buf2[0]['census_count']
+            s=s+int(cnt6[j+'_'+i])
+        s6.append(s)
+    s6s=s6[0]+s6[1]+s6[2]+s6[3]
+    s5s=s5[0]+s5[1]+s5[2]+s5[3]
+    #form= FORM(
+        #INPUT(_name='name',_type='date',requires=IS_NOT_EMPTY()),
+        #INPUT(_type='submit'))
+    return dict(
+        #form=form,
+        s5=s5,
+        s5s=s5s,
+        s6=s6,
+        s6s=s6s,
+        cnt5=cnt5,
+        cnt6=cnt6,
+        shop_ids=shop_ids)
+
+@auth.requires_login()
+def trace_trade():
+    qry=''
+    if (request.vars.begin_time) and (request.vars.end_time):
+        begintime=request.vars.begin_time
+        endtime=request.vars.end_time
+        qry='(db.trade.order_date>"%s")& (db.trade.order_date<"%s")'%(begintime,endtime)
+    shop_ids=[]
+    if request.vars.shopids:
+        t=request.vars.shopids
+        if isinstance(t,str):
+            shop_ids.append(t)
+        else:
+            for i in t:
+                shop_ids.append(i)
+    if shop_ids:
+        qry1=''
+        for i in shop_ids:
+            qry1=qry1+'|'+'('+'db.trade.shop_id.like(u"%s")'%(i)+')'
+        if qry1:
+            qry='('+qry1[1:]+')'+'&'+qry
+    if qry:
+        query= eval_in_global_env(qry)
+        search_result=db(query).select(db.trade.id,db.trade.mobilPhone,limitby=(0,100))
+    else:
+        search_result=""
+
+    return dict(
+        search_result=search_result,
+        current_user='%(first_name)s' %(auth.user),
+    )
+
+def back_trade():
+    return dict()
 
 @auth.requires_login()
 def search_by_phone():
-        return dict(
-            current_user='%(first_name)s' %(auth.user),
-            log_state=0,
-            can_log=1
-        )
-
+    return dict(
+        current_user='%(first_name)s' %(auth.user),
+        log_state=0,
+        can_log=1
+    )
 def search_trade():
     mobil=request.vars.input_mobil
     current_user=request.vars.user
@@ -149,16 +238,21 @@ def test_table():
     response.flash = "wang,wang,wang"
     return 'hello,hello,hello'
 
+def test_flash():
+    response.flash = "qqqqqqqqqq"
+    return dict()
+
 def EditTable():
     return dict()
 
 def test_ajax():
     return dict()
+
 def echo():
     name_dict=dict(request.vars)
     name_key=name_dict.keys()[0]
     name_val=name_dict.values()[0]
-    response.flash = "wang,wang,wang"
+    response.flash = name_val
     #return request.vars.your_mes
     #return request.vars.name
     #return "jQuery('#target').html(%s);" % repr(name_val)
@@ -185,7 +279,6 @@ def csv():
     response.headers['Content-Type'] = \
         gluon.contenttype.contenttype('.csv')
     db = eval_in_global_env(request.args[0])
-
     if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
         qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
     else:
@@ -194,7 +287,7 @@ def csv():
     response.headers['Content-disposition'] = 'attachment; filename=%s_%s_%s.csv'\
     % ('trade',request.vars.begin_line,request.vars.end_line)
     return str(db(query, ignore_common_filters=True).select(limitby=(int(request.vars.begin_line),int(request.vars.end_line))))
-#############################################################
+##################################################################################################################################
 
 import copy,datetime
 global_env = copy.copy(globals())
@@ -202,6 +295,7 @@ global_env['datetime'] = datetime
 def eval_in_global_env(text):
     exec ('_ret=%s' % text, {}, global_env)
     return global_env['_ret']
+
 def himin_distance(i1,i2):
     f=64
     x = (i1 ^ i2) & ((1 << 64) - 1)
@@ -211,23 +305,104 @@ def himin_distance(i1,i2):
         x &= x - 1
     return ans
 
+prov_dict={
+    "bj":u'北京' ,"sh":u'上海' ,"tj":u'天津', "cq":u'重庆',
+    "heb":u'河北', "sx":u'山西', "ln":u'辽宁', "jn":u'吉林',
+    "js":u'江苏',"zj":u'浙江', "ah":u'安徽', "fj":u'福建' ,
+    "jx":u'江西' ,"sd":u'山东' ,"hen":u'河南', "hub":u'湖北',
+    "hun":u'湖南',"gd":u'广东' ,"gx":u'广西' ,"hn":u'海南' ,
+    "sc":u'四川' ,"gz":u'贵州', "yn":u'云南',  "xz":u'西藏' ,
+    "sax":u'陕西' ,"gs":u'甘肃' ,"qh":u'青海' ,"nx":u'宁夏',
+    "xj":u'新疆', "hlj":u'黑龙江',"nm":u'内蒙'}
+
+@auth.requires_login()
+def select_province():
+    if request.vars.refresh:
+        for i in rds.keys('Pvc_*'):
+            rds.delete(i)
+        for i in  rds.keys('otid*'):
+            rds.delete(i)
+    db = eval_in_global_env('db')
+    current_user='%(first_name)s' %(auth.user)
+    prov_key=["bj","sh" ,"tj", "cq",
+              "ln", "jn","sd","sx", #东北
+              "sax" ,"gs","nx","qh",#西北
+              "hen","heb","hun","hub",#华中
+              "jx","js","zj", "ah",#华东
+              "gd" ,"gx" ,"hn" ,"fj",#华南
+              "yn","gz","sc","xz",#西南
+              "xj","nm","hlj"]#华北
+    #prov_value=prov_dict.values()
+    pvc_user='Pvc_'+current_user
+    if request.vars.provice:
+        t=request.vars.provice
+        if isinstance(t,str):
+            rds.sadd(pvc_user,t)
+        else:
+            for i in t:
+                rds.sadd(pvc_user,i)
+        redirect(URL('test_display_form'))
+    prov_set=set()
+    us=rds.keys('Pvc_*')
+    which_day=1
+    if request.vars.which_day:
+        which_day= int(request.vars.which_day)
+    that_day= (datetime.date.today() - datetime.timedelta(days=which_day)).strftime("%Y%m%d")
+    next_day= (datetime.date.today() - datetime.timedelta(days=which_day-1)).strftime("%Y%m%d")
+    select_day= that_day[0:4]+u"年"+that_day[4:6]+u"月"+that_day[6:]+u"日"
+
+    prov_cnt={}
+    for i in prov_key:
+        qry1='db.trade.province.like(u"%s%s")'%(prov_dict[i],'%')
+        qry='('+qry1+')'+'&'+'(db.trade.status!="2") & (db.trade.status!="3") &(db.trade.order_date>"%s")& (db.trade.order_date<"%s")'%(that_day,next_day)
+        query= eval_in_global_env(qry)
+        prov_cnt[i]=db(query).count()
+    for i in us:
+        s1=rds.smembers(i)
+        prov_set=prov_set|s1
+    return dict(
+        prov_cnt=prov_cnt,
+        prov_key=prov_key,
+        prov_dict=prov_dict,
+        prov_set=prov_set,
+        which_day=which_day,
+        select_day=select_day,
+    )
+
 @auth.requires_login()
 def test_display_form():
-    db = eval_in_global_env(request.args[0])
-    dbname = request.args[0]
+    current_user='%(first_name)s' %(auth.user)
+    pvc_user='Pvc_'+current_user
+    every_otid='otid'+current_user
+    if not request.function=='select_province' and not rds.exists(pvc_user):
+        redirect(URL('select_province'))
+    db = eval_in_global_env('db')
     try:
         is_imap = db._uri.startswith("imap://")
     except (KeyError, AttributeError, TypeError):
         is_imap = False
     step = 100
-    if is_imap:
-        step = 3
+
     table = "trade"
-    if (request.vars.qryfield)and(request.vars.qryoperater)and(request.vars.qryvalue):
-        qry=request.vars.qryfield+request.vars.qryoperater+request.vars.qryvalue
-    else:
-        qry = 'db.trade.id>0'
-    nrows = db((db.trade.order_date>yesterday) & (db.trade.status!='2')).count()
+    which_day=1
+    if request.vars.which_day:
+        which_day= int(request.vars.which_day)
+    that_day= (datetime.date.today() - datetime.timedelta(days=which_day)).strftime("%Y%m%d")
+    next_day= (datetime.date.today() - datetime.timedelta(days=which_day-1)).strftime("%Y%m%d")
+    qry='(db.trade.status!="2") & (db.trade.status!="3") &(db.trade.order_date>"%s")& (db.trade.order_date<"%s")'%(that_day,next_day)
+    select_day= that_day[0:4]+u"年"+that_day[4:6]+u"月"+that_day[6:]+u"日"
+    provs=rds.smembers(pvc_user)
+    provS=[]
+    if provs:
+        qry1=''
+        for i in provs:
+            qry1=qry1+'|'+'('+'db.trade.province.like(u"%s%s")'%(prov_dict[i],'%')+')'
+            provS.append(prov_dict[i])
+        if qry1:
+            qry='('+qry1[1:]+')'+'&'+qry
+    query= eval_in_global_env(qry)
+    #exec 'query=%s'%(qry)
+    nrows = db(query).count()
     start=0
     if request.vars.start:
         start = int(request.vars.start)
@@ -242,13 +417,10 @@ def test_display_form():
         stop = start + step
     else:
         stop=nrows
-    t=yesterday
-    rows=db((db.trade.order_date.day()==yesterday) & (db.trade.status!='2')& (db.trade.status!='3')).select(limitby=(start,stop),orderby=db.trade.out_tid)
-    query = eval_in_global_env(qry)
+    rows=db(query).select(limitby=(start,stop),orderby=db.trade.out_tid)
     #nrows = db(query, ignore_common_filters=True).count()
     #rows = db(query, ignore_common_filters=True).select(limitby=(start,stop))
     tb=None
-
     simaddr=[]
     for r in rows:
         sim_buf=[]
@@ -256,64 +428,78 @@ def test_display_form():
             otids=r['simid'].split('&')
             for i in otids:
                 ar=db(db.history_order.id==i).select(db.history_order.id,
-                    db.history_order.consignee,db.history_order.address).first()
+                    db.history_order.consignee,db.history_order.address,db.history_order.data_date).first()
                 sim_buf.append(ar)
         simaddr.append(sim_buf)
-        rds.sadd('every_otid',r['out_tid'])
-
-    sim_index=[]
-
-    for i in range(0,stop-start):
-        if simaddr[i]:
-            sim_index.append(i)
+        rds.sadd(every_otid,r['out_tid'])
 
     locateform = FORM(TABLE(TR(
     TD(INPUT(_name='locate', _value=request.vars.locate,_style='width:45px;')),
     TD(INPUT(_type='submit', _value=T('Locate'),_style='width:60px;text-align:center;color:blue;')))),
-    _action=URL(r=request,args=request.args),_style="padding:0;margin:0;" )
+    _action=URL(r=request,args=request.args),_style="padding:0;margin:0;")
 
     return dict(
         locateform=locateform,
+        select_day=select_day,
+        provS=provS,#
         table=table,
         start=start,
         step=step,
         nrows=nrows,
         rows=rows,
+        which_day=which_day,
         simaddr=simaddr,
-        sim_index=sim_index,
-        query=request.vars.query,
-        current_user='%(first_name)s' %(auth.user),
+        current_user=current_user,
         tb=tb
     )
 
 def update_state():
     name_dict=dict(request.vars)
-    name_key=name_dict.keys()[0]
+    user_val=name_dict['update_rest']
+    every_otid='otid'+user_val
+    name_dict.pop('update_rest')
+    name_key=pat_dat.findall(name_dict.keys()[0])[0]
     name_val=name_dict.values()[0]
-    if rds.sismember('every_otid',name_key):
-        rds.srem('every_otid',name_key)
-    if name_val=='TG':
-        r=db(db.trade.out_tid==name_key).update(status='3')
-        if r:
-            response.flash = "trade has been updated"
+    if name_val:
+        if rds.sismember(every_otid,name_key):
+            rds.srem(every_otid,name_key)
+        if name_val=='TG':
+            db(db.trade.out_tid==name_key).update(status='3')
+            r=db(db.trade.out_tid==name_key).select(db.trade.status)
+            if r:
+                if r[0]['status']=='3':
+                    response.flash = "trade has been updated"
+                else:
+                    response.flash = "failed to update the trade"
+            else:
+                response.flash = "failed to update the trade"
+            return "jQuery('#%s').css('color','#00ff00');"%(name_key)
         else:
-            response.flash = "failed to update the trade"
-        return "jQuery('#%s').css('color','#00ff00');"%(name_key)
+            db(db.trade.out_tid==name_key).update(**dict(status='2',wrong_reason=name_val))
+            r=db(db.trade.out_tid==name_key).select(db.trade.status,db.trade.wrong_reason)
+            if r:
+                if r[0]['status']=='2' and r[0]['wrong_reason']==name_val:
+                    response.flash = "trade has been updated"
+                else:
+                    response.flash = "failed to update the trade"
+            else:
+                response.flash = "failed to update the trade"
+            return "jQuery('#%s').css('color','#ff00ff');"%(name_key)
     else:
-        r=db(db.trade.out_tid==name_key).update(**dict(status='2',wrong_reason=name_val))
-        if r:
-            response.flash = "trade has been updated"
-        else:
-            response.flash = "failed to update the trade"
-        response.flash = "trade has been updated"
-        return "jQuery('#%s').css('color','#ff00ff');"%(name_key)
+        return ""
 
 def update_all_rest():
-    t=len(rds.smembers('every_otid'))
-    if t==97:
-        response.flash = "All of updated"
+    user_val=request.vars['update_rest']
+    every_otid='otid'+user_val
+    t=rds.smembers(every_otid)
+    for i in t:
+        r=db(db.trade.out_tid==i).update(status='3')
+        if r:
+            rds.srem(every_otid,i)
+    if rds.smembers(every_otid):
+        response.flash = "failed to update all rest"
     else:
-        response.flash = str(t)
+        response.flash = "all rest has been updated"
     return ''
 
 def EditTableAjax():
@@ -326,6 +512,30 @@ def EditTableAjax():
         response.flash = "address have been updated"
     else:
         response.flash = "no updated"
+    return ''
+
+def add2blackname():
+    name_dict=dict(request.vars)
+    #namekey=name_dict.keys()[0]
+    #name_key=pat_dat.findall(namekey)[0]
+    name_val=name_dict.values()[0]
+    r=rds.sadd('blackname',name_val)
+    log_file("blackname",name_val)
+    if r:
+        response.flash = "add to blackname successfully"
+    else:
+        response.flash = "no added"
+    return ''
+
+def add2may_blackname():
+    name_dict=dict(request.vars)
+    name_val=name_dict.values()[0]
+    r=rds.sadd('may_blackname',name_val)
+    log_file("may_blackname",name_val)
+    if r:
+        response.flash = "add to may_blackname successfully"
+    else:
+        response.flash = "no added"
     return ''
 
 def echo_rownum():
@@ -540,7 +750,6 @@ def add_excel(ws):
                 if rowcontent['user_name']!= ws.cell(row=rows-1, column=6).value:
                     rowcontent['product_tag']=SKU_dict[ws.cell(row=rows,column=12).value]
                     db.custom_order.insert(**rowcontent)
-
 
 pampers_dict={'order_id':'A','ex_id':'B','user_name':'C','mobile':'D','province':'E',
               'city':'F','county':'G','address':'H','pregnancy':'I','product_piece':'J',
@@ -996,8 +1205,6 @@ def statistics(list1):
         dict1[list1[i]]=li
     return dict1
 
-
-    
 def add_BBS_20151222(ws4):
     field_list=['order_id','ex_id','shop_name','telephone','cellphone','user_name','address',
                 'province','city','county','product_order','barcode','product_name','product_size',
@@ -1248,6 +1455,75 @@ def EdbOrderGet():
         return int(vars['a'])+int(vars['c'])*int(vars['b'])
     return locals()
 
+def EdbAPI(**arg):
+    def _EdbAPI(func):
+        def __EdbAPI(data):
+            #url="http://vip79.edb04.net/edb2/rest/openapi/index.aspx"
+            url="http://vip79.edb04.net/rest/index.aspx"
+            SysData={
+                "appkey":"5a7b7896",
+                "dbhost":"edb_a77527",
+                "format":"json",
+                "v":2.0,
+                "slencry":0,
+                "Ip":"117.79.148.228",
+                }
+            ExData={
+                "appscret":"1f5b75edd28d480e968feecbc38f2c73",
+                "token":"7041e7424cb4410f8370f10a2d3a285a",
+                }
+            param=func(data)
+            param.update(SysData)
+            param["method"]=arg["method"]
+            param["timestamp"]=GetTimeStamp()
+            paraList=[]
+            for k,v in param.items():
+                if k=="appkey":
+                    continue
+                if not str(v):
+                    continue
+                paraList.append(k+str(v))
+            for k,v in ExData.items():
+                paraList.append(k+str(v))
+            paraList.sort(cmp)
+            md5Str="".join(paraList)
+            md5Str=SysData["appkey"]+"appkey"+SysData["appkey"]+md5Str
+            param["sign"]=MD5Sign(md5Str)
+            req=requests.post(url,param)
+            if not req.ok:
+                print "requests FAIL"
+                log_file("%s %s"%(arg,data))
+                filePath=log_file(req.content)
+                print "log_file in",filePath
+                return
+            return json.loads(req.content)
+        return __EdbAPI
+    return _EdbAPI
+
+@EdbAPI(method="edbTradeAdd")
+def AddBsgTrade(data):
+    infos=data['product_info']
+    data.pop('product_info')
+    orderXml=XML_ET.fromstring('<info><orderInfo></orderInfo></info>')
+    orderInfo=orderXml.find("orderInfo")
+
+    for k,v in data.items():
+        tmp=XML_ET.SubElement(orderInfo,k)
+        tmp.text=v#.decode('utf8')
+
+    product_info=XML_ET.Element('product_info')
+    for info in infos:
+        c=XML_ET.SubElement(product_info,'product_item')
+        for i,j in info.items():
+            d=XML_ET.SubElement(c,i)
+            d.text=j
+
+    orderInfo.append(product_info)
+    finalStr=XML_ET.tostring(orderXml,"utf8")
+    result={}
+    result["xmlValues"]=finalStr[37:]
+    return result
+
 #@auth.requires_login()
 @request.restful()
 def TradeGet():
@@ -1285,5 +1561,43 @@ def TradeDelete():
         return db(db[table_name].order_id==record_id).delete()
     return locals()
 
-if __name__=='__main__':
-    main()
+
+
+
+if __name__=="__main__":
+    unneed_field=['status','tc_return','edb_return','oti_return','wrong_reason','simid','city_class','addrbkp']
+    data0={}
+    buf0=db(db.bsg_trade.out_tid=='bsg29').select().as_list()
+    buf1=db(db.product_info.out__tid=='bsg29').select().as_list()
+    for i,j in buf0[0].items():
+        if i in unneed_field:
+            continue
+        if j:
+            if isinstance(j,str):
+                data0[i]=j.decode('utf8')
+            if isinstance(j, datetime):
+                data0[i] = unicode(j)#.isoformat()
+            if isinstance(j, long):
+                data0[i] = unicode(j)
+                #data0[i]=j.decode('utf8')
+    info1=[]
+    for it in buf1:
+        data1={}
+        for i,j in it.items():
+            if j:
+                if isinstance(j,str):
+                    data1[i]=j.decode('utf8')
+                if isinstance(j, datetime):
+                    data1[i] = unicode(j)#.isoformat()
+                if isinstance(j, long):
+                    data1[i] = unicode(j)
+        info1.append(data1)
+    data0.update({"product_info":info1})
+
+    edb_return=AddBsgTrade(data0)
+    print edb_return
+
+
+
+
+

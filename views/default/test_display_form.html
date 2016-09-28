@@ -6,41 +6,58 @@
     {{=tb}}
   </pre>
   {{pass}}
-<form><input type="hidden" name="update_rest"  /></form>
+<form><input type="hidden" name="update_rest" value="{{=current_user}}" /></form>
   <table border="1" rules="cols" cellspacing="0" style="border-width:thin;width: 100%">
    <tr style="background-color: #122b40;">
     <td style="color: #66afe9;">{{=T("%s selected", nrows)}}</td>
     <td>
-    {{=A('\xe9\xa6\x96\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=0)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    {{=A('\xe9\xa6\x96\xe9\xa1\xb5',_href=URL('test_display_form',vars=dict(start=0)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
     </td>
     <td>
     {{if start>=step:}}
-    {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=start-step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href=URL('test_display_form',vars=dict(start=start-step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
     {{else:}}
     {{=A('\xe4\xb8\x8a\xe9\xa1\xb5',_href="#0",_style='height:25px;width:95px;text-decoration:none;color: #66afe9;')}}
     {{pass}}
     </td>
     <td>
     {{if start<=nrows-step:}}
-    {{=A('\xe4\xb8\x8b\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=start+step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    {{=A('\xe4\xb8\x8b\xe9\xa1\xb5',_href=URL('test_display_form',vars=dict(start=start+step)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
     {{else:}}
     {{=A('\xe4\xb8\x8b\xe9\xa1\xb5',_href="#0",_style='height:25px;width:95px;text-decoration:none;color:888888;')}}
     {{pass}}
     </td>
     <td>
-    {{=A('\xe5\xb0\xbe\xe9\xa1\xb5',_href=URL('test_display_form',args=request.args[0],vars=dict(start=nrows-(nrows%step))),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    {{=A('\xe5\xb0\xbe\xe9\xa1\xb5',_href=URL('test_display_form',vars=dict(start=nrows-(nrows%step))),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    </td>
+
+    <td>
+    {{if which_day<7:}}
+    {{=A('\xe5\x89\x8d\xe4\xb8\x80\xe5\xa4\xa9',_href=URL('test_display_form',vars=dict(which_day=which_day+1)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    {{else:}}
+    {{=A('\xe5\x89\x8d\xe4\xb8\x80\xe5\xa4\xa9',_href="#0",_style='height:25px;width:95px;text-decoration:none;color: #66afe9;')}}
+    {{pass}}
+    </td>
+    <td style="font-family:Book Antiqua;color: #66afe9;">{{=select_day}}</td>
+    <td>
+    {{if which_day>1:}}
+    {{=A('\xe5\x90\x8e\xe4\xb8\x80\xe5\xa4\xa9',_href=URL('test_display_form',vars=dict(which_day=which_day-1)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    {{else:}}
+    {{=A('\xe5\x90\x8e\xe4\xb8\x80\xe5\xa4\xa9',_href="#0",_style='height:25px;width:95px;text-decoration:none;color:#66afe9;')}}
+    {{pass}}
     </td>
     <td> <button style="border: none;background: none;color: #66afe9;" onclick="HiddenToolbar(this);">Show tool</button></td>
     <td> <button style="border: none;background: none;color: #66afe9;" onclick="HiddenDetail(this);">Show detail</button></td>
     <td>
-        <button  onclick="ajax('{{=URL('update_all_rest')}}', ['update_rest'], ':eval')" style="border: none;background: none;color: #66afe9;">
+        <button  onclick="ajax('{{=URL('update_all_rest')}}', ['update_rest'], ':eval')" style="border: none;background: none;font-family:Book Antiqua;font-weight:bold;color: #66afe9;">
         {{="\xe5\x89\xa9\xe4\xbd\x99\xe5\x85\xa8\xe9\x80\x9a\xe8\xbf\x87"}}
         </button>
     </td>
+    <td style="font-family:Book Antiqua;color: #66afe9;"> {{for p in provS:}} {{=p}},{{pass}}</td>
     <td style="font-family:Book Antiqua;color: #66afe9;">hello! {{=current_user}}</td>
-     <td>
+    <td>
     {{=A('\xe9\x80\x80\xe5\x87\xba',_href=URL('user',args='logout',vars=dict(_next='login')),_style='color: #66afe9;')}}
-  </td>
+    </td>
    </tr>
   </table>
 
@@ -61,9 +78,8 @@
         </thead>
         <tbody id="tbody1">
           {{for i,row in enumerate(rows.as_list()):}}
-            <tr id="tbr{{=i}}" {{if row['status']=='7':}}style="color:#ff2121" {{elif row['status']=='4':}}style="color: #0000ff;" {{elif row['status']=='9':}} style="color:#801DAE" {{elif row['status']=='8':}} style="color:#00BC12"{{else:pass}}
-                onclick="SetPointedColor(this);">
-
+            <tr id="tbr{{=i}}" tabindex="0" {{if row['status']=='7':}}style="color:#ff2121" {{elif row['status']=='4':}}style="color: #0000ff;" {{elif row['status']=='9':}} style="color:#801DAE" {{elif row['status']=='8':}} style="color:#00BC12"{{else:pass}}
+                onclick="SetPointedColor(this);" onkeyup="setshortcut(event);">
               <td class="consignee">{{=row['consignee']}}&#8194;</td>
               <td class="mobilPhone">{{=row['mobilPhone']}} &#8194;</td>
               <td class="order_date">{{=row['order_date']}} &#8194;</td>
@@ -73,8 +89,9 @@
               <td id="{{=row['out_tid']}}" class="out_tid">{{=row['out_tid']}}&#8194;</td> <!--td的id用于接收回调函数的Jquery-->
               <td class="address">{{=row['address']}}</td>
               <td class="update">
-                <form onclick="ajax('{{=URL('update_state')}}', ['{{=row["out_tid"].decode('utf8')}}'], ':eval');" style="padding:0;margin:0;">
+                <form onclick="ajax('{{=URL('update_state')}}', ['{{=row["out_tid"].decode('utf8')}}','update_rest'], ':eval');" style="padding:0;margin:0;">
                   <select name='{{=row["out_tid"]}}' style="width:100px;">
+                    <option value="">{{='\xe8\xaf\xb7\xe9\x80\x89\xe6\x8b\xa9'}}</option>
                     <option value="TG">{{='\xe9\x80\x9a\xe8\xbf\x87'}}-TG</option>
                     <option value="BTG">{{='\xe4\xb8\x8d\xe9\x80\x9a\xe8\xbf\x87'}}-BTG</option>
                     <option value="SJ">{{='\xe9\x87\x8d\xe5\xa4\x8d'}}-SJ</option>
@@ -104,7 +121,7 @@
 <table id="table2" border="1" frame="void" style="border-width:thin;display: none" cellspacing="0">
   <tr>
     <td>
-      <form enctype="multipart/form-data" style="padding:0;margin:0;" action="{{=URL(r=request, args=request.args)}}" method="post">
+      <form enctype="multipart/form-data" style="padding:0;margin:0;" action="{{=URL(r=request)}}" method="post">
         <select name="qryfield" style="width:65px;">
           <option value="db.trade.out_tid" selected>out_tid</option>
           <option value="db.trade.id" >id</option>
@@ -123,7 +140,7 @@
       </form>
     </td>
     <td>
-      <form enctype="multipart/form-data" style="padding:0;margin:0;" action="{{=URL(r=request, args=request.args)}}" method="post">
+      <form enctype="multipart/form-data" style="padding:0;margin:0;" action="{{=URL(r=request)}}" method="post">
         <select name="updatefield" style="width:60px;">
           <option value="status" selected>status</option>
           <option value="pay_status">pay_status</option>
@@ -140,7 +157,6 @@
 </table>
 
 <div id="target" class="flash" style="color:#ff0000;">{{=response.flash or ''}}</div>
-
 <div id="detailTable" style="display:none">
     {{for num,row in enumerate(rows.as_list()):}}
       <div class="detailcontent" style="display: none">
@@ -159,6 +175,7 @@
       <div class="simcontent" style="display: none">
       {{for r in row:}}
         <li type="1">
+          <span class="sitem">{{=r['data_date']}};</span>
           <span class="sitem">{{=r['consignee']}},</span>
           <span class="sitems">{{=r['address']}},</span>
           <span class="sitem">{{=r['id']}};</span>
@@ -177,14 +194,14 @@
      </form></td>
  </tr></table>
 -->
-
-
+<form><input type="hidden" id="pass_id"/></form>
 <script>
     var pointed_node0;
     var detail_node0;
     var detail_node1;
     var sim_node0;
     var sim_node1;
+
     window.onload=function(){
         pointed_node0 = document.getElementById("tbody1").firstElementChild;
         pointed_node0.style.backgroundColor='00ffff';
@@ -211,12 +228,29 @@
         detail_node1=document.getElementsByClassName("detailcontent")[p_id.rowIndex-1];
         detail_node1.style.display='inline';
         detail_node0=detail_node1;
-
         sim_node0.style.display='none';
         sim_node1=document.getElementsByClassName("simcontent")[p_id.rowIndex-1];
         sim_node1.style.display='inline';
         sim_node0=sim_node1;
     }
+
+    function setshortcut(event){
+        document.getElementById("pass_id").name=pointed_node0.children[6].innerHTML;
+        var pass_otid=pointed_node0.children[6].innerHTML;
+        if ((event.keyCode == '50')&& (event.altKey)){
+            document.getElementById("pass_id").value="TG";
+            //,'update_rest'
+            ajax("{{=URL('update_state')}}", [pass_otid,'update_rest'], ":eval");
+        }
+        else if ((event.keyCode == '51')&& (event.altKey)){
+            document.getElementById("pass_id").value="BTG";
+            //,'update_rest'
+            ajax("{{=URL('update_state')}}", [pass_otid,'update_rest'], ":eval");
+        }
+        else{
+        }
+    }
+
     function HiddenToolbar(btn_hid){
         var objtb;
         objtb=document.getElementById('table2');
@@ -242,12 +276,21 @@
             btn_hid.innerHTML='show detail';
         }
     }
+
+    function prom()
+    {
+        var name=prompt("请输入您的名字","");//将输入的内容赋给变量 name，
+        //这里需要注意的是，prompt有两个参数，前面是提示的话，后面是当对话框出来后，在对话框里的默认值
+        if(name){
+            alert("欢迎您："+ name)
+        }
+    }
 </script>
+
 <script>
     //dom创建文本框
     var input = document.createElement("input");
     input.type="text";
-
     //得到当前的单元格
     var currentCell;
     function editCell(event){
@@ -257,25 +300,37 @@
         else {
             currentCell=event.target;
         }
-        input.name=currentCell.previousElementSibling.innerHTML;//"newvar";
+        input.name=currentCell.previousElementSibling.innerHTML;//"out_tid as the key";
         var x=currentCell.previousElementSibling.innerHTML;
         if(currentCell.className=="address"){
-        input.value=currentCell.innerHTML;//用单元格的值来填充文本框的值
-        input.style.width=currentCell.offsetWidth;
-        //input.onblur=last;//当文本框丢失焦点时调用last
-        //input.ondblclick=last;
-        input.onkeypress=function (event){
-            if(event.keyCode=="13"){
-            ajax('{{=URL("EditTableAjax")}}',[x],'target');
-            last();
-            }
-        };
-        currentCell.innerHTML="";
-        //把文本框加到当前单元格上.
-        currentCell.appendChild(input);
-        input.focus();
+            var value_bkp=currentCell.innerHTML;
+            input.value=currentCell.innerHTML;//用单元格的值来填充文本框的值
+            input.style.width=currentCell.offsetWidth;
+            //input.onblur=last;//当文本框丢失焦点时调用last
+            //input.ondblclick=last;
+            input.onkeypress=function (event){
+                if(event.keyCode=='13'){
+                    ajax('{{=URL("EditTableAjax")}}',[x],'target');
+                    currentCell.innerHTML = input.value;//last();
+                }
+            };
+            input.onkeydown=function (event){
+                if(event.keyCode=='27'){
+                    ajax('{{=URL("add2blackname")}}',[x],'target');
+                    currentCell.innerHTML = value_bkp;//esc,input.value;//last();
+                }
+                if(event.keyCode=='9'){
+                    ajax('{{=URL("add2may_blackname")}}',[x],'target');
+                    currentCell.innerHTML = value_bkp;//tab,input.value;//last();
+                }
+            };
+            currentCell.innerHTML="";
+            //把文本框加到当前单元格上.
+            currentCell.appendChild(input);
+            input.focus();
         }
     }
+
     function last(){
         //充文本框的值给当前单元格
         currentCell.innerHTML = input.value;
@@ -307,7 +362,4 @@ td.address{overflow: hidden;}
 #simTable{border:1px solid #006600;}
 .items{color:blue;}
 
-{{for i in sim_index:}}
-    #tbr{{=i}}{color:#ff0000}
-{{pass}}
 </style>

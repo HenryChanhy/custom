@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+{{include 'web2py_ajax.html'}}
+<html lang="zh-cn">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title></title>
+  <link href="{{=URL('static','css/bootstrap.min.css')}}" rel="stylesheet">
+</head>
+
+<body>
+  <div align="right">
+    <span style="font-family:Book Antiqua;color:#ff00ff;">hello,hello,hello! {{=current_user}}</span>
+    <span>
+    {{=A('\xe9\x80\x80\xe5\x87\xba',_href=URL('user',args='logout',vars=dict(_next='login')),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color:0000ff;')}}
+    </span>
+  </div>
+  <h2 align="center" style="color:blue">订单回访</h2>
+
+    <form id="search_form" >
+        <input type="checkbox" name="shopids" value="61">ISA</br>
+        <input type="checkbox" name="shopids" value="38">BOX</br>
+        <input type="checkbox" name="shopids" value="112">广点通QQ手机</br>
+        <input type="checkbox" name="shopids" value="111">广点通腾讯新闻</br>
+        <input type="checkbox" name="shopids" value="110">广点通QQ浏览器</br>
+        <input type="checkbox" name="shopids" value="63">广点通-Zone</br>
+        <input type="checkbox" name="shopids" value="29">微官</br>
+        <input type="checkbox" name="shopids" value="108">微信菜单</br>
+        <input type="checkbox" name="shopids" value="89">BV赠品</br>
+        <input type="checkbox" name="shopids" value="64">BBS-ISA</br>
+        <input type="checkbox" name="shopids" value="36">特卖</br>
+        <input type="checkbox" name="shopids" value="106">贝贝</br>
+        <input type="checkbox" name="shopids" value="120">考拉</br>
+        <input type="checkbox" name="shopids" value="48">积分兑换试用装</br>
+        <input type="checkbox" name="shopids" value="49">积分兑换玩具&正装</br>
+        <input type="submit" value="搜索"style="height:38px;font-size:100%;font-weight:bold;width:60px;color:#ffffff;background-color: #2aabd2;"/>
+    </form>
+
+
+  {{if search_result:}}
+  <form class="form-inline">
+    {{for i in search_result:}}
+    <div id="result_div" class="form-group">
+        <span>{{=i['mobilPhone']}}</span>
+        <span>{{=i['id']}}</span>
+    </div>
+    {{pass}}
+  </form>
+  {{pass}}
+
+  <script src="{{=URL('static','js/jquery-1.11.1.min.js')}}"></script>
+  <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
+  <script src="{{=URL('static','js/jquery.validate.min.js')}}"></script>
+  <script src="{{=URL('static','js/messages_zh.min.js')}}"></script>
+  <script>
+    jQuery('#search_form').submit(
+    function() {
+       //ajax('{#{=URL("search_trade")}}',['input_mobil','user'], 'search_result');
+        //jQuery('#search_div').hide();
+        return false;
+    });
+    $(document).ready(function () {
+        $("#search_form").validate({
+            rules:{
+                begin_time:"required",
+                end_time:"required"
+            },
+            messages:{
+            }
+        });
+    });
+  </script>
+</body>
+</html>

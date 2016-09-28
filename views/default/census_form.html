@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="{{=URL('static','css/bootstrap.min.css')}}" rel="stylesheet">
+    <style>
+        table, th, td {border: 1px solid black; border-collapse: collapse;}
+        th, td {padding: 5px; text-align:center;}
+        th {background-color: rgba(0, 140, 205, 0.36);}
+    </style>
+    <script src="{{=URL('static','js/jquery-1.11.1.min.js')}}"></script>
+    <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
+    <script src="{{=URL('static','js/city_data_taotong.js')}}"></script>
+    <script src="{{=URL('static','js/city_taobao_select2.js')}}"></script>
+    <script src="{{=URL('static','js/jquery.validate.min.js')}}"></script>
+    <script src="{{=URL('static','js/messages_zh.min.js')}}"></script>
+</head>
+
+<body>
+<div>
+    <form method="post" id="dealerSelect" class="form-inline" role="form">
+        <div class="form-group" id="begintime_row">
+            开始时间:<input id="begintime" name="begin_time" type="date" ></br>
+            结束时间:<input id="endtime" name="end_time" type="date">
+        </div>
+        <span>&#8195</span>
+        <div class="form-group">
+            <input type="checkbox" name="express" value="中通上海">中通上海
+            <input type="checkbox" name="express" value="惠州申通">惠州申通<br>
+            <input type="checkbox" name="express" value="韵达">韵达
+            <input type="checkbox" name="express" value="国内邮政小包">国内邮政小包<br>
+            <label class="sr-only"></label>
+        </div>
+        <!--div class="form-group">
+            <label class="sr-only">请选择地区</label>
+            <select class="form-control" name="county"></select>
+        </div-->
+        <span>&#8195</span>
+        <div class="form-group">
+            <input type="submit" value="搜索" class="formButton" id="dealerSumbit" style="margin: auto;display: block">
+        </div>
+    </form>
+    <!--div>{#{=ret['result']}}</div-->
+</div>
+    <!--<div>-->
+        <!--<p class="minfo" style="width: auto">请选择你所在的省份或地区查询！</p>-->
+    <!--</div>-->
+
+<h2>派发数据各项目总报表:</h2>
+<table id="tbl1" style="width:100%">
+  <tr>
+    <th rowspan="6">源数据</th>
+    <th rowspan="2">品名shop_id</td>
+    {{for i in shop_ids:}}
+      <th>{{=i}}</th>
+    {{pass}}
+    <!--<th>ISA</th>
+    <th>BBT</th>
+    <th>广点通</th>
+    <th>帮宝适&微官</th-->
+    <th rowspan="2">Summary</th>
+    <th rowspan="2">Total</th>
+    <td rowspan="6" colspan="2">各项目汇总表</td>
+  </tr>
+  <tr>
+    <th colspan="{{=len(shop_ids)}}">Application</th>
+  </tr>
+  <tr>
+    <td>12NB</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt5['NB12_'+i])+int(cnt6['NB12_'+i])}}</td>
+    {{pass}}
+    <td>{{=s5[0]+s6[0]}}</td>
+    <td rowspan="4">{{=s5s+s6s}}</td>
+  </tr>
+  <tr>
+    <td>12S</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt5['S12_'+i])+int(cnt6['S12_'+i])}}</td>
+    {{pass}}
+    <td>{{=s5[1]+s6[1]}}</td>
+  </tr>
+  <tr>
+    <td>8NB</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt5['NB8_'+i])+int(cnt6['NB8_'+i])}}</td>
+    {{pass}}
+    <td>{{=s5[2]+s6[2]}}</td>
+  </tr>
+  <tr>
+    <td>8S</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt5['S8_'+i])+int(cnt6['S8_'+i])}}</td>
+    {{pass}}
+    <td>{{=s5[3]+s6[3]}}</td>
+  </tr>
+  <tr>
+    <th rowspan="5">合格</th>
+    <th colspan="{{=len(shop_ids)+1}}">Successful Application</th>
+    <th>Summary</th>
+    <th>Successful Summary</th>
+    <th>Successful App.rate%</th>
+    <th>rate</th>
+  </tr>
+  <tr>
+    <td>12NB</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt6['NB12_'+i])}}</td>
+    {{pass}}
+    <td>{{=s6[0]}}</td>
+    <td rowspan="4">{{=s6s}}</td>
+    <td>{{="%s%s"%(round((s6[0]+0.01)/s6s,3)*100,"%")}}</td>
+    <td rowspan="4">{{="%s%s"%(round((s6s+0.01)/(s6s+s5s)*100,3),"%")}}</td>
+  </tr>
+  <tr>
+    <td>12S</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt6['S12_'+i])}}</td>
+    {{pass}}
+    <td>{{=s6[1]}}</td>
+    <td>{{="%s%s"%(round((s6[1]+0.01)/s6s,3)*100,"%")}}</td>
+  </tr>
+  <tr>
+    <td>8NB</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt6['NB8_'+i])}}</td>
+    {{pass}}
+    <td>{{=s6[2]}}</td>
+    <td>{{="%s%s"%(round((s6[2]+0.01)/s6s,3)*100,"%")}}</td>
+  </tr>
+  <tr>
+    <td>8S</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt6['S8_'+i])}}</td>
+    {{pass}}
+    <td>{{=s6[3]}}</td>
+    <td>{{="%s%s"%(round((s6[3]+0.00001)/s6s,3)*100,"%")}}</td>
+  </tr>
+  <tr>
+    <th rowspan="5">不合格</th>
+    <th colspan="{{=len(shop_ids)+1}}">Unqualified Application</th>
+    <th>Summary</th>
+    <th>Unqualified Summary</th>
+    <th>Unqualified App.rate%</th>
+    <th>rate</th>
+  </tr>
+  <tr>
+    <td>12NB</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt5['NB12_'+i])}}</td>
+    {{pass}}
+    <!--td></td>
+    <td></td>
+    <td></td>
+    <td></td-->
+    <td>{{=s5[0]}}</td>
+    <td rowspan="4">{{=s5s}}</td>
+    <td>{{="%s%s"%(round((s5[0]+0.00001)/s5s,3)*100,'%')}}</td>
+    <td rowspan="4">{{="%s%s"%(round((s5s+0.00001)/(s6s+s5s),3)*100,'%')}}</td>
+  </tr>
+  <tr>
+    <td>12S</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt5['S12_'+i])}}</td>
+    {{pass}}
+    <!--td></td>
+    <td></td>
+    <td></td>
+    <td></td-->
+    <td>{{=s5[1]}}</td>
+    <td>{{="%s%s"%(round((s5[1]+0.00001)/s5s,3)*100,"%")}}</td>
+  </tr>
+  <tr>
+    <td>8NB</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt5['NB8_'+i])}}</td>
+    {{pass}}
+    <!--td></td>
+    <td></td>
+    <td></td>
+    <td></td-->
+    <td>{{=s5[2]}}</td>
+    <td>{{="%s%s"%(round((s5[2]+0.00001)/s5s,3)*100,"%")}}</td>
+  </tr>
+  <tr>
+    <td>8S</td>
+    {{for i in shop_ids:}}
+      <td>{{=int(cnt5['S8_'+i])}}</td>
+    {{pass}}
+    <!--td></td>
+    <td></td>
+    <td></td>
+    <td></td-->
+    <td>{{=s5[3]}}</td>
+    <td>{{="%s%s"%(round((s5[3]+0.01)/s5s,3)*100,"%")}}</td>
+  </tr>
+</table>
+<br/>
+
+<h2></h2>
+
+<br/>
+<table id="tbl2" style="width:100%">
+<tr>
+    <th rowspan="2">积分换礼</th>
+    <th colspan="2">源数据</th>
+    <th colspan="4">合格数据</th>
+    <th colspan="2">不合格数据</th>
+</tr>
+<tr>
+    <th>分</th>
+    <th>总</th>
+    <th>分</th>
+    <th>分-rate</th>
+    <th>总</th>
+    <th>总-rate</th>
+    <th>分</th>
+    <th>总</th>
+</tr>
+<tr>
+    <td>Toy(玩具)</td>
+    <td></td>
+    <td rowspan="3"></td>
+    <td></td>
+    <td></td>
+    <td rowspan="3" ></td>
+    <td rowspan="3"></td>
+    <td></td>
+    <td rowspan="3"></td>
+</tr>
+<tr>
+    <td>Trial pack(试用装)</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+<tr>
+    <td>Normal(正装)</td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+
+</table>
+</body>
+</html>
+
+<!--
+
+  <tr>
+    <th rowspan="2">Telephone:</th>
+    <td>55577854</td>
+  </tr>
+  <tr>
+    <td>55577855</td>
+  </tr>
+
+  <tr>
+    <th>Name</th>
+    <th colspan="2">Telephone</th>
+  </tr>
+  <tr>
+    <td></td>
+    <td>55577854</td>
+    <td>55577855</td>
+  </tr>
+-->

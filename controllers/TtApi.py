@@ -1,5 +1,5 @@
 __author__ = 'Administrator'
-from simhash import Simhash,SimhashIndex
+#from simhash import Simhash,SimhashIndex
 import xml.etree.ElementTree as XML_ET
 import os
 import sys
@@ -121,7 +121,7 @@ def EdbAPI(**arg):
         return __EdbAPI
     return _EdbAPI
 
-@EdbAPI(method="edbTradeAdd")
+#@EdbAPI(method="edbTradeAdd")
 def AddTrade(data):
     orderTag=('out_tid','shop_id','storage_id','buyer_id','buyer_msg','buyer_email','buyer_alipay','seller_remark','consignee','address','postcode','telephone','mobilPhone','privince','city','area','actual_freight_get','actual_RP','ship_method','express','is_invoiceOpened','invoice_type','invoice_money','invoice_title','invoice_msg','order_type','process_status','pay_status','deliver_status','is_COD','serverCost_COD','order_totalMoney','product_totalMoney','pay_method','pay_commission','pay_score','return_score','favorable_money','alipay_transaction_no','out_payNo','out_express_method','out_order_status','order_date','pay_date','finish_date','plat_type','distributor_no','WuLiu','WuLiu_no','in_memo','other_remark','actual_freight_pay','ship_date_plan','deliver_date_plan','is_scorePay','is_needInvoice')
     productTag=('barCode','product_title','standard','out_price','favorite_money','orderGoods_Num','gift_Num','cost_Price','tid','product_stockout','is_Book','is_presell','is_Gift','avg_price','product_freight','shop_id','out_tid','out_productId','out_barCode','product_intro')
@@ -139,6 +139,7 @@ def AddTrade(data):
     orderInfo.append(productXml)
     finalStr=XML_ET.tostring(orderXml,"utf8")
     result={}
+    print finalStr
     result["xmlValues"]=finalStr[37:]
     return result
 
@@ -202,7 +203,6 @@ def AddTradeToEdb():
         return jsonObj
     return locals()
 
-
 @request.restful()
 def GetEdbOrderInfo():
     WuLiu_dict={}
@@ -240,28 +240,28 @@ def GetEdbOrderInfo():
                     if result['result']=='true':
                         content['isSuccess']=True
                         content['errorCode']=1
-                        content['errorMsg']='´¦Àí³É¹¦'
+                        content['errorMsg']='ï¿½ï¿½ï¿½ï¿½É¹ï¿½'
                     else:
                         if result['error']=='1032':
                             content['isSuccess']=True
                             content['errorCode']=1
-                            content['errorMsg']='´¦Àí³É¹¦'
+                            content['errorMsg']='ï¿½ï¿½ï¿½ï¿½É¹ï¿½'
                         else:
                             content['isSuccess']=False
                             content['errorCode']=2
-                            content['errorMsg']='¶©µ¥²»´æÔÚ'
+                            content['errorMsg']='ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'
                 else:
                     content['isSuccess']=False
                     content['errorCode']=5
-                    content['errorMsg']='ÎïÁ÷¹«Ë¾²»´æÔÚ'
+                    content['errorMsg']='ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½'
             else:
                 content['isSuccess']=False
                 content['errorCode']=2
-                content['errorMsg']='¶©µ¥ºÅ²»´æÔÚ'
+                content['errorMsg']='ï¿½ï¿½ï¿½ï¿½ï¿½Å²ï¿½ï¿½ï¿½ï¿½ï¿½'
         else:
             content['isSuccess']=False
             content['errorCode']=9
-            content['wrong_reason']='¶©µ¥ºÅ¸ñÊ½´íÎó'
+            content['wrong_reason']='ï¿½ï¿½ï¿½ï¿½ï¿½Å¸ï¿½Ê½ï¿½ï¿½ï¿½ï¿½'
         return content
     return locals()
 
@@ -301,3 +301,127 @@ def TradeDelete():
     def DELETE(table_name,record_id):
         return db(db[table_name].order_id==record_id).delete()
     return locals()
+
+if __name__=="__main__":
+    data0={
+    "actual_freight_get": "1",
+    "actual_freight_pay": "1",
+    "actual_RP": "1",
+    "address": "\\u0038\\u0063",
+    "alipay_transaction_no": "1",
+    "apiKey": "A6BEA59B",
+    "area": "\\u9759\\u5B89\\u533A",
+    "buyer_alipay": "1",
+    "buyer_email": "398282040@qq.com",
+    "buyer_id": "1",
+    "buyer_msg": "",
+    "city": "\\u4E0A\\u6D77\\u5E02",
+    "consignee": "\\u007A\\u006B",
+    "deliver_date_plan": "1",
+    "deliver_status": "1",
+    "distributor_no": "1",
+    "express": "1",
+    "favorable_money": "1",
+    "finish_date": "2016-07-2110:57:31",
+    "in_memo": "1",
+    "invoice_money": "1",
+    "invoice_msg": "1",
+    "invoice_title": "1",
+    "invoice_type": "1",
+    "is_COD": "1",
+    "is_invoiceOpened": "1",
+    "is_needInvoice": "1",
+    "is_scorePay": "1",
+    "mobilPhone": "13524291340",
+    "order_date": "2016-07-2110:57:31",
+    "order_totalMoney": "1",
+    "order_type": "1",
+    "other_remark": "1111111",
+    "out_express_method": "1",
+    "out_order_status": "1",
+    "out_payNo": "1",
+    "out_tid": "bsg32",
+    "pay_commission": "1",
+    "pay_date": "2016-07-2110:57:31",
+    "pay_method": "1",
+    "pay_score": "1",
+    "pay_status": "1",
+    "plat_type": "1",
+    "postcode": "201203",
+    "process_status": "1",
+    "product_info": [{
+            "avg_price": "",
+            "barCode": "1",
+            "cost_Price": "2.00",
+            "favorite_money": "2.00",
+            "gift_Num": "0",
+            "is_Book": "0",
+            "is_Gift": "0",
+            "is_presell": "0",
+            "orderGoods_Num": "1",
+            "out__tid": "bsg32",
+            "out_barCode": "1",
+            "out_price": "2.00",
+            "out_productId": "1",
+            "product_freight": "0.00",
+            "product_intro": "testproductintro",
+            "product_stockout": "0",
+            "product_title": "\\u6842\\u683C\\u9187\\u9999\\u0035\\u0034\\u0030\\u0067\\u002A\\u0033\\uFF08\\u725B\\u5976\\u9AD8\\u9499\\u002B\\u7EA2\\u67A3\\u9AD8\\u94C1\\u002B\\u7D2B\\u85AF\\u9AD8\\u7EA4\\uFF09",
+            "shop__id": "125",
+            "standard": "\\u6842\\u683C\\u9187\\u9999\\u0035\\u0034\\u0030\\u0067\\u002A\\u0033\\uFF08\\u725B\\u5976\\u9AD8\\u9499\\u002B\\u7EA2\\u67A3\\u9AD8\\u94C1\\u002B\\u7D2B\\u85AF\\u9AD8\\u7EA4\\uFF09",
+            "t_id": "B16072110573189"
+        }, {
+            "avg_price": "",
+            "barCode": "5",
+            "cost_Price": "2.00",
+            "favorite_money": "2.00",
+            "gift_Num": "0",
+            "is_Book": "0",
+            "is_Gift": "0",
+            "is_presell": "0",
+            "orderGoods_Num": "1",
+            "out__tid": "bsg32",
+            "out_barCode": "5",
+            "out_price": "2.00",
+            "out_productId": "5",
+            "product_freight": "0.00",
+            "product_intro": "testproductintro",
+            "product_stockout": "0",
+            "product_title": "\\u6842\\u683C\\u9AD8\\u7EA4\\u71D5\\u9EA6\\u4E73\\u0032\\u0035\\u0030\\u006D\\u006C\\u002A\\u0036\\u002A\\u0033\\uFF08\\u9999\\u8549\\u002B\\u539F\\u5473\\u002B\\u699B\\u679C\\uFF09",
+            "shop__id": "125",
+            "standard": "\\u6842\\u683C\\u9AD8\\u7EA4\\u71D5\\u9EA6\\u4E73\\u0032\\u0035\\u0030\\u006D\\u006C\\u002A\\u0036\\u002A\\u0033\\uFF08\\u9999\\u8549\\u002B\\u539F\\u5473\\u002B\\u699B\\u679C\\uFF09",
+            "t_id": "B16072110573189"
+        }],
+    "product_totalMoney": "1",
+    "province": "\\u4E0A\\u6D77",
+    "return_score": "1",
+    "seller_remark": "11111",
+    "serverCost_COD": "1",
+    "ship_date_plan": "1",
+    "ship_method": "1",
+    "shop_id": "125",
+    "sig": "",
+    "storage_id": "24",
+    "telephone": "1",
+    "tid": "1",
+    "timestamp": 1468477769,
+    "WuLiu": "1",
+    "WuLiu_no": "1"}
+    AddTrade(data0)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

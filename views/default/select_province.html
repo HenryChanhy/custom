@@ -1,0 +1,101 @@
+{{include 'web2py_ajax.html'}}
+
+<table>
+  <tr>
+    <td>
+    {{if which_day<7:}}
+    {{=A('\xe5\x89\x8d\xe4\xb8\x80\xe5\xa4\xa9',_href=URL('test_display_form',vars=dict(which_day=which_day+1)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    {{else:}}
+    {{=A('\xe5\x89\x8d\xe4\xb8\x80\xe5\xa4\xa9',_href="#0",_style='height:25px;width:95px;text-decoration:none;color: #66afe9;')}}
+    {{pass}}
+    </td>
+    <td style="font-family:Book Antiqua;color: #66afe9;">{{=select_day}}</td>
+    <td>
+    {{if which_day>1:}}
+    {{=A('\xe5\x90\x8e\xe4\xb8\x80\xe5\xa4\xa9',_href=URL('test_display_form',vars=dict(which_day=which_day-1)),_style='height:25px;width:95px;text-decoration:none;font-weight:bold;color: #66afe9;')}}
+    {{else:}}
+    {{=A('\xe5\x90\x8e\xe4\xb8\x80\xe5\xa4\xa9',_href="#0",_style='height:25px;width:95px;text-decoration:none;color:#66afe9;')}}
+    {{pass}}
+    </td>
+  </tr>
+</table>
+
+  <form>
+    <table cellpadding="0" cellspacing="0"  border="1" rules="rows">
+    <tr>
+    {{k=0}}
+    {{for i in prov_key:}}
+      <td>
+      {{if i in prov_set:}}
+        <input type="checkbox" name="provice" value="{{=i}}" disabled="disabled"/>
+          <span style="color: #959595">{{=prov_dict[i]}}</span>
+          <div align="center" style="color: #959595">{{=prov_cnt[i]}}</div>
+      {{else:}}
+        <input type="checkbox" name="provice" value="{{=i}}"/>
+          <span style="color:#0000ff">{{=prov_dict[i]}}</span>
+          <div align="center" style="color:#0000ff">{{=prov_cnt[i]}}</div>
+      {{pass}}
+      </td>
+      {{k=k+1}}
+      {{if k==4:}}
+        </tr><tr>
+        {{k=0}}
+      {{pass}}
+    {{pass}}
+    <td></td>
+    </tr>
+    </table>
+      <input type="submit" value="Submit"/>
+  </form>
+
+{{for i in range(1,100):}}
+    <br/>
+{{pass}}
+
+<div>
+<form enctype="multipart/form-data" action="{{=URL(r=request)}}" method="post">
+    <input type="submit" name="refresh" value="kik" style="border: none;background: none;color:#D3D3D3;"/>
+</form>
+</div>
+
+
+<!--
+<button onclick="ajax('{=URL('refresh')}}', [], ':eval')" style="border: none;background: none;color:#737373;">
+      kik
+  </button>
+provincesf=(u'北京',u'上海',u'天津',u'重庆',u'香港',u'澳门',u'河北省',u'山西省',u'辽宁省',u'吉林省',u'黑龙江省',u'江苏省',
+    u'浙江省',u'安徽省',u'福建省',u'江西省',u'山东省',u'河南省',u'湖北省',u'湖南省',u'广东省',u'广西壮族自治区',
+    u'海南省',u'四川省',u'贵州省',u'云南省',u'西藏自治区',u'陕西省',u'甘肃省',u'青海省',u'宁夏回族自治区',u"新疆维吾尔自治区",u'内蒙古自治区')
+    <input type="checkbox" name="provice" value="北京" />='\xe5\x8c\x97\xe4\xba\xac'}}
+    <input type="checkbox" name="provice" value="上海" />='\xe4\xb8\x8a\xe6\xb5\xb7'}}
+    <input type="checkbox" name="provice" value="天津" />='\xe5\xa4\xa9\xe6\xb4\xa5'}}
+    <input type="checkbox" name="provice" value="重庆" />='\xe9\x87\x8d\xe5\xba\x86'}}<br />
+    <input type="checkbox" name="provice" value="河北" />='\xe6\xb2\xb3\xe5\x8c\x97'}}
+    <input type="checkbox" name="provice" value="山西" />='\xe5\xb1\xb1\xe8\xa5\xbf'}}
+    <input type="checkbox" name="provice" value="辽宁" />='\xe8\xbe\xbd\xe5\xae\x81'}}
+    <input type="checkbox" name="provice" value="吉林" />='\xe5\x90\x89\xe6\x9e\x97'}}<br />
+    <input type="checkbox" name="provice" value="江苏" />='\xe6\xb1\x9f\xe8\x8b\x8f'}}
+    <input type="checkbox" name="provice" value="浙江" />='\xe6\xb5\x99\xe6\xb1\x9f'}}
+    <input type="checkbox" name="provice" value="安徽" />='\xe5\xae\x89\xe5\xbe\xbd'}}
+    <input type="checkbox" name="provice" value="福建" />='\xe7\xa6\x8f\xe5\xbb\xba'}}<br />
+    <input type="checkbox" name="provice" value="江西" />='\xe6\xb1\x9f\xe8\xa5\xbf'}}
+    <input type="checkbox" name="provice" value="山东" />='\xe5\xb1\xb1\xe4\xb8\x9c'}}
+    <input type="checkbox" name="provice" value="河南" />='\xe6\xb2\xb3\xe5\x8d\x97'}}
+    <input type="checkbox" name="provice" value="湖北" />='\xe6\xb9\x96\xe5\x8c\x97'}}<br />
+    <input type="checkbox" name="provice" value="湖南" />='\xe6\xb9\x96\xe5\x8d\x97'}}
+    <input type="checkbox" name="provice" value="广东" />='\xe5\xb9\xbf\xe4\xb8\x9c'}}
+    <input type="checkbox" name="provice" value="广西" />='\xe5\xb9\xbf\xe8\xa5\xbf'}}
+    <input type="checkbox" name="provice" value="海南" />='\xe6\xb5\xb7\xe5\x8d\x97'}}<br />
+    <input type="checkbox" name="provice" value="四川" />='\xe5\x9b\x9b\xe5\xb7\x9d'}}
+    <input type="checkbox" name="provice" value="贵州" />='\xe8\xb4\xb5\xe5\xb7\x9e'}}
+    <input type="checkbox" name="provice" value="云南" />='\xe4\xba\x91\xe5\x8d\x97'}}
+    <input type="checkbox" name="provice" value="西藏" />='\xe8\xa5\xbf\xe8\x97\x8f'}}<br />
+    <input type="checkbox" name="provice" value="陕西" />='\xe9\x99\x95\xe8\xa5\xbf'}}
+    <input type="checkbox" name="provice" value="甘肃" />='\xe7\x94\x98\xe8\x82\x83'}}
+    <input type="checkbox" name="provice" value="青海" />='\xe9\x9d\x92\xe6\xb5\xb7'}}
+    <input type="checkbox" name="provice" value="宁夏" />='\xe5\xae\x81\xe5\xa4\x8f'}}<br />
+    <input type="checkbox" name="provice" value="新疆" />='\xe6\x96\xb0\xe7\x96\x86'}}
+    <input type="checkbox" name="provice" value="黑龙江" />='\xe9\xbb\x91\xe9\xbe\x99\xe6\xb1\x9f'}}
+    <input type="checkbox" name="provice" value="内蒙古" />='\xe5\x86\x85\xe8\x92\x99\xe5\x8f\xa4'}}<br />
+    <input type="submit" value="Submit"/>
+-->

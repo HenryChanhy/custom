@@ -1,4 +1,3 @@
-
 {{include 'web2py_ajax.html'}}
 <body>
   <script src="{{=URL('static','js/jquery-1.11.0.min.js')}}"></script>
@@ -38,7 +37,8 @@
   <script>
     jQuery('#search_form').submit(
     function() {
-       ajax('{{=URL("search_trade")}}',['input_mobil','user'], 'search_result');return false;
+       ajax('{{=URL("search_trade")}}',['input_mobil','user'], 'search_result');
+       return false;
     });
   </script>
 </body>

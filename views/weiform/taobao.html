@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><奇多>GOGOGO</奇多></title>
+    <!-- Bootstrap -->
+    <link href="{{=URL('static','css/bootstrap.min.css')}}" rel="stylesheet">
+
+    <style>
+        h3{
+            color: #bae3fe;
+            font-weight:bold
+        }
+
+        .minfo {
+            padding: 8px;
+            border: solid 1px #28a4c9;
+            margin-top: 24px;
+            width: 360px;
+        }
+        .error{
+            color:red;
+        }
+    </style>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="{{=URL('static','js/jquery-1.11.1.min.js')}}"></script>
+    <script src="{{=URL('static','js/bootstrap.min.js')}}"></script>
+    <script src="{{=URL('static','js/city_data_taotong.js')}}"></script>
+    <script src="{{=URL('static','js/city_taobao_select2.js')}}"></script>
+    <script src="{{=URL('static','js/jquery.validate.min.js')}}"></script>
+    <script src="{{=URL('static','js/messages_zh.min.js')}}"></script>
+</head>
+
+<body background="{{=URL('static','cloud.jpg')}}">
+<div id="qiduoForm" class="container cmxform" style="padding:10px;">
+    <h3>奇多GOGOGO</h3>
+    <p style="color: #bae3fe">参与方式：在留言区写下感言并点击提交后，即可获得我们寄出的<p style="color: #eb9316;font-weight:bold">奇多小礼包！！！</p>
+    <div >
+        <form id="dealerSelect" class="form-horizontal" role="form">
+            <div class="form-group col-sm-10">
+                <textarea class="form-control" name="leave_msg" placeholder="分享一些你和奇多的趣事或者回忆" style="width: 100%;height: 100px"></textarea>
+            </div>
+            <!--<br>-->
+            <div class="form-group">
+                <label class="sr-only">真实姓名：</label>
+                <div class="col-sm-10">
+                    <input class="form-control" type="text" name="name" placeholder="请输入您的姓名">
+                </div>
+            </div>
+            <!--<br>-->
+            <div class="form-group">
+                <label class="sr-only">联系电话：</label>
+                <div class="col-sm-10">
+                    <input class="form-control " type="text" name="phonecall" placeholder="请输入您的手机号码">
+                </div>
+
+            </div>
+            <p style="font-weight:bold">收货地址：</p>
+            <div class="form-group col-sm-10" >
+                <!--<label class="sr-only">请选择省份</label>-->
+                <select class="form-control" name="province"></select>
+            </div>
+            <div class="form-group col-sm-10">
+                <!--<label class="sr-only">请选择城市</label>-->
+                <select class="form-control" name="city"></select>
+            </div>
+            <div class="form-group col-sm-10">
+                <!--<label class="sr-only">请选择地区</label>-->
+                <select class="form-control" name="county"></select>
+            </div>
+            <div class="form-group col-sm-10" >
+                <label>补充地址：</label>
+                <input class="form-control" type="text" name="address" placeholder="请输入小区、楼号-门牌号">
+                <p style="color: #c12e2a">注：关注公众号可留言查询快递单号。</p>
+                <input type="submit" value="提交资料" class="formButton" id="dealerSumbit" style="margin: auto;display: block">
+            </div>
+        </form>
+
+    </div>
+    <!--div>{#{=ret}}</div-->
+</div>
+<script>
+    $(document).ready(function () {
+        ewenx.CitySelect().init("#dealerSelect");
+        function a() {
+            $("input[name='address']").val($("select[name='province'] option:selected").text()+$("select[name='city'] option:selected").text()+$("select[name='county'] option:selected").text());
+        }
+        a();
+        $("select[name='province']").change(function () {
+            a()
+        });
+        $("select[name='city']").change(function () {
+            a()
+        });
+        $("select[name='county']").change(function () {
+            a()
+        });
+
+        $("#dealerSelect").validate({
+            rules:{
+                name:"required",
+                phonecall:{
+                    required:true,
+                    minlength:11
+                },
+                province:"required",
+                city:"required",
+                leave_msg:{
+                    required:true,
+                    minlength:15
+                },
+                address :{
+                    required:true,
+                    minlength:8
+                }
+            },
+            messages:{
+                name:"请输入您的名字",
+                phonecall:{
+                    required:"请输入电话号码",
+                    minlength:"电话号码必须由11个数字组成"
+                },
+                province:"请选择省",
+                city:"请选择市",
+                leave_msg:{
+                    required:"请输入留言",
+                    minlength:"留言不少于15个汉字"
+                },
+                address :{
+                    required:"请填写详细地址",
+                    minlength:"不少于8个汉字"
+                }
+            }
+        });
+    });
+
+</script>
+</body>
+</html>

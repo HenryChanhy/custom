@@ -40,20 +40,25 @@
         var x=currentCell.previousElementSibling.innerHTML;
 
         if(currentCell.className=="addr"){
-        input.value=currentCell.innerHTML;//用单元格的值来填充文本框的值
-        input.style.width=currentCell.offsetWidth;
-        //input.onblur=last;//当文本框丢失焦点时调用last
-        //input.ondblclick=last;
-        input.onkeypress=function (event){
-            if(event.keyCode=="13"){
-            ajax('EditTableAjax',[x],'target');
-            last();
-            }
-        };
-        currentCell.innerHTML="";
-        //把文本框加到当前单元格上.
-        currentCell.appendChild(input);
-        input.focus();
+            var value_bkp=currentCell.innerHTML;
+            input.value=currentCell.innerHTML;//用单元格的值来填充文本框的值
+            input.style.width=currentCell.offsetWidth;
+            //input.onblur=last;//当文本框丢失焦点时调用last
+            //input.ondblclick=last;
+            input.onkeypress=function (event){
+                if(event.keyCode=="13"){
+                    ajax('EditTableAjax',[x],'target');
+                    last();
+                }
+                if(event.keyCode=="9"){
+                    //ajax('EditTableAjax',[x],'target');
+                    currentCell.innerHTML = value_bkp;
+                }
+            };
+            currentCell.innerHTML="";
+            //把文本框加到当前单元格上.
+            currentCell.appendChild(input);
+            input.focus();
         }
     }
     function last(){
